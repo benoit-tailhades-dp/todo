@@ -3,6 +3,9 @@ import { cn } from "@/presentation/lib/utils";
 import { Checkbox } from "@/presentation/ui/checkbox";
 import type { JourDeTodos, TodoAffiche } from "@/service/registre";
 
+/** « barre » : le trait d'encre passe sur le titre ; « sortie » : la ligne se replie. */
+export type Phase = "barre" | "sortie";
+
 /** L'encre monte avec l'âge : un jour qui traîne se repère d'un coup d'œil. */
 function teinteAge(jours: number): string {
   if (jours >= 4) return "bg-primary text-primary-foreground";
@@ -33,14 +36,17 @@ function CelluleEnTete({
   );
 }
 
-/** Le registre : les TODO, un bloc par jour d'ajout, dans l'ordre donné par le service. */
+/** Le registre : les TODO en cours, un bloc par jour d'ajout, dans l'ordre donné par le service. */
 export function Registre({
   jours,
+  phases,
   enAttente,
   dernierAjoutId,
   onTerminer,
 }: {
   jours: JourDeTodos[];
+  /** TODO cochés dont la chorégraphie est en cours. */
+  phases: Readonly<Record<string, Phase>>;
   /** TODO affichés avant la réponse du serveur. */
   enAttente: ReadonlySet<string>;
   /** Le dernier TODO enregistré, surligné quelques secondes. */
@@ -80,6 +86,7 @@ export function Registre({
                 <LigneTodo
                   key={todo.id}
                   todo={todo}
+                  phase={phases[todo.id]}
                   enAttente={enAttente.has(todo.id)}
                   nouveau={todo.id === dernierAjoutId}
                   onTerminer={onTerminer}
@@ -95,55 +102,61 @@ export function Registre({
 
 function LigneTodo({
   todo,
+  phase,
   enAttente,
   nouveau,
   onTerminer,
 }: {
   todo: TodoAffiche;
+  phase: Phase | undefined;
   enAttente: boolean;
   nouveau: boolean;
   onTerminer: (id: string) => void;
 }) {
+  const coche = todo.termine || phase !== undefined;
   return (
-    <li data-todo-id={todo.id} className="border-t border-border first:border-t-0">
-      {enAttente ? (
-        <div className="flex min-h-[46px] items-center gap-3.5 px-3.5 py-2.5 text-muted-foreground">
-          <LoaderCircle className="size-5 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden />
-          <span data-titre="" className="min-w-0 flex-1 break-words">
-            {todo.titre}
-          </span>
-          <span className="shrink-0 text-xs font-medium">Enregistrement…</span>
-        </div>
-      ) : (
-        <label
-          className={cn(
-            "flex min-h-[46px] items-center gap-3.5 px-3.5 py-2.5",
-            !todo.termine && "cursor-pointer transition-colors duration-150 hover:bg-accent/60",
-          )}
-        >
-          {/* Pas de « décocher » : la case d'un TODO terminé est en lecture seule. */}
-          <Checkbox
-            data-case-todo=""
-            checked={todo.termine}
-            readOnly={todo.termine}
-            onCheckedChange={(coche) => {
-              if (coche && !todo.termine) onTerminer(todo.id);
-            }}
-          />
-          <span className="min-w-0 flex-1 break-words">
-            <span className={cn(nouveau && "surligne")}>
-              <span data-titre="" className="trait-encre" data-barre={todo.termine}>
-                {todo.titre}
+    <li
+      data-todo-id={todo.id}
+      className={cn(
+        "grid border-t border-border transition-[grid-template-rows,opacity] duration-200 ease-trait first:border-t-0 motion-reduce:transition-none",
+        phase === "sortie" ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr]",
+      )}
+    >
+      <div className="min-h-0 overflow-hidden">
+        {enAttente ? (
+          <div className="flex min-h-[46px] items-center gap-3.5 px-3.5 py-2.5 text-muted-foreground">
+            <LoaderCircle className="size-5 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden />
+            <span data-titre="" className="min-w-0 flex-1 break-words">
+              {todo.titre}
+            </span>
+            <span className="shrink-0 text-xs font-medium">Enregistrement…</span>
+          </div>
+        ) : (
+          <label className="flex min-h-[46px] cursor-pointer items-center gap-3.5 px-3.5 py-2.5 transition-colors duration-150 hover:bg-accent/60">
+            {/* Pas de « décocher » : une fois cochée, la case ne réagit plus. */}
+            <Checkbox
+              data-case-todo=""
+              checked={coche}
+              readOnly={coche}
+              onCheckedChange={(valeur) => {
+                if (valeur && !coche) onTerminer(todo.id);
+              }}
+            />
+            <span className="min-w-0 flex-1 break-words">
+              <span className={cn(nouveau && "surligne")}>
+                <span data-titre="" className="trait-encre" data-barre={coche}>
+                  {todo.titre}
+                </span>
               </span>
             </span>
-          </span>
-          {nouveau ? (
-            <span className="shrink-0 animate-apparait text-xs font-medium text-muted-foreground">
-              à l&apos;instant
-            </span>
-          ) : null}
-        </label>
-      )}
+            {nouveau ? (
+              <span className="shrink-0 animate-apparait text-xs font-medium text-muted-foreground">
+                à l&apos;instant
+              </span>
+            ) : null}
+          </label>
+        )}
+      </div>
     </li>
   );
 }

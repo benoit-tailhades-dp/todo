@@ -1,5 +1,12 @@
 import { Skeleton } from "@/presentation/ui/skeleton";
 import { Bandeau } from "./bandeau";
+import { CellulesCartouche } from "./cellules-cartouche";
+
+const CELLULES = [
+  { libelle: "En cours", valeur: "", enAvant: true },
+  { libelle: "Terminés", valeur: "" },
+  { libelle: "Le plus ancien", valeur: "" },
+];
 
 const LARGEURS = [["w-3/5", "w-4/5", "w-2/5"], ["w-1/2", "w-3/4"]];
 
@@ -10,7 +17,10 @@ export function ChargementListe() {
       <p className="sr-only" role="status">
         Chargement de ta liste…
       </p>
-      <Bandeau date={<Skeleton className="mt-0.5 h-3.5 w-36 bg-shell-foreground/20" />}>
+      <Bandeau
+        date={<Skeleton className="mt-0.5 h-3.5 w-36 bg-shell-foreground/20" />}
+        cellules={<CellulesCartouche cellules={CELLULES} chargement />}
+      >
         <Skeleton className="h-11 w-full rounded-lg bg-shell-foreground/20" />
         <Skeleton className="mt-3.5 h-3 w-28 bg-shell-foreground/15" />
       </Bandeau>
@@ -27,6 +37,7 @@ export function ChargementListe() {
                   key={largeur}
                   className="flex min-h-[46px] items-center gap-3.5 border-t border-border px-3.5 first:border-t-0"
                 >
+                  <Skeleton className="size-5 shrink-0" />
                   <Skeleton className={`h-3.5 ${largeur}`} />
                 </div>
               ))}

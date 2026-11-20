@@ -27,17 +27,35 @@ export type JourDeTodos = {
   todos: TodoAffiche[];
 };
 
+export type Compteurs = {
+  enCours: number;
+  termines: number;
+  /** Âge en jours du plus ancien TODO en cours, `null` s'il n'y en a pas. */
+  plusAncien: number | null;
+};
+
+/** « vide » : aucun TODO ; « tout-termine » : que des TODO terminés ; « liste » : au moins un en cours. */
+export type EtatRegistre = "vide" | "tout-termine" | "liste";
+
 export type Registre = {
   /** « Vendredi 20 novembre ». */
   dateDuJour: string;
-  /** Du plus ancien au plus récent. */
+  /** Les TODO en cours, par jour d'ajout, du plus ancien au plus récent. */
   jours: JourDeTodos[];
+  /** Les TODO terminés, du plus ancien au plus récent. */
+  termines: TodoAffiche[];
+  compteurs: Compteurs;
+  etat: EtatRegistre;
 };
 
+function affiche(todo: Todo): TodoAffiche {
+  return { id: todo.id, titre: todo.titre, termine: todo.termine };
+}
+
+/** `todos` déjà triés du plus ancien au plus récent. */
 function grouperParJour(todos: Todo[], maintenant: number): JourDeTodos[] {
-  const tries = todos.toSorted((a, b) => a.creeLe - b.creeLe);
   const jours: JourDeTodos[] = [];
-  for (const todo of tries) {
+  for (const todo of todos) {
     const cle = cleJour(todo.creeLe);
     let jour = jours.at(-1);
     if (jour?.cle !== cle) {
@@ -51,13 +69,35 @@ function grouperParJour(todos: Todo[], maintenant: number): JourDeTodos[] {
       };
       jours.push(jour);
     }
-    jour.todos.push({ id: todo.id, titre: todo.titre, termine: todo.termine });
+    jour.todos.push(affiche(todo));
     jour.nombre = jour.todos.length;
   }
   return jours;
 }
 
-/** Le registre du jour : les TODO rangés par jour d'ajout, du plus ancien au plus récent. */
+function etatDu(enCours: number, termines: number): EtatRegistre {
+  if (enCours > 0) return "liste";
+  return termines > 0 ? "tout-termine" : "vide";
+}
+
+/**
+ * Le registre du jour : les TODO en cours rangés par jour d'ajout, puis les terminés à part,
+ * tous du plus ancien au plus récent, avec les compteurs du cartouche.
+ */
 export function composerRegistre(todos: Todo[], maintenant: number): Registre {
-  return { dateDuJour: dateLongue(maintenant), jours: grouperParJour(todos, maintenant) };
+  const tries = todos.toSorted((a, b) => a.creeLe - b.creeLe);
+  const enCours = tries.filter((todo) => !todo.termine);
+  const termines = tries.filter((todo) => todo.termine);
+  const plusAncien = enCours.at(0);
+  return {
+    dateDuJour: dateLongue(maintenant),
+    jours: grouperParJour(enCours, maintenant),
+    termines: termines.map(affiche),
+    compteurs: {
+      enCours: enCours.length,
+      termines: termines.length,
+      plusAncien: plusAncien ? ecartJours(plusAncien.creeLe, maintenant) : null,
+    },
+    etat: etatDu(enCours.length, termines.length),
+  };
 }

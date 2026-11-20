@@ -8,6 +8,10 @@ function todo(id: string, titre: string, creeLe: number): Todo {
   return { id, titre, creeLe, termine: false };
 }
 
+function termine(id: string, titre: string, creeLe: number): Todo {
+  return { id, titre, creeLe, termine: true };
+}
+
 describe("composerRegistre", () => {
   it("base sans TODO : aucun jour à afficher", () => {
     expect(composerRegistre([], VENDREDI_20_MIDI).jours).toEqual([]);
@@ -87,12 +91,103 @@ describe("composerRegistre", () => {
     expect(dernier?.todos.at(-1)).toEqual({ id: "nouveau", titre: "Préparer l'ordre du jour", termine: false });
   });
 
-  it("un TODO terminé est affiché comme terminé", () => {
-    const { jours } = composerRegistre(
-      [{ ...todo("a", "Relancer le devis", Date.UTC(2026, 10, 20, 8, 0)), termine: true }],
+  it("2 en cours et 1 terminé : les jours ne gardent que les en cours, le terminé va dans les terminés", () => {
+    const registre = composerRegistre(
+      [
+        todo("a", "Relancer le devis", Date.UTC(2026, 10, 16, 9, 0)),
+        termine("b", "Relire le contrat de maintenance", Date.UTC(2026, 10, 16, 15, 0)),
+        todo("c", "Sauvegarder la base de recette", Date.UTC(2026, 10, 20, 8, 0)),
+      ],
       VENDREDI_20_MIDI,
     );
 
-    expect(jours[0].todos).toEqual([{ id: "a", titre: "Relancer le devis", termine: true }]);
+    expect(registre.jours.map(({ titre, nombre, todos }) => ({ titre, nombre, ids: todos.map((t) => t.id) }))).toEqual([
+      { titre: "Lundi 16 novembre", nombre: 1, ids: ["a"] },
+      { titre: "Aujourd'hui", nombre: 1, ids: ["c"] },
+    ]);
+    expect(registre.termines).toEqual([{ id: "b", titre: "Relire le contrat de maintenance", termine: true }]);
+    expect(registre.compteurs).toEqual({ enCours: 2, termines: 1, plusAncien: 4 });
+    expect(registre.etat).toBe("liste");
+  });
+
+  it("un TODO coché passe dans les terminés et le compteur des en cours baisse de 1", () => {
+    const avant = [
+      todo("a", "Relancer le devis", Date.UTC(2026, 10, 16, 9, 0)),
+      todo("c", "Sauvegarder la base de recette", Date.UTC(2026, 10, 20, 8, 0)),
+      termine("b", "Relire le contrat de maintenance", Date.UTC(2026, 10, 16, 15, 0)),
+    ];
+    const apres = avant.map((t) => (t.id === "c" ? { ...t, termine: true } : t));
+
+    const { compteurs: compteursAvant } = composerRegistre(avant, VENDREDI_20_MIDI);
+    const { compteurs, termines } = composerRegistre(apres, VENDREDI_20_MIDI);
+
+    expect(compteurs.enCours).toBe(compteursAvant.enCours - 1);
+    expect(compteurs.termines).toBe(compteursAvant.termines + 1);
+    expect(termines.map((t) => t.id)).toContain("c");
+  });
+
+  it("le seul TODO en cours d'un jour terminé : l'en-tête de ce jour disparaît", () => {
+    const { jours } = composerRegistre(
+      [
+        todo("a", "Relancer le devis", Date.UTC(2026, 10, 16, 9, 0)),
+        termine("c", "Sauvegarder la base de recette", Date.UTC(2026, 10, 20, 8, 0)),
+      ],
+      VENDREDI_20_MIDI,
+    );
+
+    expect(jours.map((j) => j.titre)).toEqual(["Lundi 16 novembre"]);
+  });
+
+  it("tous les TODO terminés : état « tout terminé », aucun jour, plus ancien inconnu", () => {
+    const registre = composerRegistre(
+      [
+        termine("a", "Relancer le devis", Date.UTC(2026, 10, 16, 9, 0)),
+        termine("b", "Relire le contrat de maintenance", Date.UTC(2026, 10, 20, 8, 0)),
+      ],
+      VENDREDI_20_MIDI,
+    );
+
+    expect(registre.etat).toBe("tout-termine");
+    expect(registre.jours).toEqual([]);
+    expect(registre.compteurs).toEqual({ enCours: 0, termines: 2, plusAncien: null });
+  });
+
+  it("aucun TODO terminé : la liste des terminés est vide", () => {
+    const registre = composerRegistre(
+      [todo("a", "Relancer le devis", Date.UTC(2026, 10, 16, 9, 0))],
+      VENDREDI_20_MIDI,
+    );
+
+    expect(registre.termines).toEqual([]);
+    expect(registre.compteurs.termines).toBe(0);
+  });
+
+  it("aucun TODO : état « vide »", () => {
+    expect(composerRegistre([], VENDREDI_20_MIDI).etat).toBe("vide");
+  });
+
+  it("range les terminés du plus ancien au plus récent", () => {
+    const { termines } = composerRegistre(
+      [
+        termine("c", "Sauvegarder la base de recette", Date.UTC(2026, 10, 20, 8, 0)),
+        termine("a", "Relancer le devis", Date.UTC(2026, 10, 16, 9, 0)),
+        termine("b", "Relire le contrat de maintenance", Date.UTC(2026, 10, 18, 9, 0)),
+      ],
+      VENDREDI_20_MIDI,
+    );
+
+    expect(termines.map((t) => t.id)).toEqual(["a", "b", "c"]);
+  });
+
+  it("le plus ancien : l'âge en jours du plus ancien TODO en cours, pas d'un terminé", () => {
+    const { compteurs } = composerRegistre(
+      [
+        termine("a", "Relancer le devis", Date.UTC(2026, 10, 12, 9, 0)),
+        todo("b", "Relire le contrat de maintenance", Date.UTC(2026, 10, 18, 9, 0)),
+      ],
+      VENDREDI_20_MIDI,
+    );
+
+    expect(compteurs.plusAncien).toBe(2);
   });
 });

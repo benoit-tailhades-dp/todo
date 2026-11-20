@@ -11,7 +11,7 @@ Périmètre : `src/data/`.
 
 - Seule couche qui parle à la base. Le client de base de données (SQLite, ou libSQL pour Turso) n'est importé que dans `src/data`.
 - Chaque module commence par `import "server-only"`, pour qu'il ne puisse jamais se retrouver dans le code envoyé au navigateur.
-- Expose des interfaces de repository (ex. : `ExampleRepository`) et leurs implémentations. Les couches au-dessus ne connaissent que l'interface.
+- Expose des interfaces de repository (ex. : `TodoRepository`) et leurs implémentations. Les couches au-dessus ne connaissent que l'interface.
 - Aucune règle métier : lire, écrire, convertir entre les lignes de la base et les objets du domaine.
 - La connexion se configure par des variables d'environnement lues ici seulement. Les valeurs vont dans `.env.local`, jamais dans un fichier versionné.
 - Passer à une base managée (Turso) ne modifie que `src/data`.

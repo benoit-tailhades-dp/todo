@@ -70,4 +70,69 @@ describe("TodoRepository libSQL (fichier SQLite)", () => {
       },
     ]);
   });
+
+  it("ajouter sur une base neuve : crée la table et enregistre le TODO", async () => {
+    const repository = createLibsqlTodoRepository(connecter());
+    const todo = { id: "a", titre: "Relancer le devis", creeLe: Date.UTC(2026, 10, 20, 11, 0), termine: false };
+
+    await repository.ajouter(todo);
+
+    expect(await repository.listerTous()).toEqual([todo]);
+  });
+
+  it("TODO ajouté : après fermeture et réouverture, il est toujours là", async () => {
+    const premiere = connecter();
+    const todo = { id: "a", titre: "Relancer le devis", creeLe: Date.UTC(2026, 10, 20, 11, 0), termine: false };
+    await createLibsqlTodoRepository(premiere).ajouter(todo);
+    premiere.close();
+
+    const relus = await createLibsqlTodoRepository(connecter()).listerTous();
+
+    expect(relus).toEqual([todo]);
+  });
+
+  it("trouver : le TODO enregistré, ou null pour un identifiant inconnu", async () => {
+    const repository = createLibsqlTodoRepository(connecter());
+    const todo = { id: "a", titre: "Relancer le devis", creeLe: Date.UTC(2026, 10, 20, 11, 0), termine: false };
+    await repository.ajouter(todo);
+
+    expect(await repository.trouver("a")).toEqual(todo);
+    expect(await repository.trouver("inconnu")).toBeNull();
+  });
+
+  it("marquerTermine : ne change que le TODO visé, et l'état survit à la réouverture", async () => {
+    const premiere = connecter();
+    const repository = createLibsqlTodoRepository(premiere);
+    const a = { id: "a", titre: "Relancer le devis", creeLe: Date.UTC(2026, 10, 20, 9, 0), termine: false };
+    const b = { id: "b", titre: "Relire le contrat", creeLe: Date.UTC(2026, 10, 20, 10, 0), termine: false };
+    await repository.ajouter(a);
+    await repository.ajouter(b);
+
+    await repository.marquerTermine("a");
+    premiere.close();
+
+    const relus = await createLibsqlTodoRepository(connecter()).listerTous();
+    const parId = (x: TodoEnregistre, y: TodoEnregistre) => x.id.localeCompare(y.id);
+    expect(relus.toSorted(parId)).toEqual([{ ...a, termine: true }, b]);
+  });
+
+  it("création de la table en échec (réseau coupé) : l'appel suivant réessaie", async () => {
+    const vrai = connecter();
+    let coupures = 1;
+    // Client qui échoue une fois, comme une base distante injoignable un instant.
+    const instable = {
+      execute: (...args: Parameters<Client["execute"]>) => {
+        if (coupures > 0) {
+          coupures -= 1;
+          return Promise.reject(new Error("réseau coupé"));
+        }
+        return vrai.execute(...args);
+      },
+    } as Client;
+    const repository = createLibsqlTodoRepository(instable);
+
+    await expect(repository.listerTous()).rejects.toThrow("réseau coupé");
+
+    expect(await repository.listerTous()).toEqual([]);
+  });
 });

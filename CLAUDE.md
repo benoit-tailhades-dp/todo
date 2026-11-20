@@ -10,7 +10,7 @@ Projet en français : code, commentaires, textes d'interface et commits. Gestion
 - `pnpm lint` : ESLint, qui fait aussi respecter les frontières entre couches.
 - `pnpm exec tsc --noEmit` : vérification des types (pas de script dédié).
 - `pnpm test` : Vitest, une passe. `pnpm test:watch` : mode surveillance.
-- Un seul fichier : `pnpm test src/service/example-service.test.ts`. Un seul test : `pnpm test -t "renvoie ce que fournit"`. Une couche : `pnpm test src/service`.
+- Un seul fichier : `pnpm test src/service/todo-service.test.ts`. Un seul test : `pnpm test -t "retire les espaces"`. Une couche : `pnpm test src/service`.
 - Ajouter un composant shadcn : `pnpm dlx shadcn@latest add <nom>`, puis l'aligner sur Cartouche (modèle : `src/presentation/ui/button.tsx`).
 
 ## Next.js 16 : vérifier avant d'écrire
@@ -29,7 +29,7 @@ Cette version a des changements cassants (voir `AGENTS.md`). Lire le guide conce
 - **Service** (`src/service/`) : porte les règles métier. Il reçoit le repository en paramètre (`createXService(repository)`) et n'importe ni React, ni Next, ni la présentation. Tests écrits avant le code, avec un faux repository écrit dans le test (pas de librairie de mock).
 - **Données** (`src/data/`) : seule couche qui parle à la base et lit les variables d'environnement (valeurs dans `.env.local`). Chaque module commence par `import "server-only"`, que `vitest.config.mts` neutralise en test. Pilote prévu : `@libsql/client`, avec un fichier SQLite en local et Turso en ligne. Passer à Turso ne doit modifier que `src/data/` et `package.json`. Ajouter le pilote à `DB_CLIENTS` dans `eslint.config.mjs`.
 
-Tests : environnement `node` par défaut. Un test de composant commence par `// @vitest-environment jsdom` (voir `src/presentation/example-view.test.tsx`).
+Tests : environnement `node` par défaut. Un test de composant commence par `// @vitest-environment jsdom` (voir `src/presentation/todo/ecran-todo.test.tsx`).
 
 ## Design system Cartouche
 

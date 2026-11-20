@@ -115,4 +115,24 @@ describe("TodoRepository libSQL (fichier SQLite)", () => {
     const parId = (x: TodoEnregistre, y: TodoEnregistre) => x.id.localeCompare(y.id);
     expect(relus.toSorted(parId)).toEqual([{ ...a, termine: true }, b]);
   });
+
+  it("création de la table en échec (réseau coupé) : l'appel suivant réessaie", async () => {
+    const vrai = connecter();
+    let coupures = 1;
+    // Client qui échoue une fois, comme une base distante injoignable un instant.
+    const instable = {
+      execute: (...args: Parameters<Client["execute"]>) => {
+        if (coupures > 0) {
+          coupures -= 1;
+          return Promise.reject(new Error("réseau coupé"));
+        }
+        return vrai.execute(...args);
+      },
+    } as Client;
+    const repository = createLibsqlTodoRepository(instable);
+
+    await expect(repository.listerTous()).rejects.toThrow("réseau coupé");
+
+    expect(await repository.listerTous()).toEqual([]);
+  });
 });

@@ -37,9 +37,13 @@ function versTodo(ligne: Row): TodoEnregistre {
 
 export function createLibsqlTodoRepository(client: Client): TodoRepository {
   // La table est créée avant la première requête, une seule fois par connexion.
+  // Un échec (base distante injoignable) n'est pas gardé : l'appel suivant réessaie.
   let table: Promise<unknown> | undefined;
   function pret() {
-    table ??= client.execute(CREER_TABLE);
+    table ??= client.execute(CREER_TABLE).catch((erreur: unknown) => {
+      table = undefined;
+      throw erreur;
+    });
     return table;
   }
 

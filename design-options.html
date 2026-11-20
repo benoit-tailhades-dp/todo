@@ -1,0 +1,964 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pipeline, pistes de design system</title>
+<script>
+  (function () {
+    var theme;
+    try { theme = localStorage.getItem("pipeline-ds-theme"); } catch (e) {}
+    if (theme !== "light" && theme !== "dark") {
+      theme = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    document.documentElement.dataset.theme = theme;
+  })();
+</script>
+<link rel="preload" href="https://fonts.gstatic.com/s/barlow/v13/7cHpv4kjgoGqM7E_DMs5ynghnQ.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="https://fonts.gstatic.com/s/barlow/v13/7cHqv4kjgoGqM7E3_-gs51ostz0rdg.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="https://fonts.gstatic.com/s/barlow/v13/7cHqv4kjgoGqM7E30-8s51ostz0rdg.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="https://fonts.gstatic.com/s/barlowsemicondensed/v16/wlpigxjLBV1hqnzfr-F8sEYMB0Yybp0mudRfp66_B2slqZ6GfQ.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="https://fonts.gstatic.com/s/hankengrotesk/v12/ieVn2YZDLWuGJpnzaiwFXS9tYtpd59CxCis4.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="https://fonts.gstatic.com/s/literata/v40/or3aQ6P12-iJxAIgLa78DkrbXsDgk0oVDaDPYLanFLHpPf2TbBG_df3-vbgKBM6YoggA-vpO-7cHM524.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="https://fonts.gstatic.com/s/schibstedgrotesk/v7/Jqz55SSPQuCQF3t8uOwiUL-taUTtap9GayojdSFO.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+/* ---------- Polices : sous-ensemble latin, servi par fonts.gstatic.com ---------- */
+@font-face { font-family: 'Barlow'; font-style: normal; font-weight: 400; font-display: swap; src: url(https://fonts.gstatic.com/s/barlow/v13/7cHpv4kjgoGqM7E_DMs5ynghnQ.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Barlow'; font-style: normal; font-weight: 500; font-display: swap; src: url(https://fonts.gstatic.com/s/barlow/v13/7cHqv4kjgoGqM7E3_-gs51ostz0rdg.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Barlow'; font-style: normal; font-weight: 600; font-display: swap; src: url(https://fonts.gstatic.com/s/barlow/v13/7cHqv4kjgoGqM7E30-8s51ostz0rdg.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Barlow Semi Condensed'; font-style: normal; font-weight: 600; font-display: swap; src: url(https://fonts.gstatic.com/s/barlowsemicondensed/v16/wlpigxjLBV1hqnzfr-F8sEYMB0Yybp0mudRfp66_B2slqZ6GfQ.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Hanken Grotesk'; font-style: normal; font-weight: 400 600; font-display: swap; src: url(https://fonts.gstatic.com/s/hankengrotesk/v12/ieVn2YZDLWuGJpnzaiwFXS9tYtpd59CxCis4.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Literata'; font-style: normal; font-weight: 500 600; font-display: swap; src: url(https://fonts.gstatic.com/s/literata/v40/or3aQ6P12-iJxAIgLa78DkrbXsDgk0oVDaDPYLanFLHpPf2TbBG_df3-vbgKBM6YoggA-vpO-7cHM524.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Schibsted Grotesk'; font-style: normal; font-weight: 400 800; font-display: swap; src: url(https://fonts.gstatic.com/s/schibstedgrotesk/v7/Jqz55SSPQuCQF3t8uOwiUL-taUTtap9GayojdSFO.woff2) format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+/* ---------- Page (neutre, pour ne pas influencer la comparaison) ---------- */
+:root {
+  color-scheme: light;
+  --page-bg: #E2E3E8;
+  --page-fg: #202127;
+  --page-muted: #595B66;
+  --page-line: #C5C7CF;
+  --page-control: #FFFFFF;
+  --page-control-on: #202127;
+  --page-control-on-fg: #FFFFFF;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page-bg: #1A1B20;
+  --page-fg: #E8E9EE;
+  --page-muted: #A3A5B0;
+  --page-line: #393B44;
+  --page-control: #26272E;
+  --page-control-on: #E8E9EE;
+  --page-control-on-fg: #1A1B20;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--page-bg);
+  color: var(--page-fg);
+  font: 400 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+.when-dark { display: none; }
+[data-theme="dark"] .when-light { display: none; }
+[data-theme="dark"] .when-dark { display: inline; }
+
+.page-head {
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 40px 16px 28px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px 32px;
+}
+.page-head h1 { margin: 0 0 6px; font-size: 26px; line-height: 1.2; font-weight: 650; letter-spacing: -0.01em; }
+.page-head p { margin: 0; max-width: 62ch; color: var(--page-muted); }
+.theme-switch {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  border-radius: 10px;
+  background: var(--page-control);
+  border: 1px solid var(--page-line);
+}
+.theme-switch button {
+  font: 500 14px/1 system-ui, sans-serif;
+  padding: 9px 16px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--page-fg);
+  cursor: pointer;
+}
+.theme-switch button[aria-pressed="true"] { background: var(--page-control-on); color: var(--page-control-on-fg); }
+.theme-switch button:focus-visible { outline: 2px solid var(--page-fg); outline-offset: 2px; }
+.page-foot { max-width: 1480px; margin: 0 auto; padding: 0 16px 48px; color: var(--page-muted); font-size: 14px; }
+.page-foot p { margin: 0; max-width: 80ch; }
+.page-foot code { font-size: 13px; }
+
+.board {
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 0 16px 32px;
+  display: grid;
+  gap: 20px;
+}
+@media (min-width: 1100px) {
+  .board { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(6, auto); row-gap: 0; }
+  .ds { grid-row: span 6; display: grid; grid-template-rows: subgrid; row-gap: 0; }
+}
+
+/* ---------- Socle commun, piloté par les jetons de chaque système ---------- */
+.ds {
+  background: var(--background);
+  color: var(--foreground);
+  font: var(--t-body);
+  border-radius: 16px;
+  padding: 8px 24px 28px;
+  min-width: 0;
+  container-type: inline-size;
+}
+@media (max-width: 480px) { .ds { padding: 4px 16px 20px; } }
+.ds :where(h2, h3, h4, p, dl, dd, ul) { margin: 0; }
+.ds ul { padding: 0; list-style: none; }
+.sec { padding-top: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border); min-width: 0; }
+.sec:last-child { border-bottom: 0; padding-bottom: 0; }
+
+.ds-name { font: var(--t-display); letter-spacing: var(--t-display-tracking); }
+.ds-intent { margin-top: 8px; color: var(--muted-foreground); max-width: 46ch; }
+.sec-title { font: var(--t-title); letter-spacing: var(--t-title-tracking); font-size: 17px; margin-bottom: 16px; }
+
+.swatches { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px 12px; }
+@container (max-width: 400px) { .swatches { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.swatch { display: grid; gap: 2px; min-width: 0; }
+.chip { display: block; height: 48px; border-radius: var(--r-control); border: 1px solid var(--border); margin-bottom: 6px; }
+.sw-name { font-weight: 600; font-size: 13px; line-height: 1.3; }
+.sw-token, .sw-hex { font-size: 12px; line-height: 1.35; color: var(--muted-foreground); overflow-wrap: anywhere; }
+.sw-token { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+.sw-hex { font-variant-numeric: tabular-nums; }
+
+.type-specimen { display: grid; }
+.type-specimen .spec { font-size: 12px; line-height: 1.4; color: var(--muted-foreground); margin: 4px 0 14px; }
+.t-display { font: var(--t-display); letter-spacing: var(--t-display-tracking); }
+.t-title { font: var(--t-title); letter-spacing: var(--t-title-tracking); }
+.t-body { font: var(--t-body); max-width: 60ch; }
+.t-small { font: var(--t-small); color: var(--muted-foreground); }
+.font-roles { display: grid; gap: 4px; font-size: 13px; padding-top: 4px; }
+.font-roles div { display: flex; gap: 8px; flex-wrap: wrap; }
+.font-roles dt { color: var(--muted-foreground); }
+.font-roles dt::after { content: "\00a0:"; }
+.font-roles dd { font-weight: 600; }
+
+/* Boutons */
+.btn-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: var(--btn-h);
+  padding: 0 16px;
+  border-radius: var(--r-btn);
+  border: 1px solid transparent;
+  font: var(--btn-font);
+  letter-spacing: 0.005em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+.btn .icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.btn-primary { background: var(--primary); color: var(--primary-foreground); }
+.btn-primary:hover:not(:disabled) { background: color-mix(in oklab, var(--primary) 86%, var(--foreground)); }
+.btn-secondary { background: var(--secondary); color: var(--secondary-foreground); }
+.btn-secondary:hover:not(:disabled) { background: color-mix(in oklab, var(--secondary) 90%, var(--foreground)); }
+.btn-outline { background: transparent; color: var(--foreground); border-color: var(--input); }
+.btn-outline:hover:not(:disabled) { background: var(--accent); color: var(--accent-foreground); }
+.btn-ghost { background: transparent; color: var(--foreground); }
+.btn-ghost:hover:not(:disabled) { background: var(--accent); color: var(--accent-foreground); }
+.btn-destructive { background: var(--destructive); color: var(--destructive-foreground); }
+.btn-destructive:hover:not(:disabled) { background: color-mix(in oklab, var(--destructive) 86%, var(--foreground)); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.btn:active:not(:disabled) { transform: translateY(1px); }
+
+/* Champs */
+.fields { display: grid; gap: 16px; }
+.field { display: grid; gap: 6px; min-width: 0; }
+.field label { font-weight: 600; font-size: 14px; line-height: 1.3; }
+.input {
+  width: 100%;
+  height: var(--ctl-h);
+  padding: 0 12px;
+  border-radius: var(--r-control);
+  border: 1px solid var(--input);
+  background: var(--card);
+  color: var(--foreground);
+  font: var(--t-body);
+  line-height: normal;
+}
+.input::placeholder { color: var(--muted-foreground); }
+.input:focus { outline: none; }
+.input:focus-visible, .input.is-focus { border-color: var(--ring); outline: 2px solid var(--ring); outline-offset: 1px; }
+.input[aria-invalid="true"] { border-color: var(--destructive); }
+.help, .error { font: var(--t-small); }
+.help { color: var(--muted-foreground); }
+.error { color: var(--destructive); }
+.select { position: relative; }
+.select select { appearance: none; padding-right: 40px; cursor: pointer; }
+.select .chevron { position: absolute; right: 12px; top: 50%; width: 16px; height: 16px; transform: translateY(-50%); fill: none; stroke: var(--muted-foreground); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+
+/* Carte de contact */
+.contact { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-card); padding: 20px; display: grid; gap: 18px; min-width: 0; }
+.contact-head { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px 14px; }
+.who { flex: 1 1 160px; min-width: 0; }
+.avatar { flex: none; display: grid; place-items: center; width: 44px; height: 44px; font: 600 16px/1 var(--font-display); }
+.contact-name { font: var(--t-title); letter-spacing: var(--t-title-tracking); }
+.contact-role { color: var(--muted-foreground); font-size: 14px; line-height: 1.4; margin-top: 2px; }
+.badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: var(--r-badge); font: 600 13px/1.3 var(--font-body); background: var(--signature); color: var(--signature-foreground); }
+.progress { display: grid; gap: 6px; }
+.stages { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+.stage { height: 6px; background: var(--muted); border: 1px solid var(--border); }
+.stage.is-done { background: var(--primary); border-color: var(--primary); }
+.stage.is-current { background: var(--signature); border-color: var(--signature); }
+.progress-caption { font: var(--t-small); color: var(--muted-foreground); }
+.facts { display: grid; gap: 12px; }
+.fact dt { font: var(--t-small); color: var(--muted-foreground); }
+.fact dd { font-weight: 500; margin-top: 2px; }
+.fact-amount dd { font-variant-numeric: tabular-nums; }
+.contact-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* ---------- Cartouche : le cartouche de plan, traits nets, surligneur ---------- */
+.ds-cartouche .sec-title { font-size: 18px; }
+.ds-cartouche .btn { padding: 0 14px; }
+.ds-cartouche .btn:focus-visible,
+.ds-cartouche .input:focus-visible,
+.ds-cartouche .input.is-focus { outline: 2px solid var(--ring); outline-offset: 2px; box-shadow: 0 0 0 6px var(--signature); }
+.ds-cartouche .contact { padding: 0; gap: 0; border-color: var(--input); }
+.ds-cartouche .contact-head { padding: 16px; }
+.ds-cartouche .avatar { width: 40px; height: 40px; border-radius: 2px; background: var(--primary); color: var(--primary-foreground); font-size: 17px; letter-spacing: 0.02em; }
+.ds-cartouche .contact-name { font-size: 20px; }
+.ds-cartouche .progress { padding: 0 16px 14px; }
+.ds-cartouche .stage { height: 8px; }
+.ds-cartouche .facts { grid-template-columns: 1fr 1fr; gap: 0; border-top: 1px solid var(--input); }
+.ds-cartouche .fact { padding: 10px 16px 12px; border-bottom: 1px solid var(--border); }
+.ds-cartouche .fact-amount { border-right: 1px solid var(--border); }
+.ds-cartouche .fact-next { grid-column: 1 / -1; border-bottom-color: var(--input); }
+.ds-cartouche .fact-amount dd { font: 600 22px/1.2 var(--font-display); }
+.ds-cartouche .contact-actions { padding: 12px 16px; }
+
+/* ---------- Carnet : rondeurs, noms en serif, laiton discret ---------- */
+.ds-carnet .badge { background: color-mix(in oklab, var(--signature) 20%, var(--card)); color: var(--foreground); }
+.ds-carnet .badge::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--signature); }
+.ds-carnet .contact { padding: 22px; gap: 20px; box-shadow: 0 1px 0 var(--border), 0 18px 32px -24px color-mix(in oklab, var(--primary) 55%, transparent); }
+.ds-carnet .avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--secondary); color: var(--primary); font: 500 21px/1 var(--font-display); }
+.ds-carnet .contact-name { font-size: 23px; font-weight: 500; }
+.ds-carnet .stages { display: flex; align-items: center; gap: 0; }
+.ds-carnet .stage { flex: none; width: 12px; height: 12px; border-radius: 50%; border-width: 2px; background: var(--card); border-color: var(--input); }
+.ds-carnet .stage + .stage { margin-left: 6px; }
+.ds-carnet .stage.is-done { background: var(--primary); border-color: var(--primary); }
+.ds-carnet .stage.is-current { width: 16px; height: 16px; background: var(--signature); border-color: var(--signature); box-shadow: 0 0 0 3px color-mix(in oklab, var(--signature) 30%, var(--card)); }
+.ds-carnet .facts { gap: 14px; }
+.ds-carnet .fact-amount dd { font: 500 22px/1.25 var(--font-display); }
+.ds-carnet .fact-next { background: var(--muted); border-radius: 12px; padding: 12px 14px; }
+
+/* ---------- Signal : formes pleines, progression épaisse, montant en grand ---------- */
+.ds-signal .sec-title { font-weight: 800; letter-spacing: -0.015em; }
+.ds-signal .btn { padding: 0 20px; }
+.ds-signal .btn:focus-visible { outline-width: 3px; outline-offset: 3px; }
+.ds-signal .input { background: var(--muted); }
+.ds-signal .input:focus-visible, .ds-signal .input.is-focus { background: var(--card); outline-width: 3px; outline-offset: 2px; }
+.ds-signal .field label { font-weight: 700; }
+.ds-signal .contact { padding: 22px; border: 0; outline: 1px solid var(--border); outline-offset: -1px; gap: 20px; }
+.ds-signal .avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--primary); color: var(--primary-foreground); font: 800 17px/1 var(--font-display); letter-spacing: -0.01em; }
+.ds-signal .contact-name { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
+.ds-signal .badge { font-weight: 700; }
+.ds-signal .progress { order: -1; }
+.ds-signal .stages { gap: 6px; }
+.ds-signal .stage { height: 12px; border-radius: 999px; border: 0; }
+.ds-signal .progress-caption { font-weight: 600; }
+.ds-signal .facts { grid-template-columns: 1fr 1fr; gap: 14px 18px; }
+.ds-signal .fact-amount { grid-column: 1 / -1; }
+.ds-signal .fact-amount dd { font: 800 40px/1 var(--font-display); letter-spacing: -0.03em; margin-top: 4px; }
+
+/* ---------- Surfaces du navigateur : sélection, curseur, contrôles natifs, césures ---------- */
+.ds { accent-color: var(--primary); }
+.ds ::selection { background: var(--signature); color: var(--signature-foreground); }
+.input { caret-color: var(--primary); }
+.page-head h1, .ds :where(h2, h3, h4) { text-wrap: balance; }
+.page-head p, .page-foot p, .ds p, .ds dd { text-wrap: pretty; }
+
+@media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
+
+.ds-cartouche {
+  color-scheme: light;
+  --background: #F3F5F8;
+  --foreground: #1B2430;
+  --card: #FFFFFF;
+  --primary: #1D3E8A;
+  --primary-foreground: #FFFFFF;
+  --secondary: #E3E8EF;
+  --secondary-foreground: #1B2430;
+  --muted: #EBEFF4;
+  --muted-foreground: #536072;
+  --accent: #E7ECF3;
+  --accent-foreground: #1B2430;
+  --signature: #F7D646;
+  --signature-foreground: #1B2430;
+  --border: #CDD5DF;
+  --input: #7F8C9C;
+  --ring: #1D3E8A;
+  --destructive: #B42318;
+  --destructive-foreground: #FFFFFF;
+  --font-display: 'Barlow Semi Condensed', system-ui, sans-serif;
+  --font-body: 'Barlow', system-ui, sans-serif;
+  --t-display: 600 32px/1.1 var(--font-display);
+  --t-display-tracking: 0;
+  --t-title: 600 19px/1.25 var(--font-display);
+  --t-title-tracking: 0.005em;
+  --t-body: 400 15px/1.5 var(--font-body);
+  --t-small: 500 13px/1.4 var(--font-body);
+  --r-card: 3px;
+  --r-control: 2px;
+  --r-btn: 2px;
+  --r-badge: 2px;
+  --btn-h: 36px;
+  --ctl-h: 36px;
+  --btn-font: 600 15px/1 var(--font-display);
+}
+[data-theme="dark"] .ds-cartouche {
+  color-scheme: dark;
+  --background: #111821;
+  --foreground: #E5EAF0;
+  --card: #17202B;
+  --primary: #86A9F2;
+  --primary-foreground: #0C1730;
+  --secondary: #222D3B;
+  --secondary-foreground: #E5EAF0;
+  --muted: #1B2531;
+  --muted-foreground: #98A6B7;
+  --accent: #233041;
+  --accent-foreground: #E5EAF0;
+  --signature: #E9C93B;
+  --signature-foreground: #1A1708;
+  --border: #2B3746;
+  --input: #66778C;
+  --ring: #86A9F2;
+  --destructive: #F2766B;
+  --destructive-foreground: #2A0A07;
+}
+
+.ds-carnet {
+  color-scheme: light;
+  --background: #EFF3EE;
+  --foreground: #18231E;
+  --card: #FAFCF9;
+  --primary: #1E5845;
+  --primary-foreground: #F3F8F4;
+  --secondary: #DFE8E1;
+  --secondary-foreground: #18231E;
+  --muted: #E6EDE7;
+  --muted-foreground: #52625A;
+  --accent: #E2EBE4;
+  --accent-foreground: #18231E;
+  --signature: #B5853A;
+  --signature-foreground: #1B1406;
+  --border: #D0DBD3;
+  --input: #7E8F85;
+  --ring: #1E5845;
+  --destructive: #B3261E;
+  --destructive-foreground: #FFFFFF;
+  --font-display: 'Literata', system-ui, sans-serif;
+  --font-body: 'Hanken Grotesk', system-ui, sans-serif;
+  --t-display: 500 34px/1.15 var(--font-display);
+  --t-display-tracking: -0.01em;
+  --t-title: 600 21px/1.3 var(--font-display);
+  --t-title-tracking: 0;
+  --t-body: 400 15.5px/1.6 var(--font-body);
+  --t-small: 500 13px/1.45 var(--font-body);
+  --r-card: 18px;
+  --r-control: 10px;
+  --r-btn: 10px;
+  --r-badge: 999px;
+  --btn-h: 40px;
+  --ctl-h: 40px;
+  --btn-font: 600 15px/1 var(--font-body);
+}
+[data-theme="dark"] .ds-carnet {
+  color-scheme: dark;
+  --background: #111915;
+  --foreground: #E2EBE5;
+  --card: #17211C;
+  --primary: #72C2A0;
+  --primary-foreground: #0B1E16;
+  --secondary: #213029;
+  --secondary-foreground: #E2EBE5;
+  --muted: #1B2621;
+  --muted-foreground: #9AAEA2;
+  --accent: #24342C;
+  --accent-foreground: #E2EBE5;
+  --signature: #D8AD60;
+  --signature-foreground: #1A1307;
+  --border: #2A3931;
+  --input: #62786C;
+  --ring: #72C2A0;
+  --destructive: #F07B6B;
+  --destructive-foreground: #2A0B07;
+}
+
+.ds-signal {
+  color-scheme: light;
+  --background: #FAF7FA;
+  --foreground: #1E1424;
+  --card: #FFFFFF;
+  --primary: #A3166F;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F1E6F0;
+  --secondary-foreground: #1E1424;
+  --muted: #F4EEF4;
+  --muted-foreground: #67596F;
+  --accent: #F4E8F2;
+  --accent-foreground: #1E1424;
+  --signature: #CDBDF3;
+  --signature-foreground: #22163A;
+  --border: #E8DEE8;
+  --input: #8A7C92;
+  --ring: #A3166F;
+  --destructive: #C4291C;
+  --destructive-foreground: #FFFFFF;
+  --font-display: 'Schibsted Grotesk', system-ui, sans-serif;
+  --font-body: 'Schibsted Grotesk', system-ui, sans-serif;
+  --t-display: 800 38px/1.02 var(--font-display);
+  --t-display-tracking: -0.03em;
+  --t-title: 700 21px/1.2 var(--font-display);
+  --t-title-tracking: -0.01em;
+  --t-body: 400 15px/1.5 var(--font-body);
+  --t-small: 500 13px/1.4 var(--font-body);
+  --r-card: 22px;
+  --r-control: 12px;
+  --r-btn: 999px;
+  --r-badge: 999px;
+  --btn-h: 44px;
+  --ctl-h: 44px;
+  --btn-font: 700 15px/1 var(--font-display);
+}
+[data-theme="dark"] .ds-signal {
+  color-scheme: dark;
+  --background: #160F1B;
+  --foreground: #F2EAF4;
+  --card: #1F1626;
+  --primary: #F27DBF;
+  --primary-foreground: #2B0A1F;
+  --secondary: #2C2133;
+  --secondary-foreground: #F2EAF4;
+  --muted: #251B2C;
+  --muted-foreground: #B0A0B9;
+  --accent: #301F37;
+  --accent-foreground: #F2EAF4;
+  --signature: #A895EE;
+  --signature-foreground: #170F2C;
+  --border: #392C42;
+  --input: #76667F;
+  --ring: #F27DBF;
+  --destructive: #FF8F6B;
+  --destructive-foreground: #2B0905;
+}
+</style>
+</head>
+<body>
+  <header class="page-head">
+    <div>
+      <h1>Trois design systems pour Pipeline</h1>
+      <p>Mêmes composants, trois partis pris. Comparez-les en clair et en sombre, puis dites-moi lequel appliquer au thème shadcn de l’app.</p>
+    </div>
+    <div class="theme-switch" role="group" aria-label="Thème">
+      <button type="button" data-set-theme="light" aria-pressed="false">Clair</button>
+      <button type="button" data-set-theme="dark" aria-pressed="false">Sombre</button>
+    </div>
+  </header>
+
+  <main class="board">
+    <section class="ds ds-cartouche" aria-labelledby="cartouche-name">
+      <header class="sec ds-head">
+        <h2 class="ds-name" id="cartouche-name">Cartouche</h2>
+        <p class="ds-intent">Inspiré du cartouche des plans d’ingénierie : dense, précis, fait pour suivre beaucoup de comptes d’un coup d’œil.</p>
+      </header>
+
+      <section class="sec">
+        <h3 class="sec-title">Couleurs</h3>
+        <ul class="swatches">
+        <li class="swatch">
+          <span class="chip" style="background: var(--background)"></span>
+          <span class="sw-name">Papier</span>
+          <code class="sw-token">background</code>
+          <span class="sw-hex"><span class="when-light">#F3F5F8</span><span class="when-dark">#111821</span></span>
+        </li>
+        <li class="swatch">
+          <span class="chip" style="background: var(--foreground)"></span>
+          <span class="sw-name">Graphite</span>
+          <code class="sw-token">foreground</code>
+          <span class="sw-hex"><span class="when-light">#1B2430</span><span class="when-dark">#E5EAF0</span></span>
+        </li>
+        <li class="swatch">
+          <span class="chip" style="background: var(--primary)"></span>
+          <span class="sw-name">Encre</span>
+          <code class="sw-token">primary</code>
+          <span class="sw-hex"><span class="when-light">#1D3E8A</span><span class="when-dark">#86A9F2</span></span>
+        </li>
+        <li class="swatch">
+          <span class="chip" style="background: var(--signature)"></span>
+          <span class="sw-name">Surligneur</span>
+          <code class="sw-token">signature</code>
+          <span class="sw-hex"><span class="when-light">#F7D646</span><span class="when-dark">#E9C93B</span></span>
+        </li>
+        <li class="swatch">
+          <span class="chip" style="background: var(--muted)"></span>
+          <span class="sw-name">Calque</span>
+          <code class="sw-token">muted</code>
+          <span class="sw-hex"><span class="when-light">#EBEFF4</span><span class="when-dark">#1B2531</span></span>
+        </li>
+        <li class="swatch">
+          <span class="chip" style="background: var(--input)"></span>
+          <span class="sw-name">Trait</span>
+          <code class="sw-token">input</code>
+          <span class="sw-hex"><span class="when-light">#7F8C9C</span><span class="when-dark">#66778C</span></span>
+        </li>
+        <li class="swatch">
+          <span class="chip" style="background: var(--card)"></span>
+          <span class="sw-name">Feuille</span>
+          <code class="sw-token">card</code>
+          <span class="sw-hex"><span class="when-light">#FFFFFF</span><span class="when-dark">#17202B</span></span>
+        </li>
+        <li class="swatch">
+          <span class="chip" style="background: var(--destructive)"></span>
+          <span class="sw-name">Alerte</span>
+          <code class="sw-token">destructive</code>
+          <span class="sw-hex"><span class="when-light">#B42318</span><span class="when-dark">#F2766B</span></span>
+        </li>
+        </ul>
+      </section>
+
+      <section class="sec">
+        <h3 class="sec-title">Typographie</h3>
+        <div class="type-specimen">
+          <p class="t-display">Pipeline commercial</p>
+          <p class="spec">Titre 1, 32 px, Barlow Semi Condensed 600</p>
+          <p class="t-title">Proposition envoyée</p>
+          <p class="spec">Titre 2, 19 px, Barlow Semi Condensed 600</p>
+          <p class="t-body">Claire a validé le périmètre de la reprise des nomenclatures. Elle attend le chiffrage avant le comité du 3 décembre.</p>
+          <p class="spec">Texte, 15 px, Barlow 400</p>
+          <p class="t-small">Mis à jour il y a 2 heures</p>
+          <p class="spec">Légende, 13 px, Barlow 500</p>
+        </div>
+        <dl class="font-roles"><div><dt>Titres et boutons</dt><dd>Barlow Semi Condensed</dd></div><div><dt>Texte</dt><dd>Barlow</dd></div></dl>
+      </section>
+
+      <section class="sec">
+        <h3 class="sec-title">Boutons</h3>
+        <div class="btn-row">
+          <button type="button" class="btn btn-primary"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg>Ajouter un contact</button>
+          <button type="button" class="btn btn-secondary">Exporter</button>
+          <button type="button" class="btn btn-outline">Annuler</button>
+          <button type="button" class="btn btn-ghost">Filtrer</button>
+          <button type="button" class="btn btn-destructive">Supprimer</button>
+          <button type="button" class="btn btn-primary" disabled>Enregistrer</button>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h3 class="sec-title">Champs</h3>
+        <div class="fields">
+          <div class="field">
+            <label for="cartouche-nom">Nom du contact</label>
+            <input class="input" id="cartouche-nom" type="text" value="Claire Morand">
+          </div>
+          <div class="field">
+            <label for="cartouche-tel">Téléphone</label>
+            <input class="input" id="cartouche-tel" type="tel" placeholder="Ex. 04 76 12 34 56">
+          </div>
+          <div class="field">
+            <label for="cartouche-montant">Montant estimé</label>
+            <input class="input is-focus" id="cartouche-montant" type="text" inputmode="decimal" value="48 000 €" aria-describedby="cartouche-montant-aide">
+            <p class="help" id="cartouche-montant-aide">Hors taxes, en euros.</p>
+          </div>
+          <div class="field">
+            <label for="cartouche-mail">E-mail</label>
+            <input class="input" id="cartouche-mail" type="text" value="claire.morand@vercors" aria-invalid="true" aria-describedby="cartouche-mail-err">
+            <p class="error" id="cartouche-mail-err">Adresse incomplète : ajoutez le domaine, par exemple nom@entreprise.fr.</p>
+          </div>
+          <div class="field">
+            <label for="cartouche-etape">Étape</label>
+            <div class="select">
+              <select class="input" id="cartouche-etape">
+                <option>Premier contact</option><option>Qualifié</option><option>Démo faite</option><option selected>Proposition envoyée</option><option>Signé</option>
+              </select>
+              <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h3 class="sec-title">Carte de contact</h3>
+        <article class="contact" aria-labelledby="cartouche-contact">
+          <header class="contact-head">
+            <span class="avatar" aria-hidden="true">CM</span>
+            <div class="who">
+              <h4 class="contact-name" id="cartouche-contact">Claire Morand</h4>
+              <p class="contact-role">Responsable PLM, Atelier Vercors Mécanique</p>
+            </div>
+            <span class="badge">Proposition envoyée</span>
+          </header>
+          <div class="progress">
+            <div class="stages" role="img" aria-label="Étape 4 sur 5 : proposition envoyée"><span class="stage is-done"></span><span class="stage is-done"></span><span class="stage is-done"></span><span class="stage is-current"></span><span class="stage"></span></div>
+            <p class="progress-caption">Étape 4 sur 5</p>
+          </div>
+          <dl class="facts">
+            <div class="fact fact-amount"><dt>Montant estimé</dt><dd>48 000 €</dd></div>
+            <div class="fact fact-last"><dt>Dernier échange</dt><dd>Démo de la reprise des nomenclatures, 18 novembre</dd></div>
+            <div class="fact fact-next"><dt>Prochaine action</dt><dd>Relancer par téléphone, jeudi 26 novembre</dd></div>
+          </dl>
+          <footer class="contact-actions">
+            <button type="button" class="btn btn-primary">Appeler</button>
+            <button type="button" class="btn btn-outline">Écrire un e-mail</button>
+          </footer>
+        </article>
+      </section>
+    </section>
+
+    <section class="ds ds-carnet" aria-labelledby="carnet-name">
+      <header class="sec ds-head">
+        <h2 class="ds-name" id="carnet-name">Carnet</h2>
+        <p class="ds-intent">Un carnet d’adresses soigné : la relation passe avant les chiffres, le ton reste posé.</p>
+      </header>
+
+      <section class="sec">
+        <h3 class="sec-title">Couleurs</h3>
+        <ul class="swatches">
+        <li class="swatch">
+          <span class="chip" style="background: var(--background)"></span>
+          <span class="sw-name">Sauge</span>
+          <code class="sw-token">background</code>
+          <span class="sw-hex"><span class="when-light">#EFF3EE</span><span class="when-dark">#111915</span></span>
+        </li>
+        <li class="swatch">
+          <span class="chip" style="background: var(--foreground)"></span>
+          <span class="sw-name">Encre verte</span>
+          <code class="sw-token">foreground</code>
+          <span class="sw-hex"><span class="when-light">#18231E</span><span class="when-dark">#E2EBE5</span></span>
+        </li>
+        <li class="swatch">
+          <span class="chip" style="background: var(--primary)"></span>
+          <span class="sw-name">Pin</span>
+          <code class="sw-token">primary</code>
+          <span class="sw-hex"><span class="when-light">#1E5845</span><span class="when-dark">#72C2A0</span></span>
+        </li>
+        <li class="swatch">
+          <span class="chip" style="background: var(--signature)"></span>
+          <span class="sw-name">Laiton</span>
+          <code class="sw-token">signature</code>
+          <span class="sw-hex"><span class="when-light">#B5853A</span><span class="when-dark">#D8AD60</span></span>
+        </li>
+        <li class="swatch">
+          <span class="chip" style="background: var(--muted)"></span>
+          <span class="sw-name">Lichen</span>
+          <code class="sw-token">muted</code>
+          <span class="sw-hex"><span class="when-light">#E6EDE7</span><span class="when-dark">#1B2621</span></span>
+        </li>
+        <li class="swatch">
+          <span class="chip" style="background: var(--input)"></span>
+          <span class="sw-name">Trait</span>
+          <code class="sw-token">input</code>
+          <span class="sw-hex"><span class="when-light">#7E8F85</span><span class="when-dark">#62786C</span></span>
+        </li>
+        <li class="swatch">
+          <span class="chip" style="background: var(--card)"></span>
+          <span class="sw-name">Page</span>
+          <code class="sw-token">card</code>
+          <span class="sw-hex"><span class="when-light">#FAFCF9</span><span class="when-dark">#17211C</span></span>
+        </li>
+        <li class="swatch">
+          <span class="chip" style="background: var(--destructive)"></span>
+          <span class="sw-name">Alerte</span>
+          <code class="sw-token">destructive</code>
+          <span class="sw-hex"><span class="when-light">#B3261E</span><span class="when-dark">#F07B6B</span></span>
+        </li>
+        </ul>
+      </section>
+
+      <section class="sec">
+        <h3 class="sec-title">Typographie</h3>
+        <div class="type-specimen">
+          <p class="t-display">Pipeline commercial</p>
+          <p class="spec">Titre 1, 34 px, Literata 500</p>
+          <p class="t-title">Proposition envoyée</p>
+          <p class="spec">Titre 2, 21 px, Literata 600</p>
+          <p class="t-body">Claire a validé le périmètre de la reprise des nomenclatures. Elle attend le chiffrage avant le comité du 3 décembre.</p>
+          <p class="spec">Texte, 15,5 px, Hanken Grotesk 400</p>
+          <p class="t-small">Mis à jour il y a 2 heures</p>
+          <p class="spec">Légende, 13 px, Hanken Grotesk 500</p>
+        </div>
+        <dl class="font-roles"><div><dt>Titres et noms</dt><dd>Literata</dd></div><div><dt>Texte et boutons</dt><dd>Hanken Grotesk</dd></div></dl>
+      </section>
+
+      <section class="sec">
+        <h3 class="sec-title">Boutons</h3>
+        <div class="btn-row">
+          <button type="button" class="btn btn-primary"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg>Ajouter un contact</button>
+          <button type="button" class="btn btn-secondary">Exporter</button>
+          <button type="button" class="btn btn-outline">Annuler</button>
+          <button type="button" class="btn btn-ghost">Filtrer</button>
+          <button type="button" class="btn btn-destructive">Supprimer</button>
+          <button type="button" class="btn btn-primary" disabled>Enregistrer</button>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h3 class="sec-title">Champs</h3>
+        <div class="fields">
+          <div class="field">
+            <label for="carnet-nom">Nom du contact</label>
+            <input class="input" id="carnet-nom" type="text" value="Claire Morand">
+          </div>
+          <div class="field">
+            <label for="carnet-tel">Téléphone</label>
+            <input class="input" id="carnet-tel" type="tel" placeholder="Ex. 04 76 12 34 56">
+          </div>
+          <div class="field">
+            <label for="carnet-montant">Montant estimé</label>
+            <input class="input is-focus" id="carnet-montant" type="text" inputmode="decimal" value="48 000 €" aria-describedby="carnet-montant-aide">
+            <p class="help" id="carnet-montant-aide">Hors taxes, en euros.</p>
+          </div>
+          <div class="field">
+            <label for="carnet-mail">E-mail</label>
+            <input class="input" id="carnet-mail" type="text" value="claire.morand@vercors" aria-invalid="true" aria-describedby="carnet-mail-err">
+            <p class="error" id="carnet-mail-err">Adresse incomplète : ajoutez le domaine, par exemple nom@entreprise.fr.</p>
+          </div>
+          <div class="field">
+            <label for="carnet-etape">Étape</label>
+            <div class="select">
+              <select class="input" id="carnet-etape">
+                <option>Premier contact</option><option>Qualifié</option><option>Démo faite</option><option selected>Proposition envoyée</option><option>Signé</option>
+              </select>
+              <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h3 class="sec-title">Carte de contact</h3>
+        <article class="contact" aria-labelledby="carnet-contact">
+          <header class="contact-head">
+            <span class="avatar" aria-hidden="true">CM</span>
+            <div class="who">
+              <h4 class="contact-name" id="carnet-contact">Claire Morand</h4>
+              <p class="contact-role">Responsable PLM, Atelier Vercors Mécanique</p>
+            </div>
+            <span class="badge">Proposition envoyée</span>
+          </header>
+          <div class="progress">
+            <div class="stages" role="img" aria-label="Étape 4 sur 5 : proposition envoyée"><span class="stage is-done"></span><span class="stage is-done"></span><span class="stage is-done"></span><span class="stage is-current"></span><span class="stage"></span></div>
+            <p class="progress-caption">Étape 4 sur 5</p>
+          </div>
+          <dl class="facts">
+            <div class="fact fact-amount"><dt>Montant estimé</dt><dd>48 000 €</dd></div>
+            <div class="fact fact-last"><dt>Dernier échange</dt><dd>Démo de la reprise des nomenclatures, 18 novembre</dd></div>
+            <div class="fact fact-next"><dt>Prochaine action</dt><dd>Relancer par téléphone, jeudi 26 novembre</dd></div>
+          </dl>
+          <footer class="contact-actions">
+            <button type="button" class="btn btn-primary">Appeler</button>
+            <button type="button" class="btn btn-outline">Écrire un e-mail</button>
+          </footer>
+        </article>
+      </section>
+    </section>
+
+    <section class="ds ds-signal" aria-labelledby="signal-name">
+      <header class="sec ds-head">
+        <h2 class="ds-name" id="signal-name">Signal</h2>
+        <p class="ds-intent">Des contrastes francs et une progression lisible de loin : chaque affaire montre où elle en est.</p>
+      </header>
+
+      <section class="sec">
+        <h3 class="sec-title">Couleurs</h3>
+        <ul class="swatches">
+        <li class="swatch">
+          <span class="chip" style="background: var(--background)"></span>
+          <span class="sw-name">Blanc rosé</span>
+          <code class="sw-token">background</code>
+          <span class="sw-hex"><span class="when-light">#FAF7FA</span><span class="when-dark">#160F1B</span></span>
+        </li>
+        <li class="swatch">
+          <span class="chip" style="background: var(--foreground)"></span>
+          <span class="sw-name">Aubergine</span>
+          <code class="sw-token">foreground</code>
+          <span class="sw-hex"><span class="when-light">#1E1424</span><span class="when-dark">#F2EAF4</span></span>
+        </li>
+        <li class="swatch">
+          <span class="chip" style="background: var(--primary)"></span>
+          <span class="sw-name">Magenta</span>
+          <code class="sw-token">primary</code>
+          <span class="sw-hex"><span class="when-light">#A3166F</span><span class="when-dark">#F27DBF</span></span>
+        </li>
+        <li class="swatch">
+          <span class="chip" style="background: var(--signature)"></span>
+          <span class="sw-name">Lilas</span>
+          <code class="sw-token">signature</code>
+          <span class="sw-hex"><span class="when-light">#CDBDF3</span><span class="when-dark">#A895EE</span></span>
+        </li>
+        <li class="swatch">
+          <span class="chip" style="background: var(--muted)"></span>
+          <span class="sw-name">Voile</span>
+          <code class="sw-token">muted</code>
+          <span class="sw-hex"><span class="when-light">#F4EEF4</span><span class="when-dark">#251B2C</span></span>
+        </li>
+        <li class="swatch">
+          <span class="chip" style="background: var(--input)"></span>
+          <span class="sw-name">Trait</span>
+          <code class="sw-token">input</code>
+          <span class="sw-hex"><span class="when-light">#8A7C92</span><span class="when-dark">#76667F</span></span>
+        </li>
+        <li class="swatch">
+          <span class="chip" style="background: var(--card)"></span>
+          <span class="sw-name">Carte</span>
+          <code class="sw-token">card</code>
+          <span class="sw-hex"><span class="when-light">#FFFFFF</span><span class="when-dark">#1F1626</span></span>
+        </li>
+        <li class="swatch">
+          <span class="chip" style="background: var(--destructive)"></span>
+          <span class="sw-name">Alerte</span>
+          <code class="sw-token">destructive</code>
+          <span class="sw-hex"><span class="when-light">#C4291C</span><span class="when-dark">#FF8F6B</span></span>
+        </li>
+        </ul>
+      </section>
+
+      <section class="sec">
+        <h3 class="sec-title">Typographie</h3>
+        <div class="type-specimen">
+          <p class="t-display">Pipeline commercial</p>
+          <p class="spec">Titre 1, 38 px, Schibsted Grotesk 800</p>
+          <p class="t-title">Proposition envoyée</p>
+          <p class="spec">Titre 2, 21 px, Schibsted Grotesk 700</p>
+          <p class="t-body">Claire a validé le périmètre de la reprise des nomenclatures. Elle attend le chiffrage avant le comité du 3 décembre.</p>
+          <p class="spec">Texte, 15 px, Schibsted Grotesk 400</p>
+          <p class="t-small">Mis à jour il y a 2 heures</p>
+          <p class="spec">Légende, 13 px, Schibsted Grotesk 500</p>
+        </div>
+        <dl class="font-roles"><div><dt>Tout</dt><dd>Schibsted Grotesk, du 400 au 800</dd></div></dl>
+      </section>
+
+      <section class="sec">
+        <h3 class="sec-title">Boutons</h3>
+        <div class="btn-row">
+          <button type="button" class="btn btn-primary"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg>Ajouter un contact</button>
+          <button type="button" class="btn btn-secondary">Exporter</button>
+          <button type="button" class="btn btn-outline">Annuler</button>
+          <button type="button" class="btn btn-ghost">Filtrer</button>
+          <button type="button" class="btn btn-destructive">Supprimer</button>
+          <button type="button" class="btn btn-primary" disabled>Enregistrer</button>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h3 class="sec-title">Champs</h3>
+        <div class="fields">
+          <div class="field">
+            <label for="signal-nom">Nom du contact</label>
+            <input class="input" id="signal-nom" type="text" value="Claire Morand">
+          </div>
+          <div class="field">
+            <label for="signal-tel">Téléphone</label>
+            <input class="input" id="signal-tel" type="tel" placeholder="Ex. 04 76 12 34 56">
+          </div>
+          <div class="field">
+            <label for="signal-montant">Montant estimé</label>
+            <input class="input is-focus" id="signal-montant" type="text" inputmode="decimal" value="48 000 €" aria-describedby="signal-montant-aide">
+            <p class="help" id="signal-montant-aide">Hors taxes, en euros.</p>
+          </div>
+          <div class="field">
+            <label for="signal-mail">E-mail</label>
+            <input class="input" id="signal-mail" type="text" value="claire.morand@vercors" aria-invalid="true" aria-describedby="signal-mail-err">
+            <p class="error" id="signal-mail-err">Adresse incomplète : ajoutez le domaine, par exemple nom@entreprise.fr.</p>
+          </div>
+          <div class="field">
+            <label for="signal-etape">Étape</label>
+            <div class="select">
+              <select class="input" id="signal-etape">
+                <option>Premier contact</option><option>Qualifié</option><option>Démo faite</option><option selected>Proposition envoyée</option><option>Signé</option>
+              </select>
+              <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h3 class="sec-title">Carte de contact</h3>
+        <article class="contact" aria-labelledby="signal-contact">
+          <header class="contact-head">
+            <span class="avatar" aria-hidden="true">CM</span>
+            <div class="who">
+              <h4 class="contact-name" id="signal-contact">Claire Morand</h4>
+              <p class="contact-role">Responsable PLM, Atelier Vercors Mécanique</p>
+            </div>
+            <span class="badge">Proposition envoyée</span>
+          </header>
+          <div class="progress">
+            <div class="stages" role="img" aria-label="Étape 4 sur 5 : proposition envoyée"><span class="stage is-done"></span><span class="stage is-done"></span><span class="stage is-done"></span><span class="stage is-current"></span><span class="stage"></span></div>
+            <p class="progress-caption">Étape 4 sur 5</p>
+          </div>
+          <dl class="facts">
+            <div class="fact fact-amount"><dt>Montant estimé</dt><dd>48 000 €</dd></div>
+            <div class="fact fact-last"><dt>Dernier échange</dt><dd>Démo de la reprise des nomenclatures, 18 novembre</dd></div>
+            <div class="fact fact-next"><dt>Prochaine action</dt><dd>Relancer par téléphone, jeudi 26 novembre</dd></div>
+          </dl>
+          <footer class="contact-actions">
+            <button type="button" class="btn btn-primary">Appeler</button>
+            <button type="button" class="btn btn-outline">Écrire un e-mail</button>
+          </footer>
+        </article>
+      </section>
+    </section>
+  </main>
+
+  <footer class="page-foot">
+    <p>Les noms en code (<code>primary</code>, <code>muted</code>, <code>input</code>…) sont les variables du thème shadcn. <code>signature</code> est une variable en plus, propre à chaque système, pour les étapes et les mises en avant. Toutes les paires texte et fond respectent le contraste AA, et les bordures de champs dépassent 3:1.</p>
+  </footer>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    var buttons = document.querySelectorAll("[data-set-theme]");
+    function sync() {
+      buttons.forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.setTheme === root.dataset.theme)); });
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener("click", function () {
+        root.dataset.theme = b.dataset.setTheme;
+        try { localStorage.setItem("pipeline-ds-theme", b.dataset.setTheme); } catch (e) {}
+        sync();
+      });
+    });
+    // Sans choix enregistré, la page suit le thème du système.
+    if (window.matchMedia) {
+      matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function (e) {
+        var saved;
+        try { saved = localStorage.getItem("pipeline-ds-theme"); } catch (err) {}
+        if (saved !== "light" && saved !== "dark") { root.dataset.theme = e.matches ? "dark" : "light"; sync(); }
+      });
+    }
+    // Le focus affiché en démonstration s'efface dès qu'un vrai champ de la colonne prend le focus.
+    document.querySelectorAll(".ds").forEach(function (col) {
+      col.addEventListener("focusin", function () {
+        col.querySelectorAll(".is-focus").forEach(function (el) { el.classList.remove("is-focus"); });
+      });
+    });
+    sync();
+  })();
+</script>
+</body>
+</html>

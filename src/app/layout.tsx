@@ -1,10 +1,18 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Barlow, Barlow_Semi_Condensed, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Design system Cartouche : Barlow pour le texte, Barlow Semi Condensed pour les titres et les boutons.
+const barlow = Barlow({
+  variable: "--font-barlow",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
+});
+
+const barlowSemiCondensed = Barlow_Semi_Condensed({
+  variable: "--font-barlow-semi-condensed",
+  subsets: ["latin"],
+  weight: ["600"],
 });
 
 const geistMono = Geist_Mono({
@@ -20,8 +28,8 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      lang="fr"
+      className={`${barlow.variable} ${barlowSemiCondensed.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

@@ -1,26 +1,244 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+ * Design system « Cartouche » : inspiré du cartouche des plans d'ingénierie.
+ * Encre bleue, surligneur jaune, traits nets (rayons de 2 à 3 px).
+ * Le mode sombre suit le réglage du système (prefers-color-scheme).
+ * Référence visuelle : design-options.html, colonne Cartouche.
+ */
+@custom-variant dark (@media (prefers-color-scheme: dark));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-barlow);
+  --font-heading: var(--font-barlow-semi-condensed);
   --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-signature: var(--signature);
+  --color-signature-foreground: var(--signature-foreground);
+  --color-shell: var(--shell);
+  --color-shell-foreground: var(--shell-foreground);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Mouvements Cartouche : courts, sortie exponentielle, coupés en mouvement réduit. */
+  --ease-trait: cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-surligne: surligne 6s var(--ease-trait) both;
+  --animate-chiffre: chiffre 180ms var(--ease-trait) both;
+  --animate-apparait: apparait 200ms var(--ease-trait) both;
+
+  @keyframes surligne {
+    0% { background-size: 0% 58%; --surligne-encre: var(--signature); }
+    6% { background-size: 100% 58%; --surligne-encre: var(--signature); }
+    82% { background-size: 100% 58%; --surligne-encre: var(--signature); }
+    100% { background-size: 100% 58%; --surligne-encre: transparent; }
+  }
+  @keyframes chiffre {
+    from { opacity: 0; transform: translateY(35%); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes apparait {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+:root {
+  /* 2 px pour les contrôles (rounded-lg), environ 3 px pour les cartes (rounded-xl). */
+  --radius: 0.125rem;
+
+  --background: #F3F5F8; /* Papier */
+  --foreground: #1B2430; /* Graphite */
+  --card: #FFFFFF; /* Feuille */
+  --card-foreground: #1B2430;
+  --popover: #FFFFFF;
+  --popover-foreground: #1B2430;
+  --primary: #1D3E8A; /* Encre */
+  --primary-foreground: #FFFFFF;
+  --secondary: #E3E8EF;
+  --secondary-foreground: #1B2430;
+  --muted: #EBEFF4; /* Calque */
+  --muted-foreground: #536072;
+  --accent: #E7ECF3;
+  --accent-foreground: #1B2430;
+  --destructive: #B42318; /* Alerte */
+  --destructive-foreground: #FFFFFF;
+  --border: #CDD5DF;
+  --input: #7F8C9C; /* Trait : 3,4:1 sur Feuille, bordure de champ lisible */
+  --ring: #1D3E8A;
+  /* Couleur en plus de shadcn : étapes, mises en avant, halo de focus. */
+  --signature: #F7D646; /* Surligneur */
+  --signature-foreground: #1B2430;
+  /* Bandeau de l'application : encre, texte blanc. */
+  --shell: #1D3E8A;
+  --shell-foreground: #FFFFFF;
+
+  --chart-1: #1D3E8A;
+  --chart-2: #9A7A00;
+  --chart-3: #4A6FC0;
+  --chart-4: #536072;
+  --chart-5: #7F8C9C;
+
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #1B2430;
+  --sidebar-primary: #1D3E8A;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #E7ECF3;
+  --sidebar-accent-foreground: #1B2430;
+  --sidebar-border: #CDD5DF;
+  --sidebar-ring: #1D3E8A;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #111821;
+    --foreground: #E5EAF0;
+    --card: #17202B;
+    --card-foreground: #E5EAF0;
+    --popover: #17202B;
+    --popover-foreground: #E5EAF0;
+    --primary: #86A9F2;
+    --primary-foreground: #0C1730;
+    --secondary: #222D3B;
+    --secondary-foreground: #E5EAF0;
+    --muted: #1B2531;
+    --muted-foreground: #98A6B7;
+    --accent: #233041;
+    --accent-foreground: #E5EAF0;
+    --destructive: #F2766B;
+    --destructive-foreground: #2A0A07;
+    --border: #2B3746;
+    --input: #66778C;
+    --ring: #86A9F2;
+    --signature: #E9C93B;
+    --signature-foreground: #1A1708;
+    --shell: #1A2D5A;
+    --shell-foreground: #E5EAF0;
+
+    --chart-1: #86A9F2;
+    --chart-2: #E9C93B;
+    --chart-3: #5B7FCB;
+    --chart-4: #98A6B7;
+    --chart-5: #66778C;
+
+    --sidebar: #17202B;
+    --sidebar-foreground: #E5EAF0;
+    --sidebar-primary: #86A9F2;
+    --sidebar-primary-foreground: #0C1730;
+    --sidebar-accent: #233041;
+    --sidebar-accent-foreground: #E5EAF0;
+    --sidebar-border: #2B3746;
+    --sidebar-ring: #86A9F2;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  :root {
+    color-scheme: light dark;
+  }
+  * {
+    @apply border-border outline-ring/50;
+  }
+  ::selection {
+    @apply bg-signature text-signature-foreground;
+  }
+  html {
+    scrollbar-color: var(--input) var(--background);
+    accent-color: var(--primary);
+  }
+  input,
+  textarea {
+    caret-color: var(--primary);
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-semibold;
+  }
+  button:not(:disabled), [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+/* Surligneur : un trait jaune balaie le TODO qui vient d'être ajouté, puis s'efface. */
+@property --surligne-encre {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: transparent;
+}
+@utility surligne {
+  background-image: linear-gradient(var(--surligne-encre), var(--surligne-encre));
+  background-repeat: no-repeat;
+  background-position: 0 92%;
+  background-size: 0% 58%;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  animation: var(--animate-surligne);
+}
+
+/* Trait d'encre : barre le titre d'un TODO coché, ligne par ligne, de gauche à droite. */
+@utility trait-encre {
+  background-image: linear-gradient(var(--primary), var(--primary));
+  background-repeat: no-repeat;
+  background-position: 0 58%;
+  background-size: 0% 2px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition: background-size 220ms var(--ease-trait), color 220ms var(--ease-trait);
+  &[data-barre="true"] {
+    background-size: 100% 2px;
+    color: var(--muted-foreground);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .surligne {
+    animation: none;
+    background-size: 100% 58%;
+    --surligne-encre: var(--signature);
+  }
+  .trait-encre {
+    transition: none;
+  }
 }

@@ -36,6 +36,8 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-signature: var(--signature);
   --color-signature-foreground: var(--signature-foreground);
+  --color-shell: var(--shell);
+  --color-shell-foreground: var(--shell-foreground);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -55,6 +57,27 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Mouvements Cartouche : courts, sortie exponentielle, coupés en mouvement réduit. */
+  --ease-trait: cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-surligne: surligne 6s var(--ease-trait) both;
+  --animate-chiffre: chiffre 180ms var(--ease-trait) both;
+  --animate-apparait: apparait 200ms var(--ease-trait) both;
+
+  @keyframes surligne {
+    0% { background-size: 0% 58%; --surligne-encre: var(--signature); }
+    6% { background-size: 100% 58%; --surligne-encre: var(--signature); }
+    82% { background-size: 100% 58%; --surligne-encre: var(--signature); }
+    100% { background-size: 100% 58%; --surligne-encre: transparent; }
+  }
+  @keyframes chiffre {
+    from { opacity: 0; transform: translateY(35%); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes apparait {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 }
 
 :root {
@@ -83,6 +106,9 @@
   /* Couleur en plus de shadcn : étapes, mises en avant, halo de focus. */
   --signature: #F7D646; /* Surligneur */
   --signature-foreground: #1B2430;
+  /* Bandeau de l'application : encre, texte blanc. */
+  --shell: #1D3E8A;
+  --shell-foreground: #FFFFFF;
 
   --chart-1: #1D3E8A;
   --chart-2: #9A7A00;
@@ -123,6 +149,8 @@
     --ring: #86A9F2;
     --signature: #E9C93B;
     --signature-foreground: #1A1708;
+    --shell: #1A2D5A;
+    --shell-foreground: #E5EAF0;
 
     --chart-1: #86A9F2;
     --chart-2: #E9C93B;
@@ -151,6 +179,14 @@
   ::selection {
     @apply bg-signature text-signature-foreground;
   }
+  html {
+    scrollbar-color: var(--input) var(--background);
+    accent-color: var(--primary);
+  }
+  input,
+  textarea {
+    caret-color: var(--primary);
+  }
   body {
     @apply bg-background text-foreground;
   }
@@ -162,5 +198,47 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+/* Surligneur : un trait jaune balaie le TODO qui vient d'être ajouté, puis s'efface. */
+@property --surligne-encre {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: transparent;
+}
+@utility surligne {
+  background-image: linear-gradient(var(--surligne-encre), var(--surligne-encre));
+  background-repeat: no-repeat;
+  background-position: 0 92%;
+  background-size: 0% 58%;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  animation: var(--animate-surligne);
+}
+
+/* Trait d'encre : barre le titre d'un TODO coché, ligne par ligne, de gauche à droite. */
+@utility trait-encre {
+  background-image: linear-gradient(var(--primary), var(--primary));
+  background-repeat: no-repeat;
+  background-position: 0 58%;
+  background-size: 0% 2px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition: background-size 220ms var(--ease-trait), color 220ms var(--ease-trait);
+  &[data-barre="true"] {
+    background-size: 100% 2px;
+    color: var(--muted-foreground);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .surligne {
+    animation: none;
+    background-size: 100% 58%;
+    --surligne-encre: var(--signature);
+  }
+  .trait-encre {
+    transition: none;
   }
 }

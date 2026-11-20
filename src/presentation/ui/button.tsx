@@ -16,6 +16,9 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
         ghost:
           "hover:bg-accent hover:text-accent-foreground aria-expanded:bg-accent aria-expanded:text-accent-foreground",
+        // Surligneur : action principale posée sur le bandeau encre, où « default » se confondrait avec le fond.
+        signature:
+          "bg-signature text-signature-foreground hover:bg-[color-mix(in_oklab,var(--signature)_86%,var(--foreground))]",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-[color-mix(in_oklab,var(--destructive)_86%,var(--foreground))]",
         link: "text-primary underline-offset-4 hover:underline",

@@ -32,14 +32,14 @@ describe("composerRegistre", () => {
         titre: "Lundi 16 novembre",
         nombre: 2,
         todos: [
-          { id: "a", titre: "Relancer le devis" },
-          { id: "b", titre: "Relire le contrat de maintenance" },
+          { id: "a", titre: "Relancer le devis", termine: false },
+          { id: "b", titre: "Relire le contrat de maintenance", termine: false },
         ],
       },
       {
         titre: "Aujourd'hui",
         nombre: 1,
-        todos: [{ id: "c", titre: "Sauvegarder la base de recette" }],
+        todos: [{ id: "c", titre: "Sauvegarder la base de recette", termine: false }],
       },
     ]);
   });
@@ -84,6 +84,15 @@ describe("composerRegistre", () => {
 
     const dernier = jours.at(-1);
     expect(dernier?.titre).toBe("Aujourd'hui");
-    expect(dernier?.todos.at(-1)).toEqual({ id: "nouveau", titre: "Préparer l'ordre du jour" });
+    expect(dernier?.todos.at(-1)).toEqual({ id: "nouveau", titre: "Préparer l'ordre du jour", termine: false });
+  });
+
+  it("un TODO terminé est affiché comme terminé", () => {
+    const { jours } = composerRegistre(
+      [{ ...todo("a", "Relancer le devis", Date.UTC(2026, 10, 20, 8, 0)), termine: true }],
+      VENDREDI_20_MIDI,
+    );
+
+    expect(jours[0].todos).toEqual([{ id: "a", titre: "Relancer le devis", termine: true }]);
   });
 });

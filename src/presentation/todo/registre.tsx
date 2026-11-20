@@ -1,5 +1,6 @@
 import { LoaderCircle } from "lucide-react";
 import { cn } from "@/presentation/lib/utils";
+import { Checkbox } from "@/presentation/ui/checkbox";
 import type { JourDeTodos, TodoAffiche } from "@/service/registre";
 
 /** L'encre monte avec l'âge : un jour qui traîne se repère d'un coup d'œil. */
@@ -37,12 +38,14 @@ export function Registre({
   jours,
   enAttente,
   dernierAjoutId,
+  onTerminer,
 }: {
   jours: JourDeTodos[];
   /** TODO affichés avant la réponse du serveur. */
   enAttente: ReadonlySet<string>;
   /** Le dernier TODO enregistré, surligné quelques secondes. */
   dernierAjoutId: string | null;
+  onTerminer: (id: string) => void;
 }) {
   return (
     <div className="flex flex-col gap-6">
@@ -79,6 +82,7 @@ export function Registre({
                   todo={todo}
                   enAttente={enAttente.has(todo.id)}
                   nouveau={todo.id === dernierAjoutId}
+                  onTerminer={onTerminer}
                 />
               ))}
             </ul>
@@ -93,10 +97,12 @@ function LigneTodo({
   todo,
   enAttente,
   nouveau,
+  onTerminer,
 }: {
   todo: TodoAffiche;
   enAttente: boolean;
   nouveau: boolean;
+  onTerminer: (id: string) => void;
 }) {
   return (
     <li data-todo-id={todo.id} className="border-t border-border first:border-t-0">
@@ -109,10 +115,26 @@ function LigneTodo({
           <span className="shrink-0 text-xs font-medium">Enregistrement…</span>
         </div>
       ) : (
-        <div className="flex min-h-[46px] items-center gap-3.5 px-3.5 py-2.5">
+        <label
+          className={cn(
+            "flex min-h-[46px] items-center gap-3.5 px-3.5 py-2.5",
+            !todo.termine && "cursor-pointer transition-colors duration-150 hover:bg-accent/60",
+          )}
+        >
+          {/* Pas de « décocher » : la case d'un TODO terminé est en lecture seule. */}
+          <Checkbox
+            data-case-todo=""
+            checked={todo.termine}
+            readOnly={todo.termine}
+            onCheckedChange={(coche) => {
+              if (coche && !todo.termine) onTerminer(todo.id);
+            }}
+          />
           <span className="min-w-0 flex-1 break-words">
-            <span data-titre="" className={cn(nouveau && "surligne")}>
-              {todo.titre}
+            <span className={cn(nouveau && "surligne")}>
+              <span data-titre="" className="trait-encre" data-barre={todo.termine}>
+                {todo.titre}
+              </span>
             </span>
           </span>
           {nouveau ? (
@@ -120,7 +142,7 @@ function LigneTodo({
               à l&apos;instant
             </span>
           ) : null}
-        </div>
+        </label>
       )}
     </li>
   );

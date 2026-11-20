@@ -8,18 +8,27 @@ const VENDREDI_20_MIDI = Date.UTC(2026, 10, 20, 11, 0);
 
 /** Faux repository en mémoire : garde ce qu'on lui confie et note les écritures. */
 function fauxRepository(depart: TodoEnregistre[] = []) {
-  const todos = [...depart];
+  let todos = depart.map((t) => ({ ...t }));
   const ajouts: TodoEnregistre[] = [];
+  const terminaisons: string[] = [];
   const repository: TodoRepository = {
     async listerTous() {
-      return [...todos];
+      return todos.map((t) => ({ ...t }));
     },
     async ajouter(todo) {
       ajouts.push(todo);
-      todos.push(todo);
+      todos.push({ ...todo });
+    },
+    async trouver(id) {
+      const todo = todos.find((t) => t.id === id);
+      return todo ? { ...todo } : null;
+    },
+    async marquerTermine(id) {
+      terminaisons.push(id);
+      todos = todos.map((t) => (t.id === id ? { ...t, termine: true } : t));
     },
   };
-  return { repository, ajouts };
+  return { repository, ajouts, terminaisons };
 }
 
 function todo(id: string, titre: string, creeLe: number): TodoEnregistre {
@@ -105,5 +114,47 @@ describe("TodoService.ajouter", () => {
       { titre: "Lundi 16 novembre", nombre: 1 },
       { titre: "Aujourd'hui", nombre: 1 },
     ]);
+  });
+});
+
+describe("TodoService.terminer", () => {
+  const enBase = [
+    todo("a", "Relancer le devis", Date.UTC(2026, 10, 20, 8, 0)),
+    todo("b", "Relire le contrat de maintenance", Date.UTC(2026, 10, 20, 9, 0)),
+  ];
+
+  it("TODO en cours : l'enregistre comme terminé", async () => {
+    const { repository, terminaisons } = fauxRepository(enBase);
+    const service = createTodoService(repository);
+
+    expect(await service.terminer("a")).toEqual({ ok: true });
+
+    expect(terminaisons).toEqual(["a"]);
+    expect((await service.lister()).map(({ id, termine }) => ({ id, termine }))).toEqual([
+      { id: "a", termine: true },
+      { id: "b", termine: false },
+    ]);
+  });
+
+  it("identifiant inconnu : ne modifie rien et dit que le TODO est introuvable", async () => {
+    const { repository, terminaisons } = fauxRepository(enBase);
+    const service = createTodoService(repository);
+
+    expect(await service.terminer("inconnu")).toEqual({ ok: false, erreur: "introuvable" });
+    expect(await service.terminer(undefined)).toEqual({ ok: false, erreur: "introuvable" });
+
+    expect(terminaisons).toEqual([]);
+    expect(await service.lister()).toEqual(enBase);
+  });
+
+  it("TODO déjà terminé : il reste terminé et aucun autre TODO ne change", async () => {
+    const depart = [{ ...enBase[0], termine: true }, enBase[1]];
+    const { repository, terminaisons } = fauxRepository(depart);
+    const service = createTodoService(repository);
+
+    expect(await service.terminer("a")).toEqual({ ok: true });
+
+    expect(terminaisons).toEqual([]);
+    expect(await service.lister()).toEqual(depart);
   });
 });

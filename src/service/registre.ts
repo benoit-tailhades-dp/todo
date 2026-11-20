@@ -11,7 +11,7 @@ export type Todo = {
   termine: boolean;
 };
 
-export type TodoAffiche = { id: string; titre: string };
+export type TodoAffiche = { id: string; titre: string; termine: boolean };
 
 /** Les TODO ajoutés un même jour, à Paris. */
 export type JourDeTodos = {
@@ -51,7 +51,7 @@ function grouperParJour(todos: Todo[], maintenant: number): JourDeTodos[] {
       };
       jours.push(jour);
     }
-    jour.todos.push({ id: todo.id, titre: todo.titre });
+    jour.todos.push({ id: todo.id, titre: todo.titre, termine: todo.termine });
     jour.nombre = jour.todos.length;
   }
   return jours;

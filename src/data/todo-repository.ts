@@ -12,6 +12,9 @@ export type TodoEnregistre = {
 export interface TodoRepository {
   listerTous(): Promise<TodoEnregistre[]>;
   ajouter(todo: TodoEnregistre): Promise<void>;
+  /** Le TODO de cet identifiant, ou `null`. */
+  trouver(id: string): Promise<TodoEnregistre | null>;
+  marquerTermine(id: string): Promise<void>;
 }
 
 const CREER_TABLE = `
@@ -53,6 +56,21 @@ export function createLibsqlTodoRepository(client: Client): TodoRepository {
         sql: "INSERT INTO todos (id, titre, cree_le, termine) VALUES (?, ?, ?, ?)",
         args: [todo.id, todo.titre, todo.creeLe, todo.termine ? 1 : 0],
       });
+    },
+
+    async trouver(id) {
+      await pret();
+      const resultat = await client.execute({
+        sql: "SELECT id, titre, cree_le, termine FROM todos WHERE id = ?",
+        args: [id],
+      });
+      const [ligne] = resultat.rows;
+      return ligne ? versTodo(ligne) : null;
+    },
+
+    async marquerTermine(id) {
+      await pret();
+      await client.execute({ sql: "UPDATE todos SET termine = 1 WHERE id = ?", args: [id] });
     },
   };
 }

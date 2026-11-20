@@ -2,8 +2,9 @@
 
 import { startTransition, useEffect, useOptimistic, useRef, useState } from "react";
 import { composerRegistre, type Todo } from "@/service/registre";
-import type { ResultatAjout } from "@/service/todo-service";
+import type { ResultatAjout, ResultatTerminer } from "@/service/todo-service";
 import { validerTitre } from "@/service/titre";
+import { AlerteIntrouvable } from "./alerte-introuvable";
 import { Bandeau } from "./bandeau";
 import { EtatVide } from "./etat-vide";
 import { FormulaireAjout } from "./formulaire-ajout";
@@ -13,25 +14,36 @@ const MESSAGES = { "titre-vide": "Écris un titre avant d'ajouter." } as const;
 /** Durée pendant laquelle le dernier ajout reste surligné (ms). */
 const DUREE_SURLIGNE = 6000;
 
+/** Changement affiché avant la réponse du serveur. */
+type Changement = { type: "ajout"; todo: Todo } | { type: "termine"; id: string };
+
+function appliquer(liste: Todo[], changement: Changement): Todo[] {
+  if (changement.type === "ajout") return [...liste, changement.todo];
+  return liste.map((todo) => (todo.id === changement.id ? { ...todo, termine: true } : todo));
+}
+
 /**
  * L'écran de l'application : le bandeau et sa saisie, puis la liste rangée par jour, ou l'état vide.
- * Un ajout s'affiche tout de suite (« Enregistrement… »), puis la page se recharge avec la base.
+ * Un ajout ou un TODO coché s'affiche tout de suite, puis la page se recharge avec la base.
  */
 export function EcranTodo({
   todos,
   maintenant,
   ajouterAction,
+  terminerAction,
 }: {
   todos: Todo[];
   /** Instant de la requête : les jours sont calculés par rapport à lui. */
   maintenant: number;
   ajouterAction: (saisie: string) => Promise<ResultatAjout>;
+  terminerAction: (id: string) => Promise<ResultatTerminer>;
 }) {
   const [saisie, setSaisie] = useState("");
   const [erreur, setErreur] = useState<string | null>(null);
   const [dernierAjoutId, setDernierAjoutId] = useState<string | null>(null);
   const [annonce, setAnnonce] = useState("");
-  const [affiches, afficherAjout] = useOptimistic(todos, (liste: Todo[], ajout: Todo) => [...liste, ajout]);
+  const [alerteIntrouvable, setAlerteIntrouvable] = useState(false);
+  const [affiches, afficherChangement] = useOptimistic(todos, appliquer);
   const champRef = useRef<HTMLInputElement>(null);
   const compteurAttente = useRef(0);
 
@@ -51,6 +63,7 @@ export function EcranTodo({
     const envoyee = saisie;
     setSaisie("");
     setErreur(null);
+    setAlerteIntrouvable(false);
     compteurAttente.current += 1;
     const enAttente: Todo = {
       id: `en-attente-${compteurAttente.current}`,
@@ -59,7 +72,7 @@ export function EcranTodo({
       termine: false,
     };
     startTransition(async () => {
-      afficherAjout(enAttente);
+      afficherChangement({ type: "ajout", todo: enAttente });
       const resultat = await ajouterAction(envoyee);
       startTransition(() => {
         if (resultat.ok) {
@@ -68,6 +81,20 @@ export function EcranTodo({
         } else {
           setErreur(MESSAGES[resultat.erreur]);
         }
+      });
+    });
+  }
+
+  function terminer(id: string) {
+    const todo = affiches.find((t) => t.id === id);
+    if (!todo || todo.termine) return;
+    setErreur(null);
+    startTransition(async () => {
+      afficherChangement({ type: "termine", id });
+      const resultat = await terminerAction(id);
+      startTransition(() => {
+        if (resultat.ok) setAnnonce(`« ${todo.titre} » terminé.`);
+        else setAlerteIntrouvable(true);
       });
     });
   }
@@ -95,10 +122,16 @@ export function EcranTodo({
         <p aria-live="polite" className="sr-only">
           {annonce}
         </p>
+        {alerteIntrouvable ? <AlerteIntrouvable onFermer={() => setAlerteIntrouvable(false)} /> : null}
         {registre.jours.length === 0 ? (
           <EtatVide />
         ) : (
-          <Registre jours={registre.jours} enAttente={enAttente} dernierAjoutId={dernierAjoutId} />
+          <Registre
+            jours={registre.jours}
+            enAttente={enAttente}
+            dernierAjoutId={dernierAjoutId}
+            onTerminer={terminer}
+          />
         )}
       </main>
     </div>

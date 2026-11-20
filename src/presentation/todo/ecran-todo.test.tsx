@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
-import type { ResultatAjout } from "@/service/todo-service";
+import type { ResultatAjout, ResultatTerminer } from "@/service/todo-service";
 import type { Todo } from "@/service/registre";
 import { ChargementListe } from "./chargement-liste";
 import { EcranTodo } from "./ecran-todo";
@@ -19,23 +19,45 @@ const DEUX_JOURS: Todo[] = [
   todo("c", "Sauvegarder la base de recette", Date.UTC(2026, 10, 20, 8, 0)),
 ];
 
-/** Action d'ajout qui attend qu'on la libère : on voit l'écran pendant et après l'enregistrement. */
-function actionEnSuspens() {
-  let liberer: (resultat: ResultatAjout) => void = () => {};
+/**
+ * Réponses du serveur encore attendues. React lie entre elles toutes les transitions asynchrones en cours :
+ * une action jamais libérée bloquerait les tests suivants. Chaque test libère les siennes en sortant.
+ */
+const enSuspens: Array<() => void> = [];
+
+/** Action serveur qui attend qu'on la libère : on voit l'écran pendant et après l'enregistrement. */
+function actionEnSuspens<R>(parDefaut: R) {
+  let liberer: (resultat: R) => void = () => {};
   const action = vi.fn(
-    (saisie: string) =>
-      new Promise<ResultatAjout>((resoudre) => {
-        void saisie;
+    (argument: string) =>
+      new Promise<R>((resoudre) => {
+        void argument;
         liberer = resoudre;
+        enSuspens.push(() => resoudre(parDefaut));
       }),
   );
-  return { action, liberer: (resultat: ResultatAjout) => liberer(resultat) };
+  return { action, liberer: (resultat: R) => liberer(resultat) };
 }
 
-const actionInerte = async (): Promise<ResultatAjout> => ({ ok: false, erreur: "titre-vide" });
+const AJOUT_REFUSE: ResultatAjout = { ok: false, erreur: "titre-vide" };
+const TERMINE: ResultatTerminer = { ok: true };
 
-function afficher(todos: Todo[], ajouterAction: (saisie: string) => Promise<ResultatAjout> = actionInerte) {
-  return render(<EcranTodo todos={todos} maintenant={VENDREDI_20_MIDI} ajouterAction={ajouterAction} />);
+type Actions = {
+  ajouterAction: (saisie: string) => Promise<ResultatAjout>;
+  terminerAction: (id: string) => Promise<ResultatTerminer>;
+};
+
+const ACTIONS_INERTES: Actions = {
+  ajouterAction: async () => ({ ok: false, erreur: "titre-vide" }),
+  terminerAction: async () => ({ ok: true }),
+};
+
+function ecran(todos: Todo[], actions: Partial<Actions> = {}) {
+  return <EcranTodo todos={todos} maintenant={VENDREDI_20_MIDI} {...ACTIONS_INERTES} {...actions} />;
+}
+
+function afficher(todos: Todo[], actions: Partial<Actions> = {}) {
+  return render(ecran(todos, actions));
 }
 
 /** Valeur d'une cellule d'en-tête de jour (« Âge », « TODO »). */
@@ -66,7 +88,10 @@ function lignes(nomDuJour: string): string[] {
     .map((ligne) => ligne.querySelector("[data-titre]")?.textContent ?? "");
 }
 
-afterEach(cleanup);
+afterEach(async () => {
+  cleanup();
+  await act(async () => enSuspens.splice(0).forEach((liberer) => liberer()));
+});
 
 describe("EcranTodo · consulter", () => {
   it("affiche le bandeau : « Mes TODO » et la date du jour", () => {
@@ -111,8 +136,8 @@ describe("EcranTodo · consulter", () => {
 
 describe("EcranTodo · ajouter", () => {
   it("valide « Relancer le devis » : champ vidé, ligne en attente en dernier sous « Aujourd'hui », puis enregistrée", async () => {
-    const { action, liberer } = actionEnSuspens();
-    const { rerender } = afficher(DEUX_JOURS, action);
+    const { action, liberer } = actionEnSuspens<ResultatAjout>(AJOUT_REFUSE);
+    const { rerender } = afficher(DEUX_JOURS, { ajouterAction: action });
 
     saisir("Relancer le devis");
     fireEvent.click(screen.getByRole("button", { name: "Ajouter" }));
@@ -125,9 +150,7 @@ describe("EcranTodo · ajouter", () => {
     // Le serveur répond, puis la page se recharge avec la base (refresh()).
     const enregistre = todo("d", "Relancer le devis", VENDREDI_20_MIDI);
     await act(async () => liberer({ ok: true, todo: enregistre }));
-    rerender(
-      <EcranTodo todos={[...DEUX_JOURS, enregistre]} maintenant={VENDREDI_20_MIDI} ajouterAction={action} />,
-    );
+    rerender(ecran([...DEUX_JOURS, enregistre], { ajouterAction: action }));
 
     expect(lignes("Aujourd'hui")).toEqual(["Sauvegarder la base de recette", "Relancer le devis"]);
     expect(screen.queryByText("Enregistrement…")).toBeNull();
@@ -136,8 +159,8 @@ describe("EcranTodo · ajouter", () => {
   });
 
   it("valide avec Entrée (envoi du formulaire)", () => {
-    const { action } = actionEnSuspens();
-    afficher(DEUX_JOURS, action);
+    const { action } = actionEnSuspens<ResultatAjout>(AJOUT_REFUSE);
+    afficher(DEUX_JOURS, { ajouterAction: action });
 
     saisir("Relancer le devis");
     fireEvent.submit(formulaire());
@@ -147,8 +170,8 @@ describe("EcranTodo · ajouter", () => {
   });
 
   it("sans TODO du jour, crée l'en-tête « Aujourd'hui » pour le nouveau TODO", () => {
-    const { action } = actionEnSuspens();
-    afficher(DEUX_JOURS.slice(0, 2), action);
+    const { action } = actionEnSuspens<ResultatAjout>(AJOUT_REFUSE);
+    afficher(DEUX_JOURS.slice(0, 2), { ajouterAction: action });
 
     saisir("Relancer le devis");
     fireEvent.submit(formulaire());
@@ -159,8 +182,8 @@ describe("EcranTodo · ajouter", () => {
   });
 
   it("champ vide ou fait d'espaces : aucun ajout, un message demande un titre", () => {
-    const { action } = actionEnSuspens();
-    afficher(DEUX_JOURS, action);
+    const { action } = actionEnSuspens<ResultatAjout>(AJOUT_REFUSE);
+    afficher(DEUX_JOURS, { ajouterAction: action });
 
     fireEvent.submit(formulaire());
     expect(screen.getByRole("alert").textContent).toBe("Écris un titre avant d'ajouter.");
@@ -175,8 +198,8 @@ describe("EcranTodo · ajouter", () => {
   });
 
   it("titre entouré d'espaces : la ligne affiche le titre sans les espaces", () => {
-    const { action } = actionEnSuspens();
-    afficher(DEUX_JOURS, action);
+    const { action } = actionEnSuspens<ResultatAjout>(AJOUT_REFUSE);
+    afficher(DEUX_JOURS, { ajouterAction: action });
 
     saisir("  Relancer le devis  ");
     fireEvent.submit(formulaire());
@@ -191,6 +214,92 @@ describe("EcranTodo · ajouter", () => {
     fireEvent.keyDown(champ(), { key: "Escape" });
 
     expect(champ().value).toBe("");
+  });
+});
+
+/** La ligne d'un TODO, retrouvée par son titre. */
+function ligne(titre: string): HTMLElement {
+  const trouvee = screen
+    .getAllByRole("listitem")
+    .find((li) => li.querySelector("[data-titre]")?.textContent === titre);
+  if (!trouvee) throw new Error(`Pas de ligne « ${titre} »`);
+  return trouvee;
+}
+
+function caseDe(titre: string): HTMLElement {
+  return within(ligne(titre)).getByRole("checkbox");
+}
+
+function estBarre(titre: string): boolean {
+  return ligne(titre).querySelector("[data-barre]")?.getAttribute("data-barre") === "true";
+}
+
+describe("EcranTodo · marquer terminé", () => {
+  it("cocher un TODO en cours : affiché terminé tout de suite (case cochée, titre barré)", () => {
+    const { action } = actionEnSuspens<ResultatTerminer>(TERMINE);
+    afficher(DEUX_JOURS, { terminerAction: action });
+    expect(caseDe("Relancer le devis").getAttribute("aria-checked")).toBe("false");
+    expect(estBarre("Relancer le devis")).toBe(false);
+
+    fireEvent.click(caseDe("Relancer le devis"));
+
+    expect(action.mock.calls).toEqual([["a"]]);
+    expect(caseDe("Relancer le devis").getAttribute("aria-checked")).toBe("true");
+    expect(estBarre("Relancer le devis")).toBe(true);
+    expect(caseDe("Relire le contrat de maintenance").getAttribute("aria-checked")).toBe("false");
+  });
+
+  it("un TODO terminé en base s'affiche coché et barré", () => {
+    afficher([{ ...DEUX_JOURS[0], termine: true }, DEUX_JOURS[1]]);
+
+    expect(caseDe("Relancer le devis").getAttribute("aria-checked")).toBe("true");
+    expect(estBarre("Relancer le devis")).toBe(true);
+  });
+
+  it("TODO déjà terminé : sa case ne se décoche pas et n'appelle pas le serveur", () => {
+    const terminerAction = vi.fn(ACTIONS_INERTES.terminerAction);
+    afficher([{ ...DEUX_JOURS[0], termine: true }, DEUX_JOURS[1]], { terminerAction });
+
+    expect(caseDe("Relancer le devis").getAttribute("aria-readonly")).toBe("true");
+    fireEvent.click(caseDe("Relancer le devis"));
+
+    expect(terminerAction).not.toHaveBeenCalled();
+    expect(caseDe("Relancer le devis").getAttribute("aria-checked")).toBe("true");
+  });
+
+  it("TODO introuvable en base : rien n'est modifié et un message le dit", async () => {
+    const { action, liberer } = actionEnSuspens<ResultatTerminer>(TERMINE);
+    afficher(DEUX_JOURS, { terminerAction: action });
+
+    fireEvent.click(caseDe("Relancer le devis"));
+    await act(async () => liberer({ ok: false, erreur: "introuvable" }));
+
+    expect(screen.getByText("Ce TODO n'existe plus")).toBeDefined();
+    expect(caseDe("Relancer le devis").getAttribute("aria-checked")).toBe("false");
+    expect(estBarre("Relancer le devis")).toBe(false);
+
+    fireEvent.click(screen.getByRole("button", { name: "Fermer le message" }));
+    expect(screen.queryByText("Ce TODO n'existe plus")).toBeNull();
+  });
+
+  it("annonce le TODO terminé", async () => {
+    const { action, liberer } = actionEnSuspens<ResultatTerminer>(TERMINE);
+    afficher(DEUX_JOURS, { terminerAction: action });
+
+    fireEvent.click(caseDe("Relancer le devis"));
+    await act(async () => liberer({ ok: true }));
+
+    expect(screen.getByText("« Relancer le devis » terminé.")).toBeDefined();
+  });
+
+  it("une ligne en cours d'enregistrement n'a pas de case", () => {
+    const { action } = actionEnSuspens<ResultatAjout>(AJOUT_REFUSE);
+    afficher(DEUX_JOURS, { ajouterAction: action });
+
+    saisir("Préparer l'ordre du jour");
+    fireEvent.submit(formulaire());
+
+    expect(within(ligne("Préparer l'ordre du jour")).queryByRole("checkbox")).toBeNull();
   });
 });
 

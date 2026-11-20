@@ -46,4 +46,15 @@ describe("todoService (assemblé sur la vraie base)", () => {
       }),
     ]);
   });
+
+  it("TODO terminé : toujours terminé après un redémarrage", async () => {
+    const avant = await demarrer();
+    const ajout = await avant.ajouter("Relancer le devis", Date.UTC(2026, 10, 20, 11, 0));
+    if (!ajout.ok) throw new Error("ajout refusé");
+    expect(await avant.terminer(ajout.todo.id)).toEqual({ ok: true });
+
+    const apres = await demarrer();
+
+    expect(await apres.lister()).toEqual([{ ...ajout.todo, termine: true }]);
+  });
 });

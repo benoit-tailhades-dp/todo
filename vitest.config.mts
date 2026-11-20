@@ -16,5 +16,7 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["src/**/*.test.{ts,tsx}"],
+    // Fuseau du serveur Vercel : un calcul de jour en heure locale échoue ici, même sur un poste réglé sur Paris.
+    env: { TZ: "UTC" },
   },
 });

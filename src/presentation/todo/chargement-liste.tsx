@@ -10,7 +10,10 @@ export function ChargementListe() {
       <p className="sr-only" role="status">
         Chargement de ta liste…
       </p>
-      <Bandeau date={<Skeleton className="mt-0.5 h-3.5 w-36 bg-shell-foreground/20" />} />
+      <Bandeau date={<Skeleton className="mt-0.5 h-3.5 w-36 bg-shell-foreground/20" />}>
+        <Skeleton className="h-11 w-full rounded-lg bg-shell-foreground/20" />
+        <Skeleton className="mt-3.5 h-3 w-28 bg-shell-foreground/15" />
+      </Bandeau>
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 pt-6 sm:px-6 sm:pt-8">
         {LARGEURS.map((lignes, i) => (
           <div key={i}>

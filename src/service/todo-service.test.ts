@@ -1,94 +1,109 @@
 import { describe, expect, it } from "vitest";
 import type { TodoEnregistre, TodoRepository } from "@/data/todo-repository";
+import { composerRegistre } from "./registre";
 import { createTodoService } from "./todo-service";
 
 // Instants absolus. En novembre, Paris est à UTC + 1.
 const VENDREDI_20_MIDI = Date.UTC(2026, 10, 20, 11, 0);
 
-function fauxRepository(todos: TodoEnregistre[]): TodoRepository {
-  return {
+/** Faux repository en mémoire : garde ce qu'on lui confie et note les écritures. */
+function fauxRepository(depart: TodoEnregistre[] = []) {
+  const todos = [...depart];
+  const ajouts: TodoEnregistre[] = [];
+  const repository: TodoRepository = {
     async listerTous() {
-      return todos;
+      return [...todos];
+    },
+    async ajouter(todo) {
+      ajouts.push(todo);
+      todos.push(todo);
     },
   };
+  return { repository, ajouts };
 }
 
 function todo(id: string, titre: string, creeLe: number): TodoEnregistre {
   return { id, titre, creeLe, termine: false };
 }
 
-describe("TodoService.consulter", () => {
-  it("base sans TODO : aucun jour à afficher", async () => {
-    const service = createTodoService(fauxRepository([]));
+describe("TodoService.lister", () => {
+  it("renvoie les TODO du repository", async () => {
+    const enBase = [todo("a", "Relancer le devis", Date.UTC(2026, 10, 16, 9, 0))];
+    const { repository } = fauxRepository(enBase);
 
-    const registre = await service.consulter(VENDREDI_20_MIDI);
+    expect(await createTodoService(repository).lister()).toEqual(enBase);
+  });
+});
 
-    expect(registre.jours).toEqual([]);
+describe("TodoService.ajouter", () => {
+  it("enregistre un TODO en cours, daté de maintenant, et le renvoie", async () => {
+    const { repository, ajouts } = fauxRepository();
+
+    const resultat = await createTodoService(repository).ajouter("Relancer le devis", VENDREDI_20_MIDI);
+
+    expect(ajouts).toHaveLength(1);
+    const [enregistre] = ajouts;
+    expect(enregistre).toMatchObject({ titre: "Relancer le devis", creeLe: VENDREDI_20_MIDI, termine: false });
+    expect(enregistre.id).toMatch(/\S/);
+    expect(resultat).toEqual({ ok: true, todo: enregistre });
   });
 
-  it("donne la date du jour en toutes lettres", async () => {
-    const service = createTodoService(fauxRepository([]));
+  it("donne à chaque TODO un identifiant différent", async () => {
+    const { repository, ajouts } = fauxRepository();
+    const service = createTodoService(repository);
 
-    const registre = await service.consulter(VENDREDI_20_MIDI);
+    await service.ajouter("Relancer le devis", VENDREDI_20_MIDI);
+    await service.ajouter("Relancer le devis", VENDREDI_20_MIDI);
 
-    expect(registre.dateDuJour).toBe("Vendredi 20 novembre");
+    expect(ajouts[0].id).not.toBe(ajouts[1].id);
   });
 
-  it("range par jour d'ajout, du plus ancien au plus récent, avec le nombre de TODO de chaque jour", async () => {
-    const service = createTodoService(
-      fauxRepository([
-        todo("c", "Sauvegarder la base de recette", Date.UTC(2026, 10, 20, 8, 0)),
-        todo("b", "Relire le contrat de maintenance", Date.UTC(2026, 10, 16, 15, 0)),
-        todo("a", "Relancer le devis", Date.UTC(2026, 10, 16, 9, 0)),
-      ]),
-    );
+  it("retire les espaces autour du titre avant d'enregistrer", async () => {
+    const { repository, ajouts } = fauxRepository();
 
-    const { jours } = await service.consulter(VENDREDI_20_MIDI);
+    await createTodoService(repository).ajouter("  Relancer le devis  ", VENDREDI_20_MIDI);
 
-    expect(jours.map(({ titre, nombre, todos }) => ({ titre, nombre, todos }))).toEqual([
-      {
-        titre: "Lundi 16 novembre",
-        nombre: 2,
-        todos: [
-          { id: "a", titre: "Relancer le devis" },
-          { id: "b", titre: "Relire le contrat de maintenance" },
-        ],
-      },
-      {
-        titre: "Aujourd'hui",
-        nombre: 1,
-        todos: [{ id: "c", titre: "Sauvegarder la base de recette" }],
-      },
+    expect(ajouts.map((t) => t.titre)).toEqual(["Relancer le devis"]);
+  });
+
+  it("titre vide ou fait d'espaces : n'enregistre rien et demande un titre", async () => {
+    const { repository, ajouts } = fauxRepository();
+    const service = createTodoService(repository);
+
+    expect(await service.ajouter("", VENDREDI_20_MIDI)).toEqual({ ok: false, erreur: "titre-vide" });
+    expect(await service.ajouter("   ", VENDREDI_20_MIDI)).toEqual({ ok: false, erreur: "titre-vide" });
+    expect(ajouts).toEqual([]);
+  });
+
+  it("le TODO ajouté apparaît en dernier sous « Aujourd'hui »", async () => {
+    const { repository } = fauxRepository([
+      todo("a", "Relire le contrat de maintenance", Date.UTC(2026, 10, 16, 9, 0)),
+      todo("b", "Sauvegarder la base de recette", Date.UTC(2026, 10, 20, 8, 0)),
+    ]);
+    const service = createTodoService(repository);
+
+    await service.ajouter("Relancer le devis", VENDREDI_20_MIDI);
+
+    const { jours } = composerRegistre(await service.lister(), VENDREDI_20_MIDI);
+    expect(jours.map((j) => j.titre)).toEqual(["Lundi 16 novembre", "Aujourd'hui"]);
+    expect(jours[1].todos.map((t) => t.titre)).toEqual([
+      "Sauvegarder la base de recette",
+      "Relancer le devis",
     ]);
   });
 
-  it("donne à chaque jour sa clé, la précision de sa date et son âge en jours", async () => {
-    const service = createTodoService(
-      fauxRepository([
-        todo("a", "Relancer le devis", Date.UTC(2026, 10, 16, 9, 0)),
-        todo("c", "Sauvegarder la base de recette", Date.UTC(2026, 10, 20, 8, 0)),
-      ]),
-    );
-
-    const { jours } = await service.consulter(VENDREDI_20_MIDI);
-
-    expect(jours.map(({ cle, precision, age }) => ({ cle, precision, age }))).toEqual([
-      { cle: "2026-11-16", precision: null, age: 4 },
-      { cle: "2026-11-20", precision: "vendredi 20 novembre", age: 0 },
+  it("sans TODO du jour, l'ajout crée l'en-tête « Aujourd'hui »", async () => {
+    const { repository } = fauxRepository([
+      todo("a", "Relire le contrat de maintenance", Date.UTC(2026, 10, 16, 9, 0)),
     ]);
-  });
+    const service = createTodoService(repository);
 
-  it("TODO ajouté le 19 novembre à 23 h 30 à Paris, ouvert le 20 : rangé sous « Hier », même en UTC", async () => {
-    // 19 novembre 23 h 30 à Paris = 22 h 30 UTC. Ouverture le 20 à 0 h 15 à Paris = 19 novembre 23 h 15 UTC :
-    // un calcul en UTC mettrait les deux le même jour et dirait « Aujourd'hui ».
-    const service = createTodoService(
-      fauxRepository([todo("a", "Relancer le devis", Date.UTC(2026, 10, 19, 22, 30))]),
-    );
+    await service.ajouter("Relancer le devis", VENDREDI_20_MIDI);
 
-    const { jours } = await service.consulter(Date.UTC(2026, 10, 19, 23, 15));
-
-    expect(jours.map(({ titre, precision }) => ({ titre, precision }))).toEqual([
-      { titre: "Hier", precision: "jeudi 19 novembre" },
+    const { jours } = composerRegistre(await service.lister(), VENDREDI_20_MIDI);
+    expect(jours.map(({ titre, nombre }) => ({ titre, nombre }))).toEqual([
+      { titre: "Lundi 16 novembre", nombre: 1 },
+      { titre: "Aujourd'hui", nombre: 1 },
     ]);
   });
 });

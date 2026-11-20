@@ -1,61 +1,28 @@
-import type { TodoEnregistre, TodoRepository } from "@/data/todo-repository";
-import { cleJour, dateLongue, ecartJours, precisionDuJour, titreDuJour } from "./jours";
+import type { TodoRepository } from "@/data/todo-repository";
+import type { Todo } from "./registre";
+import { validerTitre } from "./titre";
 
-export type TodoAffiche = { id: string; titre: string };
-
-/** Les TODO ajoutés un même jour, à Paris. */
-export type JourDeTodos = {
-  /** Jour au format AAAA-MM-JJ. */
-  cle: string;
-  /** « Aujourd'hui », « Hier » ou « Lundi 16 novembre ». */
-  titre: string;
-  /** Date en clair à côté de « Aujourd'hui » et « Hier », sinon `null`. */
-  precision: string | null;
-  /** Âge du jour, en jours calendaires. */
-  age: number;
-  nombre: number;
-  todos: TodoAffiche[];
-};
-
-export type Registre = {
-  /** « Vendredi 20 novembre ». */
-  dateDuJour: string;
-  /** Du plus ancien au plus récent. */
-  jours: JourDeTodos[];
-};
+export type ResultatAjout = { ok: true; todo: Todo } | { ok: false; erreur: "titre-vide" };
 
 export type TodoService = {
-  consulter(maintenant: number): Promise<Registre>;
+  /** Tous les TODO enregistrés. Le registre affiché se compose avec `composerRegistre`. */
+  lister(): Promise<Todo[]>;
+  /** Enregistre un TODO en cours, daté de `maintenant`, si son titre est valide. */
+  ajouter(saisie: unknown, maintenant: number): Promise<ResultatAjout>;
 };
-
-function grouperParJour(todos: TodoEnregistre[], maintenant: number): JourDeTodos[] {
-  const tries = todos.toSorted((a, b) => a.creeLe - b.creeLe);
-  const jours: JourDeTodos[] = [];
-  for (const todo of tries) {
-    const cle = cleJour(todo.creeLe);
-    let jour = jours.at(-1);
-    if (jour?.cle !== cle) {
-      jour = {
-        cle,
-        titre: titreDuJour(todo.creeLe, maintenant),
-        precision: precisionDuJour(todo.creeLe, maintenant),
-        age: ecartJours(todo.creeLe, maintenant),
-        nombre: 0,
-        todos: [],
-      };
-      jours.push(jour);
-    }
-    jour.todos.push({ id: todo.id, titre: todo.titre });
-    jour.nombre = jour.todos.length;
-  }
-  return jours;
-}
 
 export function createTodoService(repository: TodoRepository): TodoService {
   return {
-    async consulter(maintenant) {
-      const todos = await repository.listerTous();
-      return { dateDuJour: dateLongue(maintenant), jours: grouperParJour(todos, maintenant) };
+    async lister() {
+      return repository.listerTous();
+    },
+
+    async ajouter(saisie, maintenant) {
+      const verdict = validerTitre(saisie);
+      if (!verdict.ok) return verdict;
+      const todo: Todo = { id: crypto.randomUUID(), titre: verdict.titre, creeLe: maintenant, termine: false };
+      await repository.ajouter(todo);
+      return { ok: true, todo };
     },
   };
 }

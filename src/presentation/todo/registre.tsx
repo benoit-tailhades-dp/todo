@@ -1,5 +1,6 @@
+import { LoaderCircle } from "lucide-react";
 import { cn } from "@/presentation/lib/utils";
-import type { JourDeTodos, TodoAffiche } from "@/service/todo-service";
+import type { JourDeTodos, TodoAffiche } from "@/service/registre";
 
 /** L'encre monte avec l'âge : un jour qui traîne se repère d'un coup d'œil. */
 function teinteAge(jours: number): string {
@@ -32,7 +33,17 @@ function CelluleEnTete({
 }
 
 /** Le registre : les TODO, un bloc par jour d'ajout, dans l'ordre donné par le service. */
-export function Registre({ jours }: { jours: JourDeTodos[] }) {
+export function Registre({
+  jours,
+  enAttente,
+  dernierAjoutId,
+}: {
+  jours: JourDeTodos[];
+  /** TODO affichés avant la réponse du serveur. */
+  enAttente: ReadonlySet<string>;
+  /** Le dernier TODO enregistré, surligné quelques secondes. */
+  dernierAjoutId: string | null;
+}) {
   return (
     <div className="flex flex-col gap-6">
       {jours.map((jour) => {
@@ -63,7 +74,12 @@ export function Registre({ jours }: { jours: JourDeTodos[] }) {
             </div>
             <ul className="overflow-hidden rounded-b-xl border border-t-0 border-border bg-card">
               {jour.todos.map((todo) => (
-                <LigneTodo key={todo.id} todo={todo} />
+                <LigneTodo
+                  key={todo.id}
+                  todo={todo}
+                  enAttente={enAttente.has(todo.id)}
+                  nouveau={todo.id === dernierAjoutId}
+                />
               ))}
             </ul>
           </section>
@@ -73,12 +89,39 @@ export function Registre({ jours }: { jours: JourDeTodos[] }) {
   );
 }
 
-function LigneTodo({ todo }: { todo: TodoAffiche }) {
+function LigneTodo({
+  todo,
+  enAttente,
+  nouveau,
+}: {
+  todo: TodoAffiche;
+  enAttente: boolean;
+  nouveau: boolean;
+}) {
   return (
-    <li className="border-t border-border first:border-t-0">
-      <div className="flex min-h-[46px] items-center gap-3.5 px-3.5 py-2.5">
-        <span className="min-w-0 flex-1 break-words">{todo.titre}</span>
-      </div>
+    <li data-todo-id={todo.id} className="border-t border-border first:border-t-0">
+      {enAttente ? (
+        <div className="flex min-h-[46px] items-center gap-3.5 px-3.5 py-2.5 text-muted-foreground">
+          <LoaderCircle className="size-5 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden />
+          <span data-titre="" className="min-w-0 flex-1 break-words">
+            {todo.titre}
+          </span>
+          <span className="shrink-0 text-xs font-medium">Enregistrement…</span>
+        </div>
+      ) : (
+        <div className="flex min-h-[46px] items-center gap-3.5 px-3.5 py-2.5">
+          <span className="min-w-0 flex-1 break-words">
+            <span data-titre="" className={cn(nouveau && "surligne")}>
+              {todo.titre}
+            </span>
+          </span>
+          {nouveau ? (
+            <span className="shrink-0 animate-apparait text-xs font-medium text-muted-foreground">
+              à l&apos;instant
+            </span>
+          ) : null}
+        </div>
+      )}
     </li>
   );
 }

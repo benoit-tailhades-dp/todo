@@ -70,4 +70,24 @@ describe("TodoRepository libSQL (fichier SQLite)", () => {
       },
     ]);
   });
+
+  it("ajouter sur une base neuve : crée la table et enregistre le TODO", async () => {
+    const repository = createLibsqlTodoRepository(connecter());
+    const todo = { id: "a", titre: "Relancer le devis", creeLe: Date.UTC(2026, 10, 20, 11, 0), termine: false };
+
+    await repository.ajouter(todo);
+
+    expect(await repository.listerTous()).toEqual([todo]);
+  });
+
+  it("TODO ajouté : après fermeture et réouverture, il est toujours là", async () => {
+    const premiere = connecter();
+    const todo = { id: "a", titre: "Relancer le devis", creeLe: Date.UTC(2026, 10, 20, 11, 0), termine: false };
+    await createLibsqlTodoRepository(premiere).ajouter(todo);
+    premiere.close();
+
+    const relus = await createLibsqlTodoRepository(connecter()).listerTous();
+
+    expect(relus).toEqual([todo]);
+  });
 });

@@ -9,7 +9,7 @@ import { ageDuJour, cleJour, dateLongue, titreDuJour } from "./dates";
 import { ID_GLISSE, ID_SELECTEUR, todosDuScenario, type Scenario, type TodoMaquette } from "./donnees-fictives";
 import { AlerteDateInvalide, AlerteIntrouvable, EtatErreurChargement, EtatToutTermine, EtatVide } from "./etats";
 import { FormulaireAjout } from "./formulaire-ajout";
-import { jourDuTodo, Registre, type Glisser, type Phase } from "./registre";
+import { jourDuTodo, ListeDesJours, type Glisser, type Phase } from "./liste-des-jours";
 import { SectionTerminees } from "./section-terminees";
 
 const MESSAGE_TITRE_VIDE = "Écris un titre avant d'ajouter.";
@@ -234,7 +234,7 @@ export function MaquetteTodo({
           )
         ) : (
           <div ref={listeRef}>
-            <Registre
+            <ListeDesJours
               enCours={enCours}
               maintenant={maintenant}
               phases={phases}

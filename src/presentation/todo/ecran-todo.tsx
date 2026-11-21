@@ -9,7 +9,7 @@ import { Bandeau } from "./bandeau";
 import { CellulesCartouche, type Cellule } from "./cellules-cartouche";
 import { AlerteDateInvalide, AlerteIntrouvable, EtatToutTermine, EtatVide } from "./etats";
 import { FormulaireAjout } from "./formulaire-ajout";
-import { Registre, type Glisser, type Phase } from "./registre";
+import { ListeDesJours, type Glisser, type Phase } from "./liste-des-jours";
 import { SectionTerminees } from "./section-terminees";
 
 const MESSAGES = { "titre-vide": "Écris un titre avant d'ajouter." } as const;
@@ -230,7 +230,7 @@ export function EcranTodo({
           <EtatToutTermine nombre={compteurs.termines} />
         ) : (
           <div ref={listeRef}>
-            <Registre
+            <ListeDesJours
               jours={registre.jours}
               maintenant={maintenant}
               phases={phases}

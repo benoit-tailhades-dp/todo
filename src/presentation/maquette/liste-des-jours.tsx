@@ -4,7 +4,8 @@ import { ArrowDownToLine, GripVertical, LoaderCircle } from "lucide-react";
 import type { DragEvent } from "react";
 import { cn } from "@/presentation/lib/utils";
 import { Checkbox } from "@/presentation/ui/checkbox";
-import type { JourDeTodos, TodoAffiche } from "@/service/registre";
+import type { TodoMaquette } from "./donnees-fictives";
+import { ageDuJour, cleJour, precisionDuJour, titreDuJour } from "./dates";
 import { SelecteurDate } from "./selecteur-date";
 
 /** « barre » : le trait d'encre passe sur le titre ; « sortie » : la ligne se replie. */
@@ -12,6 +13,23 @@ export type Phase = "barre" | "sortie";
 
 /** Le glisser-déposer en cours : le TODO saisi et le jour qu'il survole. */
 export type Glisser = { id: string | null; survole: string | null };
+
+type Groupe = { cle: string; todos: TodoMaquette[] };
+
+/** Jour d'un TODO : celui qu'on lui a choisi, sinon son jour d'ajout. */
+export function jourDuTodo(todo: TodoMaquette): string {
+  return todo.jour ?? cleJour(todo.creeLe);
+}
+
+/** Jours du plus ancien au plus futur ; dans un jour, l'ordre d'ajout. */
+function grouperParJour(todos: TodoMaquette[]): Groupe[] {
+  const groupes = new Map<string, TodoMaquette[]>();
+  for (const todo of todos.toSorted((a, b) => a.creeLe - b.creeLe)) {
+    const cle = jourDuTodo(todo);
+    groupes.set(cle, [...(groupes.get(cle) ?? []), todo]);
+  }
+  return [...groupes].map(([cle, liste]) => ({ cle, todos: liste })).sort((a, b) => a.cle.localeCompare(b.cle));
+}
 
 /** L'encre monte avec l'âge : un jour qui traîne se repère d'un coup d'œil. Un jour à venir reste neutre. */
 function teinteAge(jours: number): string {
@@ -61,12 +79,11 @@ function CelluleAge({ age }: { age: number }) {
   );
 }
 
-/** Le registre : les TODO en cours, un bloc par jour, dans l'ordre donné par le service. */
-export function Registre({
-  jours,
+/** Les TODO en cours, rangés par jour, du plus ancien au plus futur. */
+export function ListeDesJours({
+  enCours,
   maintenant,
   phases,
-  enAttente,
   dernierAjoutId,
   dateOuverte,
   glisser,
@@ -75,25 +92,20 @@ export function Registre({
   onChangerJour,
   onGlisserChange,
 }: {
-  jours: JourDeTodos[];
-  /** Instant de la requête : le calendrier marque ce jour comme aujourd'hui. */
+  enCours: TodoMaquette[];
   maintenant: number;
-  /** TODO cochés dont la chorégraphie est en cours. */
-  phases: Readonly<Record<string, Phase>>;
-  /** TODO affichés avant la réponse du serveur. */
-  enAttente: ReadonlySet<string>;
-  /** Le dernier TODO enregistré, surligné quelques secondes. */
+  phases: Record<string, Phase>;
   dernierAjoutId: string | null;
   /** Le TODO dont le sélecteur de date est ouvert. */
   dateOuverte: string | null;
   glisser: Glisser;
   onTerminer: (id: string) => void;
   onDateOuverteChange: (id: string | null) => void;
-  /** Un autre jour, AAAA-MM-JJ, choisi pour le TODO. */
   onChangerJour: (id: string, jour: string) => void;
   onGlisserChange: (glisser: Glisser) => void;
 }) {
-  const jourGlisse = glisser.id ? jours.find((j) => j.todos.some((t) => t.id === glisser.id))?.cle : undefined;
+  const groupes = grouperParJour(enCours);
+  const jourGlisse = glisser.id ? groupes.find((g) => g.todos.some((t) => t.id === glisser.id))?.cle : undefined;
 
   /** Un jour accepte le TODO glissé, sauf le sien : y relâcher ne change rien. */
   function accepte(cle: string): boolean {
@@ -102,31 +114,33 @@ export function Registre({
 
   return (
     <div className="flex flex-col gap-6">
-      {jours.map((jour) => {
-        const idTitre = `jour-${jour.cle}`;
-        const survole = glisser.survole === jour.cle && accepte(jour.cle);
+      {groupes.map((groupe) => {
+        const age = ageDuJour(groupe.cle, maintenant);
+        const precision = precisionDuJour(groupe.cle, maintenant);
+        const idTitre = `jour-${groupe.cle}`;
+        const survole = glisser.survole === groupe.cle && accepte(groupe.cle);
         return (
           <section
-            key={jour.cle}
+            key={groupe.cle}
             aria-labelledby={idTitre}
-            data-jour={jour.cle}
+            data-jour={groupe.cle}
             data-survole={survole || undefined}
             className="rounded-xl outline-offset-4 data-survole:outline-2 data-survole:outline-primary data-survole:outline-dashed"
             onDragOver={(evenement: DragEvent) => {
-              if (!accepte(jour.cle)) return;
+              if (!accepte(groupe.cle)) return;
               evenement.preventDefault();
               evenement.dataTransfer.dropEffect = "move";
-              if (glisser.survole !== jour.cle) onGlisserChange({ ...glisser, survole: jour.cle });
+              if (glisser.survole !== groupe.cle) onGlisserChange({ ...glisser, survole: groupe.cle });
             }}
             onDragLeave={(evenement: DragEvent) => {
               if (evenement.currentTarget.contains(evenement.relatedTarget as Node | null)) return;
-              if (glisser.survole === jour.cle) onGlisserChange({ ...glisser, survole: null });
+              if (glisser.survole === groupe.cle) onGlisserChange({ ...glisser, survole: null });
             }}
             onDrop={(evenement: DragEvent) => {
               evenement.preventDefault();
               const id = glisser.id;
               onGlisserChange({ id: null, survole: null });
-              if (id && accepte(jour.cle)) onChangerJour(id, jour.cle);
+              if (id && accepte(groupe.cle)) onChangerJour(id, groupe.cle);
             }}
           >
             {/* En-tête en bande de cartouche : date | âge | nombre. */}
@@ -138,10 +152,10 @@ export function Registre({
             >
               <div className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2.5 px-3.5 py-2">
                 <h2 id={idTitre} className="text-[1.0625rem] leading-tight">
-                  {jour.titre}
+                  {titreDuJour(groupe.cle, maintenant)}
                 </h2>
-                {jour.precision ? (
-                  <span className="text-[0.8125rem] font-medium text-muted-foreground">{jour.precision}</span>
+                {precision ? (
+                  <span className="text-[0.8125rem] font-medium text-muted-foreground">{precision}</span>
                 ) : null}
                 {survole ? (
                   <span className="inline-flex animate-apparait items-center gap-1 self-center text-[0.8125rem] font-medium text-primary motion-reduce:animate-none">
@@ -151,27 +165,26 @@ export function Registre({
                 ) : null}
               </div>
               <dl className="flex">
-                <CelluleAge age={jour.age} />
+                <CelluleAge age={age} />
                 <CelluleEnTete libelle="TODO" className="text-foreground">
-                  {jour.nombre}
+                  {groupe.todos.length}
                 </CelluleEnTete>
               </dl>
             </div>
             <ul className="overflow-hidden rounded-b-xl border border-t-0 border-border bg-card">
-              {jour.todos.map((todo) => (
+              {groupe.todos.map((todo) => (
                 <LigneTodo
                   key={todo.id}
                   todo={todo}
-                  jour={jour.cle}
+                  jour={groupe.cle}
                   maintenant={maintenant}
                   phase={phases[todo.id]}
-                  enAttente={enAttente.has(todo.id)}
                   nouveau={todo.id === dernierAjoutId}
                   glisse={todo.id === glisser.id}
                   dateOuverte={todo.id === dateOuverte}
                   onTerminer={onTerminer}
                   onDateOuverteChange={(ouvert) => onDateOuverteChange(ouvert ? todo.id : null)}
-                  onChangerJour={(choisi) => onChangerJour(todo.id, choisi)}
+                  onChangerJour={(jour) => onChangerJour(todo.id, jour)}
                   onGlisserDebut={() => onGlisserChange({ id: todo.id, survole: null })}
                   onGlisserFin={() => onGlisserChange({ id: null, survole: null })}
                 />
@@ -189,7 +202,6 @@ function LigneTodo({
   jour,
   maintenant,
   phase,
-  enAttente,
   nouveau,
   glisse,
   dateOuverte,
@@ -199,12 +211,10 @@ function LigneTodo({
   onGlisserDebut,
   onGlisserFin,
 }: {
-  todo: TodoAffiche;
-  /** Jour sous lequel la ligne est rangée, AAAA-MM-JJ. */
+  todo: TodoMaquette;
   jour: string;
   maintenant: number;
   phase: Phase | undefined;
-  enAttente: boolean;
   nouveau: boolean;
   glisse: boolean;
   dateOuverte: boolean;
@@ -214,8 +224,7 @@ function LigneTodo({
   onGlisserDebut: () => void;
   onGlisserFin: () => void;
 }) {
-  const coche = todo.termine || phase !== undefined;
-  const mobile = !enAttente && !coche;
+  const mobile = !todo.enAttente && phase === undefined;
   return (
     <li
       data-todo-id={todo.id}
@@ -236,29 +245,25 @@ function LigneTodo({
       )}
     >
       <div className="min-h-0 overflow-hidden">
-        {enAttente ? (
+        {todo.enAttente ? (
           <div className="flex min-h-[46px] items-center gap-3.5 px-3.5 py-2.5 text-muted-foreground">
             <LoaderCircle className="size-5 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden />
-            <span data-titre="" className="min-w-0 flex-1 break-words">
-              {todo.titre}
-            </span>
+            <span className="min-w-0 flex-1 break-words">{todo.titre}</span>
             <span className="shrink-0 text-xs font-medium">Enregistrement…</span>
           </div>
         ) : (
           <div className="flex items-center transition-colors duration-150 hover:bg-accent/60 group-data-glisse/ligne:bg-transparent">
             <label className="flex min-h-[46px] min-w-0 flex-1 cursor-pointer items-center gap-3.5 py-2.5 pl-3.5">
-              {/* Pas de « décocher » : une fois cochée, la case ne réagit plus. */}
               <Checkbox
                 data-case-todo=""
-                checked={coche}
-                readOnly={coche}
-                onCheckedChange={(valeur) => {
-                  if (valeur && !coche) onTerminer(todo.id);
+                checked={phase !== undefined}
+                onCheckedChange={(coche) => {
+                  if (coche && phase === undefined) onTerminer(todo.id);
                 }}
               />
               <span className="min-w-0 flex-1 break-words group-data-glisse/ligne:text-muted-foreground">
                 <span className={cn(nouveau && "surligne")}>
-                  <span data-titre="" className="trait-encre" data-barre={coche}>
+                  <span className="trait-encre" data-barre={phase !== undefined}>
                     {todo.titre}
                   </span>
                 </span>

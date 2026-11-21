@@ -1,6 +1,7 @@
 import { Skeleton } from "@/presentation/ui/skeleton";
 import { Bandeau } from "./bandeau";
 import { CellulesCartouche } from "./cellules-cartouche";
+import { MenuTheme } from "@/presentation/theme/menu-theme";
 
 const CELLULES = [
   { libelle: "En cours", valeur: "", enAvant: true },
@@ -20,6 +21,7 @@ export function ChargementRegistre() {
       <Bandeau
         date={<Skeleton className="mt-0.5 h-3.5 w-36 bg-shell-foreground/20" />}
         cellules={<CellulesCartouche cellules={CELLULES} chargement />}
+        theme={<MenuTheme />}
       >
         <Skeleton className="h-11 w-full rounded-lg bg-shell-foreground/20" />
         <Skeleton className="mt-3.5 h-3 w-28 bg-shell-foreground/15" />

@@ -198,7 +198,7 @@ Le système reprend le cartouche d'un plan d'ingénierie : un bandeau d'encre qu
 
 La profondeur ne vient pas des ombres mais des aplats : papier gris-bleu, feuille blanche, calque pour les en-têtes, encre pour le bandeau. Le mouvement est bref et dessiné à la main : un trait de surligneur balaie le dernier ajout, un trait d'encre barre ce qu'on coche, un chiffre glisse en place quand il change. Tout mouvement est coupé quand le système demande un mouvement réduit.
 
-Les deux modes, clair et sombre, suivent le réglage du système (`prefers-color-scheme`). Le sombre garde la même grammaire : encre éclaircie, surligneur légèrement assourdi, bandeau d'encre profonde.
+Deux modes, clair et sombre. Par défaut, ils suivent le réglage du système ; le bouton de thème du bandeau force l'un ou l'autre (Système, Clair, Sombre), choix retenu dans le navigateur. Le sombre garde la même grammaire : encre éclaircie, surligneur légèrement assourdi, bandeau d'encre profonde.
 
 **Key Characteristics:**
 - Bandeau d'encre pleine largeur, contenu centré à 56 rem.
@@ -319,6 +319,8 @@ Nets, en Semi Condensed 600, qui s'enfoncent d'un pixel au clic.
 
 ### Bandeau et cellules de cartouche (signature)
 Le bandeau d'encre porte titre, date, cellules et saisie. Les cellules sont des compartiments à filets (`bandeau-foreground` à 35 %), sans rayon, avec un libellé en label petit et une valeur en chiffre tabulaire. La valeur lue en premier (« En cours ») est en surligneur. Pendant le chargement, la valeur est remplacée par un squelette `bandeau-foreground` à 20 %.
+
+Le bouton de thème ferme le bandeau : un compartiment à filet `bandeau-foreground` à 35 %, de la hauteur des cellules et séparé d'elles par 12 px, avec l'icône du choix (écran, soleil, lune). Sur mobile, il passe à droite du titre (36 px). Son nom annonce le choix (« Thème : Sombre »). Il ouvre un menu de feuille (rayon de carte, filet, ombre de flottant) : libellé « Thème », puis trois choix radio, le choix actif coché à l'encre.
 
 ### En-tête de jour (signature)
 Une bande de cartouche en calque : date (et précision) à gauche, puis deux cellules séparées par un trait, « Âge » teintée selon la règle de l'encre qui monte, et « TODO ». La liste qui suit est une feuille à lignes séparées par un filet, survol en `survol` à 60 %.

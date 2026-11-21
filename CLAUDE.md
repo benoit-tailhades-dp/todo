@@ -33,7 +33,7 @@ Tests : environnement `node` par défaut. Un test de composant commence par `// 
 
 ## Design system Cartouche
 
-- Couleurs uniquement en jetons, définies dans `src/app/globals.css` (clair et sombre par `prefers-color-scheme`). Aucune couleur en dur, ni palette Tailwind, ni valeur arbitraire. S'il manque une couleur, ajouter un jeton clair et sombre.
+- Couleurs uniquement en jetons, définies dans `src/app/globals.css` (sombre sous `:root[data-theme="sombre"]`, attribut posé avant le premier rendu par `src/presentation/theme/script-theme.tsx`). Aucune couleur en dur, ni palette Tailwind, ni valeur arbitraire. S'il manque une couleur, ajouter un jeton clair et sombre.
 - Composants : uniquement ceux de `src/presentation/ui/` (shadcn style base-nova sur Base UI, fusion de classes avec le paquet `cn`). Le bouton a une variante `signature` (surligneur) pour le bandeau encre (`bg-shell`).
 - Mouvements définis dans `globals.css` : `surligne`, `trait-encre`, `animate-chiffre`, `animate-apparait`, courbe `ease-trait`. Ils sont coupés en mouvement réduit.
 - `DESIGN.md` et `.impeccable/design.json` décrivent le système livré. `PRODUCT.md` porte la vérité produit pour Impeccable. Un hook Impeccable analyse chaque modification de fichier d'interface.

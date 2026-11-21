@@ -25,7 +25,8 @@ export type Scenario =
   | "a-venir"
   | "selecteur-date"
   | "glisser"
-  | "date-invalide";
+  | "date-invalide"
+  | "menu-theme";
 
 export const SCENARIOS: ReadonlyArray<{ value: Scenario; label: string }> = [
   { value: "liste", label: "Liste de travail" },
@@ -40,6 +41,7 @@ export const SCENARIOS: ReadonlyArray<{ value: Scenario; label: string }> = [
   { value: "selecteur-date", label: "Sélecteur de date ouvert" },
   { value: "glisser", label: "TODO glissé sur un jour" },
   { value: "date-invalide", label: "Date refusée" },
+  { value: "menu-theme", label: "Menu du thème ouvert" },
 ];
 
 /** Revue : le TODO dont le sélecteur est ouvert (« Sauvegarder la base de recette », aujourd'hui). */

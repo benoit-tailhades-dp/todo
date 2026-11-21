@@ -731,8 +731,8 @@
       }
     ],
     "themes": {
-      "mode": "prefers-color-scheme",
-      "note": "Les jetons suffixés -sombre sont les valeurs de @media (prefers-color-scheme: dark) dans src/app/globals.css."
+      "mode": "data-theme",
+      "note": "Les jetons suffixés -sombre sont les valeurs de :root[data-theme=\"sombre\"] dans src/app/globals.css. Le script du <head> pose data-theme avant le premier rendu : choix enregistré (Clair, Sombre) ou, en Système, réglage du système."
     }
   },
   "components": [
@@ -803,7 +803,7 @@
   ],
   "narrative": {
     "northStar": "Le Cartouche",
-    "overview": "Le système reprend le cartouche d'un plan d'ingénierie : un bandeau d'encre qui porte le titre, la date et des compartiments chiffrés à filets, puis des feuilles blanches tracées au filet de 1 px. L'encre bleue structure, le surligneur jaune signale. Les formes sont nettes (rayons de 1 à 3 px), la typographie est une Barlow technique avec ses titres en Semi Condensed et des chiffres tabulaires. La densité est celle d'un registre : lignes de 46 px, en-têtes en bande, pas d'air décoratif.\n\nLa profondeur ne vient pas des ombres mais des aplats : papier gris-bleu, feuille blanche, calque pour les en-têtes, encre pour le bandeau. Le mouvement est bref et dessiné à la main : un trait de surligneur balaie le dernier ajout, un trait d'encre barre ce qu'on coche, un chiffre glisse en place quand il change. Tout mouvement est coupé quand le système demande un mouvement réduit.\n\nLes deux modes, clair et sombre, suivent le réglage du système (`prefers-color-scheme`). Le sombre garde la même grammaire : encre éclaircie, surligneur légèrement assourdi, bandeau d'encre profonde.",
+    "overview": "Le système reprend le cartouche d'un plan d'ingénierie : un bandeau d'encre qui porte le titre, la date et des compartiments chiffrés à filets, puis des feuilles blanches tracées au filet de 1 px. L'encre bleue structure, le surligneur jaune signale. Les formes sont nettes (rayons de 1 à 3 px), la typographie est une Barlow technique avec ses titres en Semi Condensed et des chiffres tabulaires. La densité est celle d'un registre : lignes de 46 px, en-têtes en bande, pas d'air décoratif.\n\nLa profondeur ne vient pas des ombres mais des aplats : papier gris-bleu, feuille blanche, calque pour les en-têtes, encre pour le bandeau. Le mouvement est bref et dessiné à la main : un trait de surligneur balaie le dernier ajout, un trait d'encre barre ce qu'on coche, un chiffre glisse en place quand il change. Tout mouvement est coupé quand le système demande un mouvement réduit.\n\nDeux modes, clair et sombre. Par défaut, ils suivent le réglage du système ; le bouton de thème du bandeau force l'un ou l'autre (Système, Clair, Sombre), choix retenu dans le navigateur. Le sombre garde la même grammaire : encre éclaircie, surligneur légèrement assourdi, bandeau d'encre profonde.",
     "keyCharacteristics": [
       "Bandeau d'encre pleine largeur, contenu centré à 56 rem.",
       "Cellules de cartouche à filets, chiffres tabulaires en Barlow Semi Condensed 600.",

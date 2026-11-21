@@ -5,10 +5,12 @@
 /*
  * Design system « Cartouche » : inspiré du cartouche des plans d'ingénierie.
  * Encre bleue, surligneur jaune, traits nets (rayons de 2 à 3 px).
- * Le mode sombre suit le réglage du système (prefers-color-scheme).
+ * Thème : l'attribut data-theme de <html> vaut « clair » ou « sombre ». Le script du <head>
+ * (src/presentation/theme/script-theme.tsx) le pose avant le premier rendu, d'après le choix
+ * enregistré ; en « Système », il suit le réglage du système.
  * Référence visuelle : design-options.html, colonne Cartouche.
  */
-@custom-variant dark (@media (prefers-color-scheme: dark));
+@custom-variant dark (&:where([data-theme="sombre"], [data-theme="sombre"] *));
 
 @theme inline {
   --color-background: var(--background);
@@ -81,6 +83,7 @@
 }
 
 :root {
+  color-scheme: light;
   /* 2 px pour les contrôles (rounded-lg), environ 3 px pour les cartes (rounded-xl). */
   --radius: 0.125rem;
 
@@ -126,53 +129,49 @@
   --sidebar-ring: #1D3E8A;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #111821;
-    --foreground: #E5EAF0;
-    --card: #17202B;
-    --card-foreground: #E5EAF0;
-    --popover: #17202B;
-    --popover-foreground: #E5EAF0;
-    --primary: #86A9F2;
-    --primary-foreground: #0C1730;
-    --secondary: #222D3B;
-    --secondary-foreground: #E5EAF0;
-    --muted: #1B2531;
-    --muted-foreground: #98A6B7;
-    --accent: #233041;
-    --accent-foreground: #E5EAF0;
-    --destructive: #F2766B;
-    --destructive-foreground: #2A0A07;
-    --border: #2B3746;
-    --input: #66778C;
-    --ring: #86A9F2;
-    --signature: #E9C93B;
-    --signature-foreground: #1A1708;
-    --shell: #1A2D5A;
-    --shell-foreground: #E5EAF0;
+:root[data-theme="sombre"] {
+  color-scheme: dark;
+  --background: #111821;
+  --foreground: #E5EAF0;
+  --card: #17202B;
+  --card-foreground: #E5EAF0;
+  --popover: #17202B;
+  --popover-foreground: #E5EAF0;
+  --primary: #86A9F2;
+  --primary-foreground: #0C1730;
+  --secondary: #222D3B;
+  --secondary-foreground: #E5EAF0;
+  --muted: #1B2531;
+  --muted-foreground: #98A6B7;
+  --accent: #233041;
+  --accent-foreground: #E5EAF0;
+  --destructive: #F2766B;
+  --destructive-foreground: #2A0A07;
+  --border: #2B3746;
+  --input: #66778C;
+  --ring: #86A9F2;
+  --signature: #E9C93B;
+  --signature-foreground: #1A1708;
+  --shell: #1A2D5A;
+  --shell-foreground: #E5EAF0;
 
-    --chart-1: #86A9F2;
-    --chart-2: #E9C93B;
-    --chart-3: #5B7FCB;
-    --chart-4: #98A6B7;
-    --chart-5: #66778C;
+  --chart-1: #86A9F2;
+  --chart-2: #E9C93B;
+  --chart-3: #5B7FCB;
+  --chart-4: #98A6B7;
+  --chart-5: #66778C;
 
-    --sidebar: #17202B;
-    --sidebar-foreground: #E5EAF0;
-    --sidebar-primary: #86A9F2;
-    --sidebar-primary-foreground: #0C1730;
-    --sidebar-accent: #233041;
-    --sidebar-accent-foreground: #E5EAF0;
-    --sidebar-border: #2B3746;
-    --sidebar-ring: #86A9F2;
-  }
+  --sidebar: #17202B;
+  --sidebar-foreground: #E5EAF0;
+  --sidebar-primary: #86A9F2;
+  --sidebar-primary-foreground: #0C1730;
+  --sidebar-accent: #233041;
+  --sidebar-accent-foreground: #E5EAF0;
+  --sidebar-border: #2B3746;
+  --sidebar-ring: #86A9F2;
 }
 
 @layer base {
-  :root {
-    color-scheme: light dark;
-  }
   * {
     @apply border-border outline-ring/50;
   }

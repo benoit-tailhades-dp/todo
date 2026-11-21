@@ -10,6 +10,7 @@ import { ID_GLISSE, ID_SELECTEUR, todosDuScenario, type Scenario, type TodoMaque
 import { AlerteDateInvalide, AlerteIntrouvable, EtatErreurChargement, EtatToutTermine, EtatVide } from "./etats";
 import { FormulaireAjout } from "./formulaire-ajout";
 import { jourDuTodo, ListeDesJours, type Glisser, type Phase } from "./liste-des-jours";
+import { MenuTheme } from "@/presentation/theme/menu-theme";
 import { SectionTerminees } from "./section-terminees";
 
 const MESSAGE_TITRE_VIDE = "Écris un titre avant d'ajouter.";
@@ -65,6 +66,7 @@ export function MaquetteTodo({
   );
   const [glisser, setGlisser] = useState<Glisser>(() => glisserDuScenario(scenarioInitial, maintenant));
   const [alerteDateInvalide, setAlerteDateInvalide] = useState(scenarioInitial === "date-invalide");
+  const [menuThemeOuvert, setMenuThemeOuvert] = useState(scenarioInitial === "menu-theme");
   const champRef = useRef<HTMLInputElement>(null);
   const listeRef = useRef<HTMLDivElement>(null);
   const minuteurs = useRef<number[]>([]);
@@ -108,6 +110,7 @@ export function MaquetteTodo({
     setDateOuverte(suivant === "selecteur-date" ? ID_SELECTEUR : null);
     setGlisser(glisserDuScenario(suivant, maintenant));
     setAlerteDateInvalide(suivant === "date-invalide");
+    setMenuThemeOuvert(suivant === "menu-theme");
   }
 
   /**
@@ -202,7 +205,11 @@ export function MaquetteTodo({
 
   return (
     <div className="flex flex-1 flex-col">
-      <Bandeau date={dateLongue(maintenant)} cellules={<CellulesCartouche cellules={cellules} />}>
+      <Bandeau
+        date={dateLongue(maintenant)}
+        cellules={<CellulesCartouche cellules={cellules} />}
+        theme={<MenuTheme ouvert={menuThemeOuvert} onOuvertChange={setMenuThemeOuvert} />}
+      >
         <FormulaireAjout
           refChamp={champRef}
           valeur={saisie}

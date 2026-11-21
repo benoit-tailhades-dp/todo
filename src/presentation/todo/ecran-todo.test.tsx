@@ -105,6 +105,12 @@ describe("EcranTodo · consulter", () => {
     expect(screen.getByText("Vendredi 20 novembre")).toBeDefined();
   });
 
+  it("le bandeau porte le bouton de thème, qui annonce le thème actif", () => {
+    afficher([]);
+
+    expect(within(screen.getByRole("banner")).getByRole("button", { name: "Thème : Système" })).toBeDefined();
+  });
+
   it("base sans TODO : affiche « Aucun TODO pour l'instant »", () => {
     afficher([]);
 
@@ -727,5 +733,11 @@ describe("ChargementListe", () => {
     render(<ChargementListe />);
 
     expect(screen.getByRole("status").textContent).toBe("Chargement de ta liste…");
+  });
+
+  it("le thème se choisit déjà pendant le chargement : le bandeau porte le bouton", () => {
+    render(<ChargementListe />);
+
+    expect(within(screen.getByRole("banner")).getByRole("button", { name: "Thème : Système" })).toBeDefined();
   });
 });

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Barlow, Barlow_Semi_Condensed, Geist_Mono } from "next/font/google";
+import { ScriptTheme } from "@/presentation/theme/script-theme";
 import "./globals.css";
 
 // Design system Cartouche : Barlow pour le texte, Barlow Semi Condensed pour les titres et les boutons.
@@ -27,10 +28,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
+    // Le script du <head> pose data-theme avant l'hydratation : React doit garder l'attribut.
     <html
       lang="fr"
       className={`${barlow.variable} ${barlowSemiCondensed.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        <ScriptTheme />
+      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

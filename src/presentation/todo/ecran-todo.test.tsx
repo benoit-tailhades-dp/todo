@@ -1,13 +1,14 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
-import type { ResultatAjout, ResultatTerminer } from "@/service/todo-service";
+import type { ResultatAjout, ResultatChangerDate, ResultatTerminer } from "@/service/todo-service";
 import type { Todo } from "@/service/registre";
 import { ChargementListe } from "./chargement-liste";
 import { EcranTodo } from "./ecran-todo";
 
 // Instants absolus. En novembre, Paris est à UTC + 1.
 const VENDREDI_20_MIDI = Date.UTC(2026, 10, 20, 11, 0);
+const VENDREDI_20_23H30 = Date.UTC(2026, 10, 20, 22, 30);
 
 function todo(id: string, titre: string, creeLe: number): Todo {
   return { id, titre, creeLe, termine: false };
@@ -29,9 +30,9 @@ const enSuspens: Array<() => void> = [];
 function actionEnSuspens<R>(parDefaut: R) {
   let liberer: (resultat: R) => void = () => {};
   const action = vi.fn(
-    (argument: string) =>
+    (...argumentsRecus: string[]) =>
       new Promise<R>((resoudre) => {
-        void argument;
+        void argumentsRecus;
         liberer = resoudre;
         enSuspens.push(() => resoudre(parDefaut));
       }),
@@ -41,23 +42,26 @@ function actionEnSuspens<R>(parDefaut: R) {
 
 const AJOUT_REFUSE: ResultatAjout = { ok: false, erreur: "titre-vide" };
 const TERMINE: ResultatTerminer = { ok: true };
+const DATE_CHANGEE: ResultatChangerDate = { ok: true };
 
 type Actions = {
   ajouterAction: (saisie: string) => Promise<ResultatAjout>;
   terminerAction: (id: string) => Promise<ResultatTerminer>;
+  changerDateAction: (id: string, jour: string) => Promise<ResultatChangerDate>;
 };
 
 const ACTIONS_INERTES: Actions = {
   ajouterAction: async () => ({ ok: false, erreur: "titre-vide" }),
   terminerAction: async () => ({ ok: true }),
+  changerDateAction: async () => ({ ok: true }),
 };
 
-function ecran(todos: Todo[], actions: Partial<Actions> = {}) {
-  return <EcranTodo todos={todos} maintenant={VENDREDI_20_MIDI} {...ACTIONS_INERTES} {...actions} />;
+function ecran(todos: Todo[], actions: Partial<Actions> = {}, maintenant = VENDREDI_20_MIDI) {
+  return <EcranTodo todos={todos} maintenant={maintenant} {...ACTIONS_INERTES} {...actions} />;
 }
 
-function afficher(todos: Todo[], actions: Partial<Actions> = {}) {
-  return render(ecran(todos, actions));
+function afficher(todos: Todo[], actions: Partial<Actions> = {}, maintenant = VENDREDI_20_MIDI) {
+  return render(ecran(todos, actions, maintenant));
 }
 
 /** Valeur d'une cellule d'en-tête de jour (« Âge », « TODO »). */
@@ -135,6 +139,16 @@ describe("EcranTodo · consulter", () => {
 });
 
 describe("EcranTodo · ajouter", () => {
+  // La ligne en attente est datée de l'heure de l'ajout : on fige l'horloge au jour de l'écran.
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(VENDREDI_20_MIDI);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("valide « Relancer le devis » : champ vidé, ligne en attente en dernier sous « Aujourd'hui », puis enregistrée", async () => {
     const { action, liberer } = actionEnSuspens<ResultatAjout>(AJOUT_REFUSE);
     const { rerender } = afficher(DEUX_JOURS, { ajouterAction: action });
@@ -436,6 +450,275 @@ describe("EcranTodo · en cours et terminés", () => {
     });
 
     expect(document.activeElement).toBe(caseDe("Relire le contrat de maintenance"));
+  });
+});
+
+/** Un TODO en cours auquel on a choisi un autre jour que son jour d'ajout. */
+function deplace(id: string, titre: string, creeLe: number, jour: string): Todo {
+  return { ...todo(id, titre, creeLe), jour };
+}
+
+const QUATRE: Todo[] = [...DEUX_JOURS, todo("d", "Préparer l'ordre du jour", Date.UTC(2026, 10, 20, 9, 0))];
+
+const HIER_ET_AUJOURDHUI: Todo[] = [
+  todo("h", "Commander les badges", Date.UTC(2026, 10, 19, 9, 0)),
+  todo("c", "Sauvegarder la base de recette", Date.UTC(2026, 10, 20, 8, 0)),
+];
+
+function titresDesJours(): string[] {
+  return screen.getAllByRole("heading", { level: 2 }).map((titre) => titre.textContent ?? "");
+}
+
+function boutonDate(titre: string): HTMLElement {
+  return within(ligne(titre)).getByRole("button", { name: `Changer la date de « ${titre} »` });
+}
+
+function selecteur(): HTMLElement {
+  return screen.getByRole("dialog", { name: "Changer la date" });
+}
+
+function ouvrirSelecteur(titre: string): HTMLElement {
+  fireEvent.click(boutonDate(titre));
+  return selecteur();
+}
+
+/** Choisit un jour dans le calendrier ouvert ; le nom suit le format « lundi 16 novembre 2026 ». */
+function choisirJour(nom: string) {
+  fireEvent.click(within(selecteur()).getByRole("button", { name: new RegExp(nom) }));
+}
+
+/** Le `DataTransfer` d'un glisser-déposer, que jsdom ne fournit pas. */
+function transfert() {
+  const donnees = new Map<string, string>();
+  return {
+    effectAllowed: "uninitialized",
+    dropEffect: "none",
+    setData: (type: string, valeur: string) => void donnees.set(type, valeur),
+    getData: (type: string) => donnees.get(type) ?? "",
+  };
+}
+
+function jour(nom: string): HTMLElement {
+  return screen.getByRole("region", { name: nom });
+}
+
+async function prochaineImage() {
+  await act(async () => {
+    await new Promise((resoudre) => requestAnimationFrame(() => resoudre(null)));
+  });
+}
+
+describe("EcranTodo · changer la date avec le sélecteur", () => {
+  it("TODO d'aujourd'hui, lundi 16 choisi : il passe sous « Lundi 16 novembre » et les compteurs des deux jours changent", async () => {
+    const { action, liberer } = actionEnSuspens<ResultatChangerDate>(DATE_CHANGEE);
+    const { rerender } = afficher(QUATRE, { changerDateAction: action });
+    expect(cellule(jour("Lundi 16 novembre"), "TODO")).toBe("2");
+    expect(cellule(jour("Aujourd'hui"), "TODO")).toBe("2");
+
+    ouvrirSelecteur("Sauvegarder la base de recette");
+    choisirJour("lundi 16 novembre 2026");
+
+    expect(action.mock.calls).toEqual([["c", "2026-11-16"]]);
+    expect(screen.queryByRole("dialog", { name: "Changer la date" })).toBeNull();
+    expect(lignes("Lundi 16 novembre")).toEqual([
+      "Relancer le devis",
+      "Relire le contrat de maintenance",
+      "Sauvegarder la base de recette",
+    ]);
+    expect(lignes("Aujourd'hui")).toEqual(["Préparer l'ordre du jour"]);
+    expect(cellule(jour("Lundi 16 novembre"), "TODO")).toBe("3");
+    expect(cellule(jour("Aujourd'hui"), "TODO")).toBe("1");
+
+    // Le serveur répond, puis la page se recharge avec la base (refresh()).
+    await act(async () => liberer({ ok: true }));
+    const enBase = QUATRE.map((t) => (t.id === "c" ? { ...t, jour: "2026-11-16" } : t));
+    rerender(ecran(enBase, { changerDateAction: action }));
+
+    expect(lignes("Lundi 16 novembre")).toHaveLength(3);
+    expect(screen.getByText("« Sauvegarder la base de recette » déplacé sous Lundi 16 novembre.")).toBeDefined();
+  });
+
+  it("samedi 21 pour l'un, mardi 24 pour l'autre : rangés après « Aujourd'hui », sous « Demain » puis « Mardi 24 novembre »", () => {
+    const { action } = actionEnSuspens<ResultatChangerDate>(DATE_CHANGEE);
+    afficher(DEUX_JOURS, { changerDateAction: action });
+
+    ouvrirSelecteur("Relancer le devis");
+    choisirJour("samedi 21 novembre 2026");
+    ouvrirSelecteur("Relire le contrat de maintenance");
+    choisirJour("mardi 24 novembre 2026");
+
+    expect(action.mock.calls).toEqual([
+      ["a", "2026-11-21"],
+      ["b", "2026-11-24"],
+    ]);
+    expect(titresDesJours()).toEqual(["Aujourd'hui", "Demain", "Mardi 24 novembre"]);
+    expect(lignes("Demain")).toEqual(["Relancer le devis"]);
+    expect(lignes("Mardi 24 novembre")).toEqual(["Relire le contrat de maintenance"]);
+    expect(within(jour("Demain")).getByText("samedi 21 novembre")).toBeDefined();
+    expect(cellule(jour("Demain"), "Dans")).toContain("1 j");
+  });
+
+  it("le seul TODO d'un jour déplacé : l'en-tête du jour qu'il quitte disparaît", () => {
+    const { action } = actionEnSuspens<ResultatChangerDate>(DATE_CHANGEE);
+    afficher(DEUX_JOURS, { changerDateAction: action });
+
+    ouvrirSelecteur("Sauvegarder la base de recette");
+    choisirJour("lundi 16 novembre 2026");
+
+    expect(titresDesJours()).toEqual(["Lundi 16 novembre"]);
+  });
+
+  it("son propre jour choisi : il reste à sa place et rien n'est enregistré", () => {
+    const changerDateAction = vi.fn(ACTIONS_INERTES.changerDateAction);
+    afficher(DEUX_JOURS, { changerDateAction });
+
+    ouvrirSelecteur("Relancer le devis");
+    choisirJour("lundi 16 novembre 2026");
+
+    expect(changerDateAction).not.toHaveBeenCalled();
+    expect(screen.queryByRole("dialog", { name: "Changer la date" })).toBeNull();
+    expect(lignes("Lundi 16 novembre")).toEqual(["Relancer le devis", "Relire le contrat de maintenance"]);
+  });
+
+  it("serveur et navigateur en UTC, mardi 24 choisi le vendredi 20 à 23 h 30 à Paris : envoyé « 2026-11-24 », rangé sous « Mardi 24 novembre »", () => {
+    expect(new Date(VENDREDI_20_23H30).getTimezoneOffset()).toBe(0);
+    const { action } = actionEnSuspens<ResultatChangerDate>(DATE_CHANGEE);
+    afficher(DEUX_JOURS, { changerDateAction: action }, VENDREDI_20_23H30);
+
+    ouvrirSelecteur("Sauvegarder la base de recette");
+    choisirJour("mardi 24 novembre 2026");
+
+    expect(action.mock.calls).toEqual([["c", "2026-11-24"]]);
+    expect(lignes("Mardi 24 novembre")).toEqual(["Sauvegarder la base de recette"]);
+  });
+
+  it("le calendrier s'ouvre sur le jour du TODO, sélectionné et qui a le focus", async () => {
+    afficher(DEUX_JOURS);
+
+    ouvrirSelecteur("Relancer le devis");
+    await prochaineImage();
+
+    const selectionne = within(selecteur()).getByRole("button", { name: /lundi 16 novembre 2026, sélectionné/ });
+    expect(document.activeElement).toBe(selectionne);
+    expect(within(selecteur()).getByText("Relancer le devis")).toBeDefined();
+  });
+
+  it("au clavier : après le choix, le focus revient au bouton de date du TODO, sous son nouveau jour", async () => {
+    const { action } = actionEnSuspens<ResultatChangerDate>(DATE_CHANGEE);
+    afficher(DEUX_JOURS, { changerDateAction: action });
+
+    ouvrirSelecteur("Sauvegarder la base de recette");
+    choisirJour("lundi 16 novembre 2026");
+    await prochaineImage();
+
+    expect(document.activeElement).toBe(boutonDate("Sauvegarder la base de recette"));
+    expect(jour("Lundi 16 novembre").contains(document.activeElement)).toBe(true);
+  });
+
+  it("« Le plus ancien » suit le jour affiché : « — » s'il ne reste que des jours à venir", () => {
+    const { action } = actionEnSuspens<ResultatChangerDate>(DATE_CHANGEE);
+    afficher([deplace("a", "Relancer le devis", Date.UTC(2026, 10, 16, 9, 0), "2026-11-21")], {
+      changerDateAction: action,
+    });
+
+    expect(compteur("Le plus ancien")).toBe("—");
+  });
+
+  it("date refusée par le serveur : le TODO revient sous son jour et un message dit pourquoi", async () => {
+    const { action, liberer } = actionEnSuspens<ResultatChangerDate>(DATE_CHANGEE);
+    afficher(DEUX_JOURS, { changerDateAction: action });
+
+    ouvrirSelecteur("Sauvegarder la base de recette");
+    choisirJour("mardi 24 novembre 2026");
+    await act(async () => liberer({ ok: false, erreur: "date-invalide" }));
+
+    expect(screen.getByText("Cette date n'est pas valide")).toBeDefined();
+    expect(lignes("Aujourd'hui")).toEqual(["Sauvegarder la base de recette"]);
+    expect(screen.queryByRole("region", { name: "Mardi 24 novembre" })).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Fermer le message" }));
+    expect(screen.queryByText("Cette date n'est pas valide")).toBeNull();
+  });
+
+  it("TODO introuvable en base : rien n'est modifié et un message le dit", async () => {
+    const { action, liberer } = actionEnSuspens<ResultatChangerDate>(DATE_CHANGEE);
+    afficher(DEUX_JOURS, { changerDateAction: action });
+
+    ouvrirSelecteur("Sauvegarder la base de recette");
+    choisirJour("lundi 16 novembre 2026");
+    await act(async () => liberer({ ok: false, erreur: "introuvable" }));
+
+    expect(screen.getByText("Ce TODO n'existe plus")).toBeDefined();
+    expect(lignes("Aujourd'hui")).toEqual(["Sauvegarder la base de recette"]);
+  });
+
+  it("un TODO terminé ou en cours d'enregistrement n'a pas de sélecteur de date", () => {
+    const { action } = actionEnSuspens<ResultatAjout>(AJOUT_REFUSE);
+    afficher(UN_TERMINE, { ajouterAction: action });
+    saisir("Préparer l'ordre du jour");
+    fireEvent.submit(formulaire());
+    lignesTerminees();
+
+    expect(within(ligne("Relire le contrat de maintenance")).queryByRole("button")).toBeNull();
+    expect(within(ligne("Préparer l'ordre du jour")).queryByRole("button")).toBeNull();
+    expect(ligne("Préparer l'ordre du jour").getAttribute("draggable")).not.toBe("true");
+  });
+});
+
+describe("EcranTodo · glisser-déposer", () => {
+  it("TODO glissé de « Hier » et déposé sur « Aujourd'hui » : il passe sous « Aujourd'hui » avec la date du jour", () => {
+    const { action } = actionEnSuspens<ResultatChangerDate>(DATE_CHANGEE);
+    afficher(HIER_ET_AUJOURDHUI, { changerDateAction: action });
+    const donnees = transfert();
+
+    expect(ligne("Commander les badges").getAttribute("draggable")).toBe("true");
+    fireEvent.dragStart(ligne("Commander les badges"), { dataTransfer: donnees });
+    expect(ligne("Commander les badges").hasAttribute("data-glisse")).toBe(true);
+
+    const accepte = !fireEvent.dragOver(screen.getByRole("heading", { name: "Aujourd'hui" }), { dataTransfer: donnees });
+    expect(accepte).toBe(true);
+    expect(jour("Aujourd'hui").hasAttribute("data-survole")).toBe(true);
+    expect(within(jour("Aujourd'hui")).getByText("Déposer ici")).toBeDefined();
+
+    fireEvent.drop(screen.getByRole("heading", { name: "Aujourd'hui" }), { dataTransfer: donnees });
+    fireEvent.dragEnd(ligne("Commander les badges"), { dataTransfer: donnees });
+
+    expect(action.mock.calls).toEqual([["h", "2026-11-20"]]);
+    expect(titresDesJours()).toEqual(["Aujourd'hui"]);
+    expect(lignes("Aujourd'hui")).toEqual(["Commander les badges", "Sauvegarder la base de recette"]);
+    expect(screen.queryByText("Déposer ici")).toBeNull();
+  });
+
+  it("relâché sur son propre jour : le jour le refuse, il reste à sa place et rien n'est enregistré", () => {
+    const changerDateAction = vi.fn(ACTIONS_INERTES.changerDateAction);
+    afficher(HIER_ET_AUJOURDHUI, { changerDateAction });
+    const donnees = transfert();
+
+    fireEvent.dragStart(ligne("Commander les badges"), { dataTransfer: donnees });
+    const accepte = !fireEvent.dragOver(screen.getByRole("heading", { name: "Hier" }), { dataTransfer: donnees });
+    fireEvent.drop(screen.getByRole("heading", { name: "Hier" }), { dataTransfer: donnees });
+    fireEvent.dragEnd(ligne("Commander les badges"), { dataTransfer: donnees });
+
+    expect(accepte).toBe(false);
+    expect(screen.queryByText("Déposer ici")).toBeNull();
+    expect(changerDateAction).not.toHaveBeenCalled();
+    expect(lignes("Hier")).toEqual(["Commander les badges"]);
+  });
+
+  it("relâché hors de la liste : il reste à sa place et rien n'est enregistré", () => {
+    const changerDateAction = vi.fn(ACTIONS_INERTES.changerDateAction);
+    afficher(HIER_ET_AUJOURDHUI, { changerDateAction });
+    const donnees = transfert();
+
+    fireEvent.dragStart(ligne("Commander les badges"), { dataTransfer: donnees });
+    fireEvent.dragOver(screen.getByRole("heading", { name: "Aujourd'hui" }), { dataTransfer: donnees });
+    fireEvent.dragLeave(jour("Aujourd'hui"), { dataTransfer: donnees, relatedTarget: document.body });
+    fireEvent.dragEnd(ligne("Commander les badges"), { dataTransfer: donnees });
+
+    expect(changerDateAction).not.toHaveBeenCalled();
+    expect(jour("Aujourd'hui").hasAttribute("data-survole")).toBe(false);
+    expect(ligne("Commander les badges").hasAttribute("data-glisse")).toBe(false);
+    expect(lignes("Hier")).toEqual(["Commander les badges"]);
   });
 });
 

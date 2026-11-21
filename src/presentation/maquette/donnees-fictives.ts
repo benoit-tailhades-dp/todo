@@ -1,4 +1,5 @@
 // Maquette : données fictives et scénarios de démonstration. Aucune donnée réelle.
+import { cleJour, decalerJour } from "./dates";
 
 export type TodoMaquette = {
   id: string;
@@ -6,6 +7,8 @@ export type TodoMaquette = {
   /** Instant d'ajout, en millisecondes. */
   creeLe: number;
   termine: boolean;
+  /** Jour choisi (AAAA-MM-JJ, à Paris) ; sans lui, le TODO est rangé sous son jour d'ajout. */
+  jour?: string;
   /** Ajout affiché tout de suite, pendant que l'enregistrement se termine. */
   enAttente?: boolean;
 };
@@ -18,7 +21,11 @@ export type Scenario =
   | "erreur-chargement"
   | "titre-vide"
   | "introuvable"
-  | "enregistrement";
+  | "enregistrement"
+  | "a-venir"
+  | "selecteur-date"
+  | "glisser"
+  | "date-invalide";
 
 export const SCENARIOS: ReadonlyArray<{ value: Scenario; label: string }> = [
   { value: "liste", label: "Liste de travail" },
@@ -29,7 +36,16 @@ export const SCENARIOS: ReadonlyArray<{ value: Scenario; label: string }> = [
   { value: "titre-vide", label: "Titre vide refusé" },
   { value: "introuvable", label: "TODO introuvable" },
   { value: "enregistrement", label: "Enregistrement en cours" },
+  { value: "a-venir", label: "Jours à venir" },
+  { value: "selecteur-date", label: "Sélecteur de date ouvert" },
+  { value: "glisser", label: "TODO glissé sur un jour" },
+  { value: "date-invalide", label: "Date refusée" },
 ];
+
+/** Revue : le TODO dont le sélecteur est ouvert (« Sauvegarder la base de recette », aujourd'hui). */
+export const ID_SELECTEUR = "en-cours-14";
+/** Revue : le TODO glissé (« Commander un écran pour le poste de test », hier), posé sur aujourd'hui. */
+export const ID_GLISSE = "en-cours-10";
 
 export function estScenario(valeur: unknown): valeur is Scenario {
   return SCENARIOS.some((s) => s.value === valeur);
@@ -77,11 +93,14 @@ function fabriquer(
   termine: boolean,
   prefixe: string,
 ): TodoMaquette[] {
+  const aujourdhui = cleJour(maintenant);
   return source.map(([jours, titre], i) => ({
     id: `${prefixe}-${i + 1}`,
     titre,
     // Dans une même journée, l'ordre de la liste est l'ordre d'ajout.
     creeLe: maintenant - jours * JOUR - (source.length - i) * 17 * MINUTE,
+    // Jour fixé : peu après minuit, les minutes retirées ci-dessus feraient basculer « aujourd'hui » sur la veille.
+    jour: decalerJour(aujourdhui, -jours),
     termine,
   }));
 }
@@ -109,6 +128,18 @@ export function todosDuScenario(scenario: Scenario, maintenant: number): TodoMaq
           enAttente: true,
         },
       ];
+    case "a-venir": {
+      // Deux TODO repoussés : l'un à demain, l'autre à dans 4 jours.
+      const aujourdhui = cleJour(maintenant);
+      const repousses: Record<string, string> = {
+        "en-cours-13": decalerJour(aujourdhui, 1),
+        "en-cours-3": decalerJour(aujourdhui, 4),
+      };
+      return [
+        ...enCours.map((todo) => (repousses[todo.id] ? { ...todo, jour: repousses[todo.id] } : todo)),
+        ...termines,
+      ];
+    }
     default:
       return [...enCours, ...termines];
   }

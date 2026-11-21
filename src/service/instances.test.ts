@@ -2,6 +2,7 @@ import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { composerRegistre } from "./registre";
 
 describe("todoService (assemblé sur la vraie base)", () => {
   let dossier: string;
@@ -56,5 +57,20 @@ describe("todoService (assemblé sur la vraie base)", () => {
     const apres = await demarrer();
 
     expect(await apres.lister()).toEqual([{ ...ajout.todo, termine: true }]);
+  });
+
+  it("TODO dont la date a changé : toujours sous son nouveau jour après un redémarrage", async () => {
+    const VENDREDI_20_MIDI = Date.UTC(2026, 10, 20, 11, 0);
+    const avant = await demarrer();
+    const ajout = await avant.ajouter("Relancer le devis", VENDREDI_20_MIDI);
+    if (!ajout.ok) throw new Error("ajout refusé");
+    expect(await avant.changerDate(ajout.todo.id, "2026-11-16")).toEqual({ ok: true });
+
+    const apres = await demarrer();
+
+    const { jours } = composerRegistre(await apres.lister(), VENDREDI_20_MIDI);
+    expect(jours.map(({ titre, todos }) => ({ titre, titres: todos.map((t) => t.titre) }))).toEqual([
+      { titre: "Lundi 16 novembre", titres: ["Relancer le devis"] },
+    ]);
   });
 });

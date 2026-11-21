@@ -1,6 +1,6 @@
 // Composition du registre affiché : tri et groupement par jour de Paris. Fonctions pures, sans base :
 // le navigateur les rappelle pour afficher un changement avant la réponse du serveur.
-import { cleJour, dateLongue, ecartJours, precisionDuJour, titreDuJour } from "./jours";
+import { ageDuJour, cleJour, dateLongue, precisionDuJour, titreDuJour } from "./jours";
 
 /** Un TODO, tel que le service le donne à la présentation. */
 export type Todo = {
@@ -9,19 +9,21 @@ export type Todo = {
   /** Instant d'ajout, en millisecondes depuis l'époque Unix (UTC). */
   creeLe: number;
   termine: boolean;
+  /** Jour choisi, AAAA-MM-JJ. Absent : le jour d'ajout. */
+  jour?: string;
 };
 
 export type TodoAffiche = { id: string; titre: string; termine: boolean };
 
-/** Les TODO ajoutés un même jour, à Paris. */
+/** Les TODO d'un même jour, à Paris. */
 export type JourDeTodos = {
   /** Jour au format AAAA-MM-JJ. */
   cle: string;
-  /** « Aujourd'hui », « Hier » ou « Lundi 16 novembre ». */
+  /** « Aujourd'hui », « Hier », « Demain » ou « Lundi 16 novembre ». */
   titre: string;
-  /** Date en clair à côté de « Aujourd'hui » et « Hier », sinon `null`. */
+  /** Date en clair à côté de « Aujourd'hui », « Hier » et « Demain », sinon `null`. */
   precision: string | null;
-  /** Âge du jour, en jours calendaires. */
+  /** Âge du jour, en jours calendaires : négatif pour un jour à venir. */
   age: number;
   nombre: number;
   todos: TodoAffiche[];
@@ -30,7 +32,7 @@ export type JourDeTodos = {
 export type Compteurs = {
   enCours: number;
   termines: number;
-  /** Âge en jours du plus ancien TODO en cours, `null` s'il n'y en a pas. */
+  /** Âge en jours du plus ancien jour affiché, `null` sans TODO en cours ou s'ils sont tous à venir. */
   plusAncien: number | null;
 };
 
@@ -40,7 +42,7 @@ export type EtatRegistre = "vide" | "tout-termine" | "liste";
 export type Registre = {
   /** « Vendredi 20 novembre ». */
   dateDuJour: string;
-  /** Les TODO en cours, par jour d'ajout, du plus ancien au plus récent. */
+  /** Les TODO en cours, par jour, du plus ancien au plus futur. */
   jours: JourDeTodos[];
   /** Les TODO terminés, du plus ancien au plus récent. */
   termines: TodoAffiche[];
@@ -52,27 +54,31 @@ function affiche(todo: Todo): TodoAffiche {
   return { id: todo.id, titre: todo.titre, termine: todo.termine };
 }
 
-/** `todos` déjà triés du plus ancien au plus récent. */
+/** Jour d'un TODO : celui qu'on lui a choisi, sinon son jour d'ajout. */
+export function jourDuTodo(todo: Todo): string {
+  return todo.jour ?? cleJour(todo.creeLe);
+}
+
+/** Jours du plus ancien au plus futur ; dans un jour, l'ordre de `todos`, déjà triés par ajout. */
 function grouperParJour(todos: Todo[], maintenant: number): JourDeTodos[] {
-  const jours: JourDeTodos[] = [];
+  const parJour = new Map<string, Todo[]>();
   for (const todo of todos) {
-    const cle = cleJour(todo.creeLe);
-    let jour = jours.at(-1);
-    if (jour?.cle !== cle) {
-      jour = {
-        cle,
-        titre: titreDuJour(todo.creeLe, maintenant),
-        precision: precisionDuJour(todo.creeLe, maintenant),
-        age: ecartJours(todo.creeLe, maintenant),
-        nombre: 0,
-        todos: [],
-      };
-      jours.push(jour);
-    }
-    jour.todos.push(affiche(todo));
-    jour.nombre = jour.todos.length;
+    const cle = jourDuTodo(todo);
+    const liste = parJour.get(cle);
+    if (liste) liste.push(todo);
+    else parJour.set(cle, [todo]);
   }
-  return jours;
+  // Les clés AAAA-MM-JJ se trient comme des dates.
+  return [...parJour]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([cle, liste]) => ({
+      cle,
+      titre: titreDuJour(cle, maintenant),
+      precision: precisionDuJour(cle, maintenant),
+      age: ageDuJour(cle, maintenant),
+      nombre: liste.length,
+      todos: liste.map(affiche),
+    }));
 }
 
 function etatDu(enCours: number, termines: number): EtatRegistre {
@@ -81,22 +87,24 @@ function etatDu(enCours: number, termines: number): EtatRegistre {
 }
 
 /**
- * Le registre du jour : les TODO en cours rangés par jour d'ajout, puis les terminés à part,
- * tous du plus ancien au plus récent, avec les compteurs du cartouche.
+ * Le registre du jour : les TODO en cours rangés par jour, du plus ancien au plus futur, puis les terminés
+ * à part, du plus ancien au plus récent, avec les compteurs du cartouche.
  */
 export function composerRegistre(todos: Todo[], maintenant: number): Registre {
   const tries = todos.toSorted((a, b) => a.creeLe - b.creeLe);
   const enCours = tries.filter((todo) => !todo.termine);
   const termines = tries.filter((todo) => todo.termine);
-  const plusAncien = enCours.at(0);
+  const jours = grouperParJour(enCours, maintenant);
+  // Le plus ancien suit le jour affiché : un TODO repoussé à demain n'est plus en retard.
+  const age = jours.at(0)?.age;
   return {
     dateDuJour: dateLongue(maintenant),
-    jours: grouperParJour(enCours, maintenant),
+    jours,
     termines: termines.map(affiche),
     compteurs: {
       enCours: enCours.length,
       termines: termines.length,
-      plusAncien: plusAncien ? ecartJours(plusAncien.creeLe, maintenant) : null,
+      plusAncien: age !== undefined && age >= 0 ? age : null,
     },
     etat: etatDu(enCours.length, termines.length),
   };

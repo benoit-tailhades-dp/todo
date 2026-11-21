@@ -10,6 +10,7 @@ import { ID_GLISSE, ID_SELECTEUR, todosDuScenario, type Scenario, type TodoMaque
 import { AlerteDateInvalide, AlerteIntrouvable, EtatErreurChargement, EtatToutTermine, EtatVide } from "./etats";
 import { FormulaireAjout } from "./formulaire-ajout";
 import { jourDuTodo, ListeDesJours, type Glisser, type Phase } from "./liste-des-jours";
+import { SelecteurTheme } from "@/presentation/theme/selecteur-theme";
 import { SectionTerminees } from "./section-terminees";
 
 const MESSAGE_TITRE_VIDE = "Écris un titre avant d'ajouter.";
@@ -202,7 +203,11 @@ export function MaquetteTodo({
 
   return (
     <div className="flex flex-1 flex-col">
-      <Bandeau date={dateLongue(maintenant)} cellules={<CellulesCartouche cellules={cellules} />}>
+      <Bandeau
+        date={dateLongue(maintenant)}
+        cellules={<CellulesCartouche cellules={cellules} />}
+        theme={<SelecteurTheme />}
+      >
         <FormulaireAjout
           refChamp={champRef}
           valeur={saisie}

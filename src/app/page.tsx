@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { io } from "next/cache";
 import { Suspense } from "react";
 import { ChargementListe } from "@/presentation/todo/chargement-liste";
@@ -9,6 +9,15 @@ import { ajouterTodo, changerDateTodo, terminerTodo } from "./actions";
 export const metadata: Metadata = {
   title: "Mes TODO",
   description: "Ma liste de TODO, rangée par jour.",
+};
+
+// Téléphone : la saisie est posée en bas de l'écran. Le clavier réduit la page plutôt que de la recouvrir,
+// et la page s'étend sous les bords arrondis (marge de sécurité gérée par la saisie).
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  interactiveWidget: "resizes-content",
 };
 
 export default function Page() {

@@ -5,17 +5,18 @@ import { titreDuJour } from "@/service/jours";
 import { composerRegistre, type Todo } from "@/service/registre";
 import type { ResultatAjout, ResultatChangerDate, ResultatTerminer } from "@/service/todo-service";
 import { validerTitre } from "@/service/titre";
+import { ArcsDuJour } from "./arcs-du-jour";
 import { Bandeau } from "./bandeau";
-import { CellulesCartouche, type Cellule } from "./cellules-cartouche";
+import { Compteurs } from "./compteurs";
 import { AlerteDateInvalide, AlerteIntrouvable, EtatToutTermine, EtatVide } from "./etats";
 import { FormulaireAjout } from "./formulaire-ajout";
 import { ListeDesJours, type Glisser, type Phase } from "./liste-des-jours";
 import { SectionTerminees } from "./section-terminees";
 
 const MESSAGES = { "titre-vide": "Écris un titre avant d'ajouter." } as const;
-/** Durée pendant laquelle le dernier ajout reste surligné (ms). */
+/** Durée pendant laquelle le dernier ajout reste tracé (ms). */
 const DUREE_SURLIGNE = 6000;
-/** Durée du trait d'encre, puis du repli de la ligne (ms). */
+/** Durée du trait vermillon, puis de l'effacement de la ligne (ms). */
 const DUREE_TRAIT = 380;
 const DUREE_REPLI = 220;
 
@@ -49,9 +50,9 @@ function mouvementReduit(): boolean {
 }
 
 /**
- * L'écran de l'application : le bandeau, son cartouche et sa saisie, puis les TODO en cours rangés par jour
- * et les TODO terminés à part. Un ajout, un TODO coché ou déplacé s'affiche tout de suite, puis la page
- * se recharge avec la base.
+ * L'écran de l'application, en affiche : le champ vermillon (compteurs et arcs du jour), la saisie, puis
+ * les TODO en cours rangés par jour et les TODO terminés à part. Un ajout, un TODO coché ou déplacé
+ * s'affiche tout de suite, puis la page se recharge avec la base.
  */
 export function EcranTodo({
   todos,
@@ -133,7 +134,7 @@ export function EcranTodo({
   }
 
   /**
-   * Trait d'encre, repli de la ligne, puis passage dans « Terminés » et enregistrement.
+   * Trait vermillon, effacement de la ligne, puis passage dans « Terminés » et enregistrement.
    * L'enregistrement part à la fin : la liste rechargée couperait sinon la chorégraphie.
    */
   function terminer(id: string) {
@@ -194,66 +195,88 @@ export function EcranTodo({
   }
 
   const { compteurs } = registre;
-  const cellules: Cellule[] = [
-    { libelle: "En cours", valeur: String(compteurs.enCours), enAvant: true },
-    { libelle: "Terminés", valeur: String(compteurs.termines) },
-    { libelle: "Le plus ancien", valeur: compteurs.plusAncien === null ? "—" : `${compteurs.plusAncien} j` },
-  ];
+  const faits = registre.jours.reduce((somme, j) => somme + j.termines, 0);
+  const total = registre.jours.reduce((somme, j) => somme + j.termines + j.nombre, 0);
+  const legende =
+    registre.etat === "liste"
+      ? `Un arc par jour, le plus ancien dehors · ${faits} sur ${total} faits`
+      : registre.etat === "tout-termine"
+        ? "Le cercle est fermé : tout est fait"
+        : null;
   const idsEnregistres = new Set(todos.map((todo) => todo.id));
   const enAttente = new Set(affiches.filter((todo) => !idsEnregistres.has(todo.id)).map((todo) => todo.id));
 
   return (
-    <div className="flex flex-1 flex-col">
-      <Bandeau date={registre.dateDuJour} cellules={<CellulesCartouche cellules={cellules} />}>
-        <FormulaireAjout
-          refChamp={champRef}
-          valeur={saisie}
-          erreur={erreur}
-          onValeurChange={(valeur) => {
-            setSaisie(valeur);
-            if (erreur && validerTitre(valeur).ok) setErreur(null);
-          }}
-          onAjouter={ajouter}
-          onAbandon={() => setErreur(null)}
-        />
-      </Bandeau>
-      <main className="mx-auto w-full max-w-4xl flex-1 px-4 pt-6 pb-32 sm:px-6 sm:pt-8">
-        <p aria-live="polite" className="sr-only">
-          {annonce}
-        </p>
-        {alerteIntrouvable ? <AlerteIntrouvable onFermer={() => setAlerteIntrouvable(false)} /> : null}
-        {alerteDateInvalide ? <AlerteDateInvalide onFermer={() => setAlerteDateInvalide(false)} /> : null}
-
-        {registre.etat === "vide" ? (
-          <EtatVide />
-        ) : registre.etat === "tout-termine" ? (
-          <EtatToutTermine nombre={compteurs.termines} />
-        ) : (
-          <div ref={listeRef}>
-            <ListeDesJours
-              jours={registre.jours}
-              maintenant={maintenant}
-              phases={phases}
-              enAttente={enAttente}
-              dernierAjoutId={dernierAjoutId}
-              dateOuverte={dateOuverte}
-              glisser={glisser}
-              onTerminer={terminer}
-              onDateOuverteChange={setDateOuverte}
-              onChangerJour={(id, jour) => changerJour(id, jour, glisser.id === null)}
-              onGlisserChange={setGlisser}
+    <div className="flex flex-1 flex-col lg:grid lg:grid-cols-[minmax(22rem,5fr)_7fr]">
+      <Bandeau
+        date={registre.dateDuJour}
+        compteurs={
+          <Compteurs
+            enCours={String(compteurs.enCours)}
+            termines={String(compteurs.termines)}
+            plusAncien={compteurs.plusAncien === null ? "—" : `${compteurs.plusAncien} j`}
+          />
+        }
+        arcs={<ArcsDuJour jours={registre.jours} etat={registre.etat} className="size-full" />}
+        legende={legende}
+      />
+      <main className="flex min-w-0 flex-1 flex-col">
+        {/* Téléphone : la saisie reste en bas de l'écran, à portée du pouce. Large : en tête, collée en haut. */}
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-8 lg:sticky lg:top-0 lg:bottom-auto lg:border-t-0 lg:px-14 lg:pt-10 lg:pb-6">
+          <div className="mx-auto w-full max-w-3xl">
+            <FormulaireAjout
+              refChamp={champRef}
+              valeur={saisie}
+              erreur={erreur}
+              onValeurChange={(valeur) => {
+                setSaisie(valeur);
+                if (erreur && validerTitre(valeur).ok) setErreur(null);
+              }}
+              onAjouter={ajouter}
+              onAbandon={() => setErreur(null)}
             />
           </div>
-        )}
+        </div>
+        <div className="w-full flex-1 px-4 pt-8 pb-44 sm:px-8 lg:px-14 lg:pt-6 lg:pb-24">
+          <div className="mx-auto w-full max-w-3xl">
+          <p aria-live="polite" className="sr-only">
+            {annonce}
+          </p>
+          {alerteIntrouvable ? <AlerteIntrouvable onFermer={() => setAlerteIntrouvable(false)} /> : null}
+          {alerteDateInvalide ? <AlerteDateInvalide onFermer={() => setAlerteDateInvalide(false)} /> : null}
 
-        {registre.termines.length > 0 ? (
-          <SectionTerminees
-            className="mt-6"
-            termines={registre.termines}
-            ouvert={terminesOuvert}
-            onOuvertChange={setTerminesOuvert}
-          />
-        ) : null}
+          {registre.etat === "vide" ? (
+            <EtatVide />
+          ) : registre.etat === "tout-termine" ? (
+            <EtatToutTermine nombre={compteurs.termines} />
+          ) : (
+            <div ref={listeRef}>
+              <ListeDesJours
+                jours={registre.jours}
+                maintenant={maintenant}
+                phases={phases}
+                enAttente={enAttente}
+                dernierAjoutId={dernierAjoutId}
+                dateOuverte={dateOuverte}
+                glisser={glisser}
+                onTerminer={terminer}
+                onDateOuverteChange={setDateOuverte}
+                onChangerJour={(id, jour) => changerJour(id, jour, glisser.id === null)}
+                onGlisserChange={setGlisser}
+              />
+            </div>
+          )}
+
+          {registre.termines.length > 0 ? (
+            <SectionTerminees
+              className="mt-14"
+              termines={registre.termines}
+              ouvert={terminesOuvert}
+              onOuvertChange={setTerminesOuvert}
+            />
+          ) : null}
+          </div>
+        </div>
       </main>
     </div>
   );

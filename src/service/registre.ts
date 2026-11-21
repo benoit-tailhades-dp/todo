@@ -26,6 +26,8 @@ export type JourDeTodos = {
   /** Âge du jour, en jours calendaires : négatif pour un jour à venir. */
   age: number;
   nombre: number;
+  /** Nombre de TODO terminés de ce jour : avec `nombre`, la part déjà faite du jour. */
+  termines: number;
   todos: TodoAffiche[];
 };
 
@@ -59,8 +61,19 @@ export function jourDuTodo(todo: Todo): string {
   return todo.jour ?? cleJour(todo.creeLe);
 }
 
+/** Nombre de TODO terminés par jour. */
+function compterParJour(termines: Todo[]): Map<string, number> {
+  const parJour = new Map<string, number>();
+  for (const todo of termines) {
+    const cle = jourDuTodo(todo);
+    parJour.set(cle, (parJour.get(cle) ?? 0) + 1);
+  }
+  return parJour;
+}
+
 /** Jours du plus ancien au plus futur ; dans un jour, l'ordre de `todos`, déjà triés par ajout. */
-function grouperParJour(todos: Todo[], maintenant: number): JourDeTodos[] {
+function grouperParJour(todos: Todo[], termines: Todo[], maintenant: number): JourDeTodos[] {
+  const terminesParJour = compterParJour(termines);
   const parJour = new Map<string, Todo[]>();
   for (const todo of todos) {
     const cle = jourDuTodo(todo);
@@ -77,6 +90,7 @@ function grouperParJour(todos: Todo[], maintenant: number): JourDeTodos[] {
       precision: precisionDuJour(cle, maintenant),
       age: ageDuJour(cle, maintenant),
       nombre: liste.length,
+      termines: terminesParJour.get(cle) ?? 0,
       todos: liste.map(affiche),
     }));
 }
@@ -94,7 +108,7 @@ export function composerRegistre(todos: Todo[], maintenant: number): Registre {
   const tries = todos.toSorted((a, b) => a.creeLe - b.creeLe);
   const enCours = tries.filter((todo) => !todo.termine);
   const termines = tries.filter((todo) => todo.termine);
-  const jours = grouperParJour(enCours, maintenant);
+  const jours = grouperParJour(enCours, termines, maintenant);
   // Le plus ancien suit le jour affiché : un TODO repoussé à demain n'est plus en retard.
   const age = jours.at(0)?.age;
   return {

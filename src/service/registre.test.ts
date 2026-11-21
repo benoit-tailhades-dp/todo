@@ -124,6 +124,24 @@ describe("composerRegistre", () => {
     expect(registre.etat).toBe("liste");
   });
 
+  it("chaque jour compte aussi ses TODO terminés, rangés sous leur jour choisi ou leur jour d'ajout", () => {
+    const { jours } = composerRegistre(
+      [
+        todo("a", "Relancer le devis", Date.UTC(2026, 10, 16, 9, 0)),
+        termine("b", "Relire le contrat de maintenance", Date.UTC(2026, 10, 16, 15, 0)),
+        { ...termine("c", "Payer les cotisations", Date.UTC(2026, 10, 16, 16, 0)), jour: "2026-11-20" },
+        todo("d", "Sauvegarder la base de recette", Date.UTC(2026, 10, 20, 8, 0)),
+        termine("e", "Commander les cartes de visite", Date.UTC(2026, 10, 18, 8, 0)),
+      ],
+      VENDREDI_20_MIDI,
+    );
+
+    expect(jours.map(({ titre, nombre, termines }) => ({ titre, nombre, termines }))).toEqual([
+      { titre: "Lundi 16 novembre", nombre: 1, termines: 1 },
+      { titre: "Aujourd'hui", nombre: 1, termines: 1 },
+    ]);
+  });
+
   it("un TODO coché passe dans les terminés et le compteur des en cours baisse de 1", () => {
     const avant = [
       todo("a", "Relancer le devis", Date.UTC(2026, 10, 16, 9, 0)),

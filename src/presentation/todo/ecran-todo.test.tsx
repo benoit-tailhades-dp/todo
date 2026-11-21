@@ -105,6 +105,13 @@ describe("EcranTodo · consulter", () => {
     expect(screen.getByText("Vendredi 20 novembre")).toBeDefined();
   });
 
+  it("le bandeau porte le sélecteur de thème, qui annonce le thème actif", () => {
+    afficher([]);
+
+    const theme = within(screen.getByRole("banner")).getByRole("radiogroup", { name: "Thème" });
+    expect(within(theme).getByRole("radio", { name: "Système" }).getAttribute("aria-checked")).toBe("true");
+  });
+
   it("base sans TODO : affiche « Aucun TODO pour l'instant »", () => {
     afficher([]);
 
@@ -727,5 +734,74 @@ describe("ChargementListe", () => {
     render(<ChargementListe />);
 
     expect(screen.getByRole("status").textContent).toBe("Chargement de ta liste…");
+  });
+
+  it("le thème se choisit déjà pendant le chargement : le bandeau porte le sélecteur", () => {
+    render(<ChargementListe />);
+
+    expect(within(screen.getByRole("banner")).getByRole("radiogroup", { name: "Thème" })).toBeDefined();
+  });
+});
+
+/** Un doigt pose, glisse horizontalement de `dx` pixels, puis se lève, sur la ligne d'un TODO. */
+function glisserAuDoigt(titre: string, dx: number, pointerType = "touch") {
+  const zone = ligne(titre).querySelector<HTMLElement>("[data-zone-geste]");
+  if (!zone) throw new Error(`Pas de zone de geste sur « ${titre} »`);
+  const commun = { pointerId: 1, pointerType, isPrimary: true, clientY: 100 };
+  fireEvent.pointerDown(zone, { ...commun, clientX: 150 });
+  fireEvent.pointerMove(zone, { ...commun, clientX: 150 + dx / 2 });
+  fireEvent.pointerMove(zone, { ...commun, clientX: 150 + dx });
+  fireEvent.pointerUp(zone, { ...commun, clientX: 150 + dx });
+}
+
+describe("EcranTodo · gestes au doigt", () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("glisser une ligne vers la droite au-delà du seuil la termine, comme cocher sa case", async () => {
+    const { action } = actionEnSuspens<ResultatTerminer>(TERMINE);
+    afficher(DEUX_JOURS, { terminerAction: action });
+
+    glisserAuDoigt("Relancer le devis", 140);
+
+    expect(caseDe("Relancer le devis").getAttribute("aria-checked")).toBe("true");
+    expect(estBarre("Relancer le devis")).toBe(true);
+    await laisserPasser(CHOREGRAPHIE);
+    expect(action.mock.calls).toEqual([["a"]]);
+  });
+
+  it("un glissement trop court ne fait rien : la ligne revient à sa place", async () => {
+    const terminerAction = vi.fn(ACTIONS_INERTES.terminerAction);
+    afficher(DEUX_JOURS, { terminerAction });
+
+    glisserAuDoigt("Relancer le devis", 60);
+    await laisserPasser(CHOREGRAPHIE);
+
+    expect(caseDe("Relancer le devis").getAttribute("aria-checked")).toBe("false");
+    expect(terminerAction).not.toHaveBeenCalled();
+  });
+
+  it("à la souris, la ligne ne se glisse pas de côté (la souris garde le glisser-déposer vers un jour)", async () => {
+    const terminerAction = vi.fn(ACTIONS_INERTES.terminerAction);
+    afficher(DEUX_JOURS, { terminerAction });
+
+    glisserAuDoigt("Relancer le devis", 140, "mouse");
+    await laisserPasser(CHOREGRAPHIE);
+
+    expect(terminerAction).not.toHaveBeenCalled();
+  });
+
+  it("glisser une ligne vers la gauche au-delà du seuil ouvre son calendrier", async () => {
+    afficher(DEUX_JOURS);
+
+    glisserAuDoigt("Sauvegarder la base de recette", -140);
+    await laisserPasser(400);
+
+    expect(within(selecteur()).getByText("Sauvegarder la base de recette")).toBeDefined();
   });
 });

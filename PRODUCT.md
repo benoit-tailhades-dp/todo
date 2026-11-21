@@ -37,7 +37,8 @@ Outil personnel pour une seule personne : pas de compte, pas de partage, pas de 
 
 ## Brand Commitments
 
-- Le design system Cartouche est imposé : jetons dans `src/app/globals.css`, composants dans `src/presentation/ui/`, référence dans `design-options.html`. Aucune couleur hors jetons.
+- Le design system Affiche est imposé (il remplace Cartouche à la demande de l'utilisateur, qui le trouvait trop carré et voulait une interface plus dynamique et amicale) : jetons dans `src/app/globals.css`, composants dans `src/presentation/ui/`, description dans `DESIGN.md`. Aucune couleur hors jetons.
+- Attentes d'interaction : gestes au pouce, mouvement vivant, progression gratifiante.
 
 ## Evidence on Hand
 

@@ -91,3 +91,21 @@ Hors lot :
 - Réordonner les TODO à la main dans un jour : non demandé.
 - Changer la date d'un TODO terminé.
 - Glisser vers un jour qui n'est pas affiché : on passe par le sélecteur.
+
+## Lot 7 · Choisir le thème clair ou sombre
+
+Issue : #24
+
+Dans le bandeau, un bouton me laisse choisir le thème : Système, Clair ou Sombre. Le choix s'applique tout de suite, sans recharger la page, et il est retenu sur cet appareil. Par défaut, l'application suit le réglage du système, comme aujourd'hui.
+
+- [ ] Étant donné le thème « Système », quand mon système est réglé en sombre, alors l'application s'affiche en sombre, et en clair s'il est réglé en clair.
+- [ ] Étant donné l'application en clair, quand je choisis « Sombre », alors toute la page passe en sombre tout de suite, sans rechargement.
+- [ ] Étant donné « Sombre » choisi, quand je rouvre l'application, alors elle s'ouvre directement en sombre, sans flash blanc pendant le chargement.
+- [ ] Étant donné « Clair » choisi, quand le système passe en sombre, alors l'application reste en clair.
+- [ ] Étant donné « Système » choisi de nouveau, alors l'application suit à nouveau le réglage du système.
+- [ ] Au clavier, je choisis le thème sans souris, et le lecteur d'écran annonce le thème actif.
+
+Maquette : à compléter avant le code (bouton de thème dans le bandeau, menu ouvert avec les trois choix, bandeau en clair et en sombre).
+
+Hors lot :
+- Retrouver le même thème sur un autre appareil : pas de compte, le choix reste dans le navigateur.

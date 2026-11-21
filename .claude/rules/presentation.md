@@ -12,7 +12,7 @@ Périmètre : `src/app/` (routes Next.js) et `src/presentation/` (composants).
 
 - N'appelle que la couche service (`@/service/...`). Jamais `@/data/...`, jamais de client de base de données, jamais `process.env`.
 - Aucune règle métier ici : un composant affiche et transmet, le service décide.
-- N'utilise que les composants du design system Cartouche, dans `@/presentation/ui/`. S'il en manque un : `pnpm dlx shadcn@latest add <nom>`, puis l'aligner sur Cartouche (modèle : `button.tsx`).
+- N'utilise que les composants du design system Affiche, dans `@/presentation/ui/`. S'il en manque un : `pnpm dlx shadcn@latest add <nom>`, puis l'aligner sur Affiche (modèle : `button.tsx`).
 - Aucune couleur en dur :
   - ni hex, `rgb()`, `hsl()` ou `oklch()` ;
   - ni couleur de la palette Tailwind (`zinc-500`, `bg-white`, `text-black`…) ;

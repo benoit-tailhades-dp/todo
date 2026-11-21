@@ -36,8 +36,8 @@ function PopoverContent({
         <PopoverPrimitive.Popup
           data-slot="popover-content"
           className={cn(
-            // Cartouche : feuille à filet, rayon de carte ; seule ombre permise, car le popover flotte au-dessus de la page.
-            "z-50 flex w-72 origin-(--transform-origin) flex-col gap-2.5 rounded-xl border border-border bg-popover p-3 text-[0.9375rem] text-popover-foreground shadow-md outline-hidden duration-150 ease-trait motion-reduce:animate-none data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+            // Affiche : filet fin, grand rayon ; ombre douce et décalée, car le popover flotte au-dessus de la page.
+            "z-50 flex w-72 origin-(--transform-origin) flex-col gap-2.5 rounded-2xl border border-border bg-popover p-3 text-[0.9375rem] text-popover-foreground shadow-lg outline-hidden duration-150 ease-trait motion-reduce:animate-none data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
             className
           )}
           {...props}

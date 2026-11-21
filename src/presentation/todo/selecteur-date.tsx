@@ -37,10 +37,10 @@ export function SelecteurDate({
         render={
           <Button
             variant="ghost"
-            size="icon-sm"
+            size="icon"
             data-bouton-date=""
             aria-label={`Changer la date de « ${titre} »`}
-            className="text-muted-foreground hover:text-foreground aria-expanded:text-foreground"
+            className="rounded-full text-muted-foreground hover:text-foreground aria-expanded:bg-foreground aria-expanded:text-background"
           />
         }
       >

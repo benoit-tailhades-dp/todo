@@ -1,46 +1,57 @@
-import { ArrowUp, CheckCheck, CircleAlert, X } from "lucide-react";
+import { Check, CircleAlert, Plus, X } from "lucide-react";
+import { cn } from "@/presentation/lib/utils";
 import { Alert, AlertAction, AlertDescription, AlertTitle } from "@/presentation/ui/alert";
 import { Button } from "@/presentation/ui/button";
 
+/** Un état sans liste, en affiche : un disque, un grand titre, une phrase. */
 function Encart({
   id,
   icone,
+  disque,
   titre,
   children,
 }: {
   id: string;
   icone: React.ReactNode;
+  /** Classes du disque qui porte l'icône. */
+  disque: string;
   titre: string;
   children: React.ReactNode;
 }) {
   return (
-    <section
-      aria-labelledby={id}
-      className="animate-apparait rounded-xl border border-border bg-card px-5 py-8 sm:px-8 sm:py-10"
-    >
-      <div className="mb-3 text-primary">{icone}</div>
-      <h2 id={id} className="text-xl leading-tight">
+    <section aria-labelledby={id} className="animate-apparait pt-6 lg:pt-16">
+      <div className={cn("mb-7 flex size-20 items-center justify-center rounded-full lg:size-24", disque)}>
+        {icone}
+      </div>
+      <h2 id={id} className="text-[2rem] leading-[1.05] text-balance sm:text-[2.75rem]">
         {titre}
       </h2>
-      <p className="mt-1.5 max-w-prose text-pretty text-muted-foreground">{children}</p>
+      <p className="mt-3 max-w-[34rem] text-[1.0625rem] text-pretty text-muted-foreground">{children}</p>
     </section>
   );
 }
 
 export function EtatVide() {
   return (
-    <Encart id="etat-vide" icone={<ArrowUp className="size-5" aria-hidden />} titre="Aucun TODO pour l'instant">
-      Écris ton premier TODO dans le champ ci-dessus, puis appuie sur Entrée. Il se rangera sous
-      « Aujourd&apos;hui » et le compteur passera à 1.
+    <Encart
+      id="etat-vide"
+      disque="border-[3px] border-foreground text-foreground"
+      icone={<Plus className="size-9 stroke-[2.5]" aria-hidden />}
+      titre="Aucun TODO pour l'instant"
+    >
+      Écris ton premier TODO dans le champ, puis appuie sur Entrée. Il se rangera sous « Aujourd&apos;hui »
+      et le compteur passera à 1.
     </Encart>
   );
 }
 
+/** Tout est fait : le disque vermillon se pose avec un léger ressort, c'est le moment de la journée. */
 export function EtatToutTermine({ nombre }: { nombre: number }) {
   return (
     <Encart
       id="etat-tout-termine"
-      icone={<CheckCheck className="size-5" aria-hidden />}
+      disque="animate-coche bg-signature text-signature-foreground [animation-duration:600ms]"
+      icone={<Check className="size-10 stroke-3" aria-hidden />}
       titre="Rien à faire pour l'instant"
     >
       {nombre === 1 ? "Ton TODO est terminé." : `Tes ${nombre} TODO sont terminés.`} Le prochain que tu

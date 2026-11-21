@@ -11,7 +11,7 @@ Projet en français : code, commentaires, textes d'interface et commits. Gestion
 - `pnpm exec tsc --noEmit` : vérification des types (pas de script dédié).
 - `pnpm test` : Vitest, une passe. `pnpm test:watch` : mode surveillance.
 - Un seul fichier : `pnpm test src/service/todo-service.test.ts`. Un seul test : `pnpm test -t "retire les espaces"`. Une couche : `pnpm test src/service`.
-- Ajouter un composant shadcn : `pnpm dlx shadcn@latest add <nom>`, puis l'aligner sur Cartouche (modèle : `src/presentation/ui/button.tsx`).
+- Ajouter un composant shadcn : `pnpm dlx shadcn@latest add <nom>`, puis l'aligner sur Affiche (modèle : `src/presentation/ui/button.tsx`).
 
 ## Next.js 16 : vérifier avant d'écrire
 
@@ -31,16 +31,19 @@ Cette version a des changements cassants (voir `AGENTS.md`). Lire le guide conce
 
 Tests : environnement `node` par défaut. Un test de composant commence par `// @vitest-environment jsdom` (voir `src/presentation/todo/ecran-todo.test.tsx`).
 
-## Design system Cartouche
+## Design system Affiche
+
+Affiche suisse (style typographique international) : champ vermillon en aplat (`bg-shell`), noir et blanc, Archivo très grasse et étendue pour les chiffres et titres, cercles et pilules, filets fins, aucune carte.
+
 
 - Couleurs uniquement en jetons, définies dans `src/app/globals.css` (sombre sous `:root[data-theme="sombre"]`, attribut posé avant le premier rendu par `src/presentation/theme/script-theme.tsx`). Aucune couleur en dur, ni palette Tailwind, ni valeur arbitraire. S'il manque une couleur, ajouter un jeton clair et sombre.
-- Composants : uniquement ceux de `src/presentation/ui/` (shadcn style base-nova sur Base UI, fusion de classes avec le paquet `cn`). Le bouton a une variante `signature` (surligneur) pour le bandeau encre (`bg-shell`).
-- Mouvements définis dans `globals.css` : `surligne`, `trait-encre`, `animate-chiffre`, `animate-apparait`, courbe `ease-trait`. Ils sont coupés en mouvement réduit.
+- Composants : uniquement ceux de `src/presentation/ui/` (shadcn style base-nova sur Base UI, fusion de classes avec le paquet `cn`). Le bouton principal est noir (`default`) ; `signature` est vermillon. Cases et pastilles rondes, champ et boutons de l'écran en pilule (`rounded-full`).
+- Mouvements définis dans `globals.css` : `surligne` (trace du dernier ajout), `trait-encre` (trait vermillon du TODO coché), `animate-chiffre` (le chiffre roule), `animate-apparait`, `animate-coche`, courbes `ease-trait` et `ease-ressort`. Dans `src/presentation/todo/` : `geste-ligne.ts` (glisser au doigt : droite = terminer, gauche = calendrier) et `glissement-fluide.ts` (les lignes glissent à leur nouvelle place). Tout est coupé en mouvement réduit.
 - `DESIGN.md` et `.impeccable/design.json` décrivent le système livré. `PRODUCT.md` porte la vérité produit pour Impeccable. Un hook Impeccable analyse chaque modification de fichier d'interface.
 
 ## Maquette de référence
 
-La route `/maquette` (`src/presentation/maquette/`) est la référence visuelle des lots : données fictives, état local, pas de base. `?etat=` ouvre un état directement (`vide`, `tout-termine`, `chargement`, `erreur-chargement`, `titre-vide`, `introuvable`, `enregistrement`). Les règles qu'elle simule (titre obligatoire, espaces retirés, tri, groupement par jour) doivent vivre dans le service quand un lot les livre. Les jours se calculent à l'heure de Paris (`Europe/Paris`), voir `src/presentation/maquette/dates.ts`.
+La route `/maquette` (`src/presentation/maquette/`) a servi de référence visuelle aux lots 1 à 7. Elle n'a pas été refaite dans le monde Affiche (elle en hérite seulement les jetons) : pour le visuel, l'écran réel `/` fait foi. Données fictives, état local, pas de base. `?etat=` ouvre un état directement (`vide`, `tout-termine`, `chargement`, `erreur-chargement`, `titre-vide`, `introuvable`, `enregistrement`). Les règles qu'elle simule (titre obligatoire, espaces retirés, tri, groupement par jour) doivent vivre dans le service quand un lot les livre. Les jours se calculent à l'heure de Paris (`Europe/Paris`), voir `src/presentation/maquette/dates.ts`.
 
 ## Façon de travailler
 

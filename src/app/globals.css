@@ -3,20 +3,19 @@
 @import "shadcn/tailwind.css";
 
 /*
- * Design system « Cartouche » : inspiré du cartouche des plans d'ingénierie.
- * Encre bleue, surligneur jaune, traits nets (rayons de 2 à 3 px).
+ * Design system « Affiche » : inspiré des affiches suisses du style typographique international.
+ * Champ vermillon en aplat, noir et blanc, Archivo très grasse, cercles et pilules.
  * Thème : l'attribut data-theme de <html> vaut « clair » ou « sombre ». Le script du <head>
  * (src/presentation/theme/script-theme.tsx) le pose avant le premier rendu, d'après le choix
  * enregistré ; en « Système », il suit le réglage du système.
- * Référence visuelle : design-options.html, colonne Cartouche.
  */
 @custom-variant dark (&:where([data-theme="sombre"], [data-theme="sombre"] *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-barlow);
-  --font-heading: var(--font-barlow-semi-condensed);
+  --font-sans: var(--font-archivo);
+  --font-heading: var(--font-archivo);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -38,8 +37,10 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-signature: var(--signature);
   --color-signature-foreground: var(--signature-foreground);
+  --color-signature-doux: var(--signature-doux);
   --color-shell: var(--shell);
   --color-shell-foreground: var(--shell-foreground);
+  --color-shell-accent: var(--shell-accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -60,115 +61,126 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  /* Mouvements Cartouche : courts, sortie exponentielle, coupés en mouvement réduit. */
+  /* Mouvements Affiche : sortie exponentielle, ressort pour ce qui revient au repos, coupés en mouvement réduit. */
   --ease-trait: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-ressort: cubic-bezier(0.34, 1.56, 0.64, 1);
   --animate-surligne: surligne 6s var(--ease-trait) both;
-  --animate-chiffre: chiffre 180ms var(--ease-trait) both;
-  --animate-apparait: apparait 200ms var(--ease-trait) both;
+  --animate-chiffre: chiffre 420ms var(--ease-trait) both;
+  --animate-apparait: apparait 240ms var(--ease-trait) both;
+  --animate-coche: coche 320ms var(--ease-ressort) both;
 
   @keyframes surligne {
-    0% { background-size: 0% 58%; --surligne-encre: var(--signature); }
-    6% { background-size: 100% 58%; --surligne-encre: var(--signature); }
-    82% { background-size: 100% 58%; --surligne-encre: var(--signature); }
+    0% { background-size: 0% 58%; --surligne-encre: var(--signature-doux); }
+    6% { background-size: 100% 58%; --surligne-encre: var(--signature-doux); }
+    82% { background-size: 100% 58%; --surligne-encre: var(--signature-doux); }
     100% { background-size: 100% 58%; --surligne-encre: transparent; }
   }
+  /* Le chiffre roule : le nouveau monte depuis le bas de sa fenêtre. */
   @keyframes chiffre {
-    from { opacity: 0; transform: translateY(35%); }
+    from { opacity: 0; transform: translateY(70%); }
     to { opacity: 1; transform: translateY(0); }
   }
   @keyframes apparait {
-    from { opacity: 0; transform: translateY(-4px); }
+    from { opacity: 0; transform: translateY(-6px); }
     to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes coche {
+    0% { transform: scale(0.7); }
+    100% { transform: scale(1); }
   }
 }
 
 :root {
   color-scheme: light;
-  /* 2 px pour les contrôles (rounded-lg), environ 3 px pour les cartes (rounded-xl). */
-  --radius: 0.125rem;
+  /* Pilules et cercles : 12 px pour les contrôles (rounded-lg), 17 px pour les menus (rounded-xl). */
+  --radius: 0.75rem;
 
-  --background: #F3F5F8; /* Papier */
-  --foreground: #1B2430; /* Graphite */
-  --card: #FFFFFF; /* Feuille */
-  --card-foreground: #1B2430;
+  --background: #FFFFFF; /* Papier */
+  --foreground: #111111; /* Noir */
+  --card: #FFFFFF;
+  --card-foreground: #111111;
   --popover: #FFFFFF;
-  --popover-foreground: #1B2430;
-  --primary: #1D3E8A; /* Encre */
+  --popover-foreground: #111111;
+  --primary: #111111; /* Noir : action principale, cases, focus */
   --primary-foreground: #FFFFFF;
-  --secondary: #E3E8EF;
-  --secondary-foreground: #1B2430;
-  --muted: #EBEFF4; /* Calque */
-  --muted-foreground: #536072;
-  --accent: #E7ECF3;
-  --accent-foreground: #1B2430;
-  --destructive: #B42318; /* Alerte */
+  --secondary: #F1EFEA;
+  --secondary-foreground: #111111;
+  --muted: #F4F2EE;
+  --muted-foreground: #6B6862; /* 5,6:1 sur Papier */
+  --accent: #F1EFEA; /* Survol */
+  --accent-foreground: #111111;
+  --destructive: #A1190C; /* Erreur : plus sombre que le vermillon pour ne pas s'y confondre */
   --destructive-foreground: #FFFFFF;
-  --border: #CDD5DF;
-  --input: #7F8C9C; /* Trait : 3,4:1 sur Feuille, bordure de champ lisible */
-  --ring: #1D3E8A;
-  /* Couleur en plus de shadcn : étapes, mises en avant, halo de focus. */
-  --signature: #F7D646; /* Surligneur */
-  --signature-foreground: #1B2430;
-  /* Bandeau de l'application : encre, texte blanc. */
-  --shell: #1D3E8A;
+  --border: #E6E3DD; /* Filet */
+  --input: #8C8880; /* Bord de contrôle : 3,5:1 sur Papier */
+  --ring: #111111;
+  /* Couleurs en plus de shadcn. */
+  --signature: #D93A1A; /* Vermillon : case cochée, âge qui traîne, geste, sélection (4,6:1 avec le blanc) */
+  --signature-foreground: #FFFFFF;
+  --signature-doux: #FBE0D7; /* Trace du dernier ajout */
+  /* Champ de l'affiche : aplat vermillon, texte blanc, un arc en noir. */
+  --shell: #D93A1A;
   --shell-foreground: #FFFFFF;
+  --shell-accent: #111111;
 
-  --chart-1: #1D3E8A;
-  --chart-2: #9A7A00;
-  --chart-3: #4A6FC0;
-  --chart-4: #536072;
-  --chart-5: #7F8C9C;
+  --chart-1: #D93A1A;
+  --chart-2: #111111;
+  --chart-3: #E8775F;
+  --chart-4: #6B6862;
+  --chart-5: #8C8880;
 
   --sidebar: #FFFFFF;
-  --sidebar-foreground: #1B2430;
-  --sidebar-primary: #1D3E8A;
+  --sidebar-foreground: #111111;
+  --sidebar-primary: #111111;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #E7ECF3;
-  --sidebar-accent-foreground: #1B2430;
-  --sidebar-border: #CDD5DF;
-  --sidebar-ring: #1D3E8A;
+  --sidebar-accent: #F1EFEA;
+  --sidebar-accent-foreground: #111111;
+  --sidebar-border: #E6E3DD;
+  --sidebar-ring: #111111;
 }
 
 :root[data-theme="sombre"] {
   color-scheme: dark;
-  --background: #111821;
-  --foreground: #E5EAF0;
-  --card: #17202B;
-  --card-foreground: #E5EAF0;
-  --popover: #17202B;
-  --popover-foreground: #E5EAF0;
-  --primary: #86A9F2;
-  --primary-foreground: #0C1730;
-  --secondary: #222D3B;
-  --secondary-foreground: #E5EAF0;
-  --muted: #1B2531;
-  --muted-foreground: #98A6B7;
-  --accent: #233041;
-  --accent-foreground: #E5EAF0;
-  --destructive: #F2766B;
-  --destructive-foreground: #2A0A07;
-  --border: #2B3746;
-  --input: #66778C;
-  --ring: #86A9F2;
-  --signature: #E9C93B;
-  --signature-foreground: #1A1708;
-  --shell: #1A2D5A;
-  --shell-foreground: #E5EAF0;
+  --background: #131211;
+  --foreground: #F3F1EC;
+  --card: #1A1917;
+  --card-foreground: #F3F1EC;
+  --popover: #1F1E1B;
+  --popover-foreground: #F3F1EC;
+  --primary: #F3F1EC;
+  --primary-foreground: #131211;
+  --secondary: #24221F;
+  --secondary-foreground: #F3F1EC;
+  --muted: #1E1D1A;
+  --muted-foreground: #A39F97;
+  --accent: #262420;
+  --accent-foreground: #F3F1EC;
+  --destructive: #FF8A70;
+  --destructive-foreground: #2A0A05;
+  --border: #2E2C28;
+  --input: #6E6A63;
+  --ring: #F3F1EC;
+  --signature: #FF5A36;
+  --signature-foreground: #131211;
+  --signature-doux: #4A1E12;
+  --shell: #C7361A; /* Plus profond la nuit, toujours 5,3:1 avec le blanc */
+  --shell-foreground: #FFFFFF;
+  --shell-accent: #131211;
 
-  --chart-1: #86A9F2;
-  --chart-2: #E9C93B;
-  --chart-3: #5B7FCB;
-  --chart-4: #98A6B7;
-  --chart-5: #66778C;
+  --chart-1: #FF5A36;
+  --chart-2: #F3F1EC;
+  --chart-3: #E8775F;
+  --chart-4: #A39F97;
+  --chart-5: #6E6A63;
 
-  --sidebar: #17202B;
-  --sidebar-foreground: #E5EAF0;
-  --sidebar-primary: #86A9F2;
-  --sidebar-primary-foreground: #0C1730;
-  --sidebar-accent: #233041;
-  --sidebar-accent-foreground: #E5EAF0;
-  --sidebar-border: #2B3746;
-  --sidebar-ring: #86A9F2;
+  --sidebar: #1A1917;
+  --sidebar-foreground: #F3F1EC;
+  --sidebar-primary: #F3F1EC;
+  --sidebar-primary-foreground: #131211;
+  --sidebar-accent: #262420;
+  --sidebar-accent-foreground: #F3F1EC;
+  --sidebar-border: #2E2C28;
+  --sidebar-ring: #F3F1EC;
 }
 
 @layer base {
@@ -190,7 +202,7 @@
     @apply bg-background text-foreground;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-heading font-semibold;
+    @apply font-heading font-extrabold tracking-tight;
   }
   button:not(:disabled), [role="button"]:not(:disabled) {
     cursor: pointer;
@@ -200,7 +212,7 @@
   }
 }
 
-/* Surligneur : un trait jaune balaie le TODO qui vient d'être ajouté, puis s'efface. */
+/* Trace : une bande vermillon pâle balaie le TODO qui vient d'être ajouté, puis s'efface. */
 @property --surligne-encre {
   syntax: "<color>";
   inherits: false;
@@ -216,9 +228,9 @@
   animation: var(--animate-surligne);
 }
 
-/* Trait d'encre : barre le titre d'un TODO coché, ligne par ligne, de gauche à droite. */
+/* Trait vermillon : barre le titre d'un TODO coché, ligne par ligne, de gauche à droite. */
 @utility trait-encre {
-  background-image: linear-gradient(var(--primary), var(--primary));
+  background-image: linear-gradient(var(--signature), var(--signature));
   background-repeat: no-repeat;
   background-position: 0 58%;
   background-size: 0% 2px;
@@ -235,9 +247,13 @@
   .surligne {
     animation: none;
     background-size: 100% 58%;
-    --surligne-encre: var(--signature);
+    --surligne-encre: var(--signature-doux);
   }
   .trait-encre {
     transition: none;
+  }
+  .animate-coche,
+  .animate-chiffre {
+    animation: none;
   }
 }

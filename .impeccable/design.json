@@ -1,868 +1,795 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-20T15:42:45+00:00",
+  "generatedAt": "2026-11-21T20:11:25+00:00",
   "title": "Design System: Mes TODO",
   "extensions": {
     "colorMeta": {
-      "encre": {
+      "vermillon": {
         "role": "primary",
-        "displayName": "Encre",
-        "canonical": "#1D3E8A",
-        "cssVariable": "--primary",
+        "displayName": "Vermillon d'affiche",
+        "canonical": "#D93A1A",
+        "cssVariable": "--signature / --shell",
         "mode": "clair",
-        "oklch": "oklch(38.7% 0.133 263.7)",
+        "oklch": "oklch(58.6% 0.200 33.0)",
         "tonalRamp": [
-          "#020921",
-          "#0F224D",
-          "#213E7E",
-          "#395DAC",
-          "#587FD1",
-          "#80A4ED",
-          "#ADC9FF",
-          "#DCEFFF"
+          "#210000",
+          "#500000",
+          "#840000",
+          "#B30000",
+          "#DA3B1C",
+          "#FE674A",
+          "#FFA38C",
+          "#FFDED0"
         ]
       },
-      "encre-foreground": {
+      "vermillon-foreground": {
         "role": "primary",
-        "displayName": "Blanc sur encre",
+        "displayName": "Blanc sur vermillon",
         "canonical": "#FFFFFF",
-        "cssVariable": "--primary-foreground",
+        "cssVariable": "--signature-foreground / --shell-foreground",
         "mode": "clair",
         "oklch": "oklch(100.0% 0.000 89.9)",
         "tonalRamp": [
           "#0B0B0B",
-          "#252525",
-          "#424242",
-          "#616161",
-          "#828282",
-          "#A5A5A5",
-          "#C9C9C9",
+          "#242424",
+          "#404040",
+          "#5D5D5D",
+          "#7D7D7D",
+          "#9E9E9E",
+          "#C4C4C4",
           "#EEEEEE"
         ]
       },
-      "surligneur": {
-        "role": "secondary",
-        "displayName": "Surligneur",
-        "canonical": "#F7D646",
-        "cssVariable": "--signature",
+      "vermillon-pale": {
+        "role": "primary",
+        "displayName": "Vermillon pâle",
+        "canonical": "#FBE0D7",
+        "cssVariable": "--signature-doux",
         "mode": "clair",
-        "oklch": "oklch(88.0% 0.159 95.8)",
+        "oklch": "oklch(92.6% 0.032 39.3)",
         "tonalRamp": [
-          "#130900",
-          "#342200",
-          "#583E00",
-          "#7D5D00",
-          "#9F7F00",
-          "#BFA429",
-          "#DDC97C",
-          "#FBEFBF"
+          "#100A08",
+          "#2D211D",
+          "#4D3B35",
+          "#6E5850",
+          "#8F776F",
+          "#B09891",
+          "#D1C0BA",
+          "#F6ECE9"
         ]
       },
-      "surligneur-foreground": {
-        "role": "secondary",
-        "displayName": "Graphite sur surligneur",
-        "canonical": "#1B2430",
-        "cssVariable": "--signature-foreground",
+      "noir": {
+        "role": "neutral",
+        "displayName": "Noir d'imprimerie",
+        "canonical": "#111111",
+        "cssVariable": "--foreground / --primary / --ring / --shell-accent",
         "mode": "clair",
-        "oklch": "oklch(25.7% 0.026 255.8)",
+        "oklch": "oklch(17.8% 0.000 89.9)",
         "tonalRamp": [
-          "#080B10",
-          "#20262D",
-          "#3A434E",
-          "#586270",
-          "#788392",
-          "#9CA6B3",
-          "#C2CAD4",
-          "#EAEFF6"
+          "#0B0B0B",
+          "#242424",
+          "#404040",
+          "#5D5D5D",
+          "#7D7D7D",
+          "#9E9E9E",
+          "#C4C4C4",
+          "#EEEEEE"
         ]
       },
       "papier": {
         "role": "neutral",
         "displayName": "Papier",
-        "canonical": "#F3F5F8",
-        "cssVariable": "--background",
-        "mode": "clair",
-        "oklch": "oklch(96.9% 0.005 258.3)",
-        "tonalRamp": [
-          "#0B0B0C",
-          "#242526",
-          "#414244",
-          "#606164",
-          "#818285",
-          "#A3A5A7",
-          "#C8C9CB",
-          "#EEEEF0"
-        ]
-      },
-      "graphite": {
-        "role": "neutral",
-        "displayName": "Graphite",
-        "canonical": "#1B2430",
-        "cssVariable": "--foreground",
-        "mode": "clair",
-        "oklch": "oklch(25.7% 0.026 255.8)",
-        "tonalRamp": [
-          "#080B10",
-          "#20262D",
-          "#3A434E",
-          "#586270",
-          "#788392",
-          "#9CA6B3",
-          "#C2CAD4",
-          "#EAEFF6"
-        ]
-      },
-      "feuille": {
-        "role": "neutral",
-        "displayName": "Feuille",
         "canonical": "#FFFFFF",
-        "cssVariable": "--card",
+        "cssVariable": "--background / --card / --popover",
         "mode": "clair",
         "oklch": "oklch(100.0% 0.000 89.9)",
         "tonalRamp": [
           "#0B0B0B",
-          "#252525",
-          "#424242",
-          "#616161",
-          "#828282",
-          "#A5A5A5",
-          "#C9C9C9",
+          "#242424",
+          "#404040",
+          "#5D5D5D",
+          "#7D7D7D",
+          "#9E9E9E",
+          "#C4C4C4",
           "#EEEEEE"
         ]
       },
-      "calque": {
+      "lin": {
         "role": "neutral",
-        "displayName": "Calque",
-        "canonical": "#EBEFF4",
+        "displayName": "Lin",
+        "canonical": "#F1EFEA",
+        "cssVariable": "--secondary / --accent",
+        "mode": "clair",
+        "oklch": "oklch(95.2% 0.007 88.6)",
+        "tonalRamp": [
+          "#0C0B0A",
+          "#252422",
+          "#41403C",
+          "#5F5D59",
+          "#7F7D79",
+          "#A09E9A",
+          "#C5C4C1",
+          "#EFEEED"
+        ]
+      },
+      "lin-clair": {
+        "role": "neutral",
+        "displayName": "Lin clair",
+        "canonical": "#F4F2EE",
         "cssVariable": "--muted",
         "mode": "clair",
-        "oklch": "oklch(95.1% 0.008 253.9)",
+        "oklch": "oklch(96.2% 0.006 84.6)",
         "tonalRamp": [
-          "#0A0B0C",
-          "#232527",
-          "#3F4246",
-          "#5E6266",
-          "#7F8387",
-          "#A2A5A9",
-          "#C7C9CC",
-          "#EDEFF1"
+          "#0C0B0A",
+          "#252422",
+          "#41403D",
+          "#5F5D5A",
+          "#7F7D79",
+          "#A09E9B",
+          "#C5C4C1",
+          "#EFEEED"
         ]
       },
-      "graphite-doux": {
+      "gris-pierre": {
         "role": "neutral",
-        "displayName": "Graphite doux",
-        "canonical": "#536072",
+        "displayName": "Gris pierre",
+        "canonical": "#6B6862",
         "cssVariable": "--muted-foreground",
         "mode": "clair",
-        "oklch": "oklch(48.5% 0.033 256.6)",
+        "oklch": "oklch(51.8% 0.010 84.6)",
         "tonalRamp": [
-          "#080B11",
-          "#1F262F",
-          "#384351",
-          "#556274",
-          "#768397",
-          "#9AA6B7",
-          "#C1CAD7",
-          "#E9EFF8"
-        ]
-      },
-      "secondaire": {
-        "role": "neutral",
-        "displayName": "Secondaire",
-        "canonical": "#E3E8EF",
-        "cssVariable": "--secondary",
-        "mode": "clair",
-        "oklch": "oklch(92.9% 0.011 256.7)",
-        "tonalRamp": [
-          "#0A0B0D",
-          "#232528",
-          "#3F4247",
-          "#5D6268",
-          "#7E8389",
-          "#A1A5AB",
-          "#C6C9CE",
-          "#EDEFF1"
-        ]
-      },
-      "survol": {
-        "role": "neutral",
-        "displayName": "Survol",
-        "canonical": "#E7ECF3",
-        "cssVariable": "--accent",
-        "mode": "clair",
-        "oklch": "oklch(94.1% 0.011 256.7)",
-        "tonalRamp": [
-          "#0A0B0D",
-          "#232528",
-          "#3F4247",
-          "#5D6267",
-          "#7E8389",
-          "#A1A5AB",
-          "#C6C9CE",
-          "#EDEFF1"
+          "#0C0B09",
+          "#252421",
+          "#423F3B",
+          "#605D57",
+          "#807D77",
+          "#A19E98",
+          "#C6C4BF",
+          "#EFEEEC"
         ]
       },
       "filet": {
         "role": "neutral",
         "displayName": "Filet",
-        "canonical": "#CDD5DF",
+        "canonical": "#E6E3DD",
         "cssVariable": "--border",
         "mode": "clair",
-        "oklch": "oklch(87.0% 0.016 253.9)",
+        "oklch": "oklch(91.6% 0.009 84.6)",
         "tonalRamp": [
-          "#090B0E",
-          "#22252A",
-          "#3D4349",
-          "#5B626B",
-          "#7C838C",
-          "#9FA6AE",
-          "#C5CAD0",
-          "#EBEFF3"
+          "#0C0B0A",
+          "#252421",
+          "#423F3B",
+          "#605D58",
+          "#807D77",
+          "#A19E99",
+          "#C6C4C0",
+          "#EFEEEC"
         ]
       },
       "trait": {
         "role": "neutral",
         "displayName": "Trait",
-        "canonical": "#7F8C9C",
+        "canonical": "#8C8880",
         "cssVariable": "--input",
         "mode": "clair",
-        "oklch": "oklch(63.5% 0.028 253.7)",
+        "oklch": "oklch(62.8% 0.013 84.6)",
         "tonalRamp": [
-          "#080B10",
-          "#1F262E",
-          "#39434F",
-          "#566271",
-          "#778493",
-          "#9BA6B4",
-          "#C1CAD5",
-          "#E9EFF6"
+          "#0C0B09",
+          "#262420",
+          "#423F39",
+          "#615D56",
+          "#817D75",
+          "#A29E96",
+          "#C7C4BE",
+          "#F0EEEB"
         ]
       },
-      "alerte": {
-        "role": "tertiary",
-        "displayName": "Alerte",
-        "canonical": "#B42318",
+      "erreur": {
+        "role": "error",
+        "displayName": "Rouge d'erreur",
+        "canonical": "#A1190C",
         "cssVariable": "--destructive",
         "mode": "clair",
-        "oklch": "oklch(50.0% 0.182 29.5)",
+        "oklch": "oklch(45.7% 0.172 30.2)",
         "tonalRamp": [
-          "#220000",
-          "#4F0000",
-          "#810000",
-          "#B12015",
-          "#DA4A3B",
-          "#F77A69",
-          "#FFAC9D",
-          "#FFDDD2"
+          "#1F0000",
+          "#4B0100",
+          "#7C0300",
+          "#A92316",
+          "#CF4A39",
+          "#F2725F",
+          "#FFA898",
+          "#FFE0D7"
         ]
       },
-      "alerte-foreground": {
-        "role": "tertiary",
-        "displayName": "Blanc sur alerte",
+      "erreur-foreground": {
+        "role": "error",
+        "displayName": "Blanc sur erreur",
         "canonical": "#FFFFFF",
         "cssVariable": "--destructive-foreground",
         "mode": "clair",
         "oklch": "oklch(100.0% 0.000 89.9)",
         "tonalRamp": [
           "#0B0B0B",
-          "#252525",
-          "#424242",
-          "#616161",
-          "#828282",
-          "#A5A5A5",
-          "#C9C9C9",
+          "#242424",
+          "#404040",
+          "#5D5D5D",
+          "#7D7D7D",
+          "#9E9E9E",
+          "#C4C4C4",
           "#EEEEEE"
         ]
       },
-      "bandeau": {
+      "champ-sombre": {
         "role": "primary",
-        "displayName": "Bandeau",
-        "canonical": "#1D3E8A",
+        "displayName": "Vermillon profond (champ)",
+        "canonical": "#C7361A",
         "cssVariable": "--shell",
-        "mode": "clair",
-        "oklch": "oklch(38.7% 0.133 263.7)",
-        "tonalRamp": [
-          "#020921",
-          "#0F224D",
-          "#213E7E",
-          "#395DAC",
-          "#587FD1",
-          "#80A4ED",
-          "#ADC9FF",
-          "#DCEFFF"
-        ]
-      },
-      "bandeau-foreground": {
-        "role": "primary",
-        "displayName": "Texte du bandeau",
-        "canonical": "#FFFFFF",
-        "cssVariable": "--shell-foreground",
-        "mode": "clair",
-        "oklch": "oklch(100.0% 0.000 89.9)",
-        "tonalRamp": [
-          "#0B0B0B",
-          "#252525",
-          "#424242",
-          "#616161",
-          "#828282",
-          "#A5A5A5",
-          "#C9C9C9",
-          "#EEEEEE"
-        ]
-      },
-      "encre-sombre": {
-        "role": "primary",
-        "displayName": "Encre (sombre)",
-        "canonical": "#86A9F2",
-        "cssVariable": "--primary",
         "mode": "sombre",
-        "oklch": "oklch(73.8% 0.113 264.2)",
+        "oklch": "oklch(55.1% 0.186 32.8)",
         "tonalRamp": [
-          "#030A1E",
-          "#132347",
-          "#273F75",
-          "#405EA1",
-          "#6080C6",
-          "#86A4E2",
-          "#B2C9F9",
-          "#DFEFFF"
+          "#200000",
+          "#4D0000",
+          "#800000",
+          "#AE1800",
+          "#D54429",
+          "#F86D52",
+          "#FFA690",
+          "#FFDFD3"
         ]
       },
-      "encre-foreground-sombre": {
+      "vermillon-sombre": {
         "role": "primary",
-        "displayName": "Blanc sur encre (sombre)",
-        "canonical": "#0C1730",
-        "cssVariable": "--primary-foreground",
-        "mode": "sombre",
-        "oklch": "oklch(21.0% 0.052 264.5)",
-        "tonalRamp": [
-          "#070B14",
-          "#1D2535",
-          "#36425A",
-          "#52617F",
-          "#7382A2",
-          "#97A5C2",
-          "#BFC9DF",
-          "#E8EFFD"
-        ]
-      },
-      "surligneur-sombre": {
-        "role": "secondary",
-        "displayName": "Surligneur (sombre)",
-        "canonical": "#E9C93B",
+        "displayName": "Vermillon de nuit",
+        "canonical": "#FF5A36",
         "cssVariable": "--signature",
         "mode": "sombre",
-        "oklch": "oklch(84.0% 0.155 95.8)",
+        "oklch": "oklch(68.4% 0.207 33.9)",
         "tonalRamp": [
-          "#130900",
-          "#342200",
-          "#583E00",
-          "#7C5D00",
-          "#9F7F00",
-          "#BEA42F",
-          "#DCC97E",
-          "#FBEFC0"
+          "#220000",
+          "#510000",
+          "#860000",
+          "#B50000",
+          "#DD380D",
+          "#FF6543",
+          "#FFA288",
+          "#FFDECF"
         ]
       },
-      "surligneur-foreground-sombre": {
-        "role": "secondary",
-        "displayName": "Graphite sur surligneur (sombre)",
-        "canonical": "#1A1708",
+      "vermillon-foreground-sombre": {
+        "role": "primary",
+        "displayName": "Noir sur vermillon",
+        "canonical": "#131211",
         "cssVariable": "--signature-foreground",
         "mode": "sombre",
-        "oklch": "oklch(20.4% 0.027 98.4)",
+        "oklch": "oklch(18.3% 0.003 67.7)",
         "tonalRamp": [
-          "#0C0B06",
-          "#27251C",
-          "#454234",
-          "#656250",
-          "#868371",
-          "#A9A595",
-          "#CCC9BD",
-          "#F0EFE7"
+          "#0B0B0B",
+          "#242423",
+          "#403F3E",
+          "#5F5D5C",
+          "#7E7D7C",
+          "#9F9E9D",
+          "#C5C4C3",
+          "#EFEEEE"
+        ]
+      },
+      "vermillon-pale-sombre": {
+        "role": "primary",
+        "displayName": "Braise",
+        "canonical": "#4A1E12",
+        "cssVariable": "--signature-doux",
+        "mode": "sombre",
+        "oklch": "oklch(29.7% 0.071 36.2)",
+        "tonalRamp": [
+          "#140705",
+          "#361C15",
+          "#5C3328",
+          "#804F41",
+          "#A26E60",
+          "#C49082",
+          "#E0BAAF",
+          "#FFE9E3"
+        ]
+      },
+      "craie-sombre": {
+        "role": "neutral",
+        "displayName": "Craie",
+        "canonical": "#F3F1EC",
+        "cssVariable": "--foreground / --primary / --ring",
+        "mode": "sombre",
+        "oklch": "oklch(95.8% 0.007 88.6)",
+        "tonalRamp": [
+          "#0C0B0A",
+          "#252422",
+          "#41403C",
+          "#5F5D59",
+          "#7F7D79",
+          "#A09E9A",
+          "#C5C4C1",
+          "#EFEEED"
         ]
       },
       "papier-sombre": {
         "role": "neutral",
-        "displayName": "Papier (sombre)",
-        "canonical": "#111821",
-        "cssVariable": "--background",
+        "displayName": "Noir chaud",
+        "canonical": "#131211",
+        "cssVariable": "--background / --shell-accent",
         "mode": "sombre",
-        "oklch": "oklch(20.6% 0.021 254.9)",
+        "oklch": "oklch(18.3% 0.003 67.7)",
         "tonalRamp": [
-          "#090B0F",
-          "#21252B",
-          "#3C434C",
-          "#59626D",
-          "#7A838F",
-          "#9EA6B0",
-          "#C4CAD2",
-          "#EBEFF4"
+          "#0B0B0B",
+          "#242423",
+          "#403F3E",
+          "#5F5D5C",
+          "#7E7D7C",
+          "#9F9E9D",
+          "#C5C4C3",
+          "#EFEEEE"
         ]
       },
-      "graphite-sombre": {
+      "carte-sombre": {
         "role": "neutral",
-        "displayName": "Graphite (sombre)",
-        "canonical": "#E5EAF0",
-        "cssVariable": "--foreground",
-        "mode": "sombre",
-        "oklch": "oklch(93.5% 0.010 252.8)",
-        "tonalRamp": [
-          "#0A0B0D",
-          "#232528",
-          "#3F4246",
-          "#5D6267",
-          "#7E8388",
-          "#A1A5AA",
-          "#C6C9CD",
-          "#EDEFF1"
-        ]
-      },
-      "feuille-sombre": {
-        "role": "neutral",
-        "displayName": "Feuille (sombre)",
-        "canonical": "#17202B",
+        "displayName": "Carte de nuit",
+        "canonical": "#1A1917",
         "cssVariable": "--card",
         "mode": "sombre",
-        "oklch": "oklch(24.0% 0.025 253.8)",
+        "oklch": "oklch(21.4% 0.004 84.6)",
         "tonalRamp": [
-          "#080B0F",
-          "#20262D",
-          "#3A434D",
-          "#58626F",
-          "#788391",
-          "#9CA6B3",
-          "#C2CAD3",
-          "#EAEFF5"
+          "#0B0B0A",
+          "#252423",
+          "#41403E",
+          "#5F5D5B",
+          "#7E7D7A",
+          "#9F9E9C",
+          "#C5C4C2",
+          "#EFEEED"
         ]
       },
-      "calque-sombre": {
+      "popover-sombre": {
         "role": "neutral",
-        "displayName": "Calque (sombre)",
-        "canonical": "#1B2531",
-        "cssVariable": "--muted",
+        "displayName": "Calque de nuit",
+        "canonical": "#1F1E1B",
+        "cssVariable": "--popover",
         "mode": "sombre",
-        "oklch": "oklch(26.1% 0.027 253.3)",
+        "oklch": "oklch(23.5% 0.006 91.6)",
         "tonalRamp": [
-          "#080B10",
-          "#1F262D",
-          "#3A434E",
-          "#576270",
-          "#778492",
-          "#9BA6B3",
-          "#C2CAD4",
-          "#EAEFF6"
+          "#0B0B0A",
+          "#252422",
+          "#41403D",
+          "#5F5D5A",
+          "#7E7D79",
+          "#9F9E9B",
+          "#C5C4C1",
+          "#EFEEED"
         ]
       },
-      "graphite-doux-sombre": {
+      "lin-sombre": {
         "role": "neutral",
-        "displayName": "Graphite doux (sombre)",
-        "canonical": "#98A6B7",
-        "cssVariable": "--muted-foreground",
-        "mode": "sombre",
-        "oklch": "oklch(72.0% 0.029 253.3)",
-        "tonalRamp": [
-          "#080B10",
-          "#1F262E",
-          "#39434F",
-          "#566372",
-          "#768494",
-          "#9AA6B5",
-          "#C1CAD5",
-          "#E9EFF6"
-        ]
-      },
-      "secondaire-sombre": {
-        "role": "neutral",
-        "displayName": "Secondaire (sombre)",
-        "canonical": "#222D3B",
+        "displayName": "Lin de nuit",
+        "canonical": "#24221F",
         "cssVariable": "--secondary",
         "mode": "sombre",
-        "oklch": "oklch(29.3% 0.030 254.7)",
+        "oklch": "oklch(25.3% 0.006 78.2)",
         "tonalRamp": [
-          "#080B10",
-          "#1F262E",
-          "#394350",
-          "#566272",
-          "#778494",
-          "#9BA6B5",
-          "#C1CAD6",
-          "#E9EFF7"
+          "#0C0B0A",
+          "#252422",
+          "#413F3C",
+          "#605D5A",
+          "#7F7D79",
+          "#A09E9A",
+          "#C5C4C1",
+          "#EFEEED"
         ]
       },
       "survol-sombre": {
         "role": "neutral",
-        "displayName": "Survol (sombre)",
-        "canonical": "#233041",
+        "displayName": "Survol de nuit",
+        "canonical": "#262420",
         "cssVariable": "--accent",
         "mode": "sombre",
-        "oklch": "oklch(30.5% 0.036 255.4)",
+        "oklch": "oklch(26.1% 0.008 84.6)",
         "tonalRamp": [
-          "#070B11",
-          "#1E2630",
-          "#374352",
-          "#546276",
-          "#748498",
-          "#99A6B8",
-          "#C0CAD8",
-          "#E8EFF8"
+          "#0C0B0A",
+          "#252421",
+          "#413F3C",
+          "#605D59",
+          "#7F7D78",
+          "#A09E99",
+          "#C6C4C0",
+          "#EFEEEC"
+        ]
+      },
+      "lin-clair-sombre": {
+        "role": "neutral",
+        "displayName": "Lin clair de nuit",
+        "canonical": "#1E1D1A",
+        "cssVariable": "--muted",
+        "mode": "sombre",
+        "oklch": "oklch(23.1% 0.006 91.6)",
+        "tonalRamp": [
+          "#0B0B0A",
+          "#252422",
+          "#41403D",
+          "#5F5D5A",
+          "#7E7D79",
+          "#9F9E9B",
+          "#C5C4C1",
+          "#EFEEED"
+        ]
+      },
+      "gris-pierre-sombre": {
+        "role": "neutral",
+        "displayName": "Gris pierre de nuit",
+        "canonical": "#A39F97",
+        "cssVariable": "--muted-foreground",
+        "mode": "sombre",
+        "oklch": "oklch(70.4% 0.012 84.6)",
+        "tonalRamp": [
+          "#0C0B09",
+          "#262420",
+          "#423F39",
+          "#615D56",
+          "#817D75",
+          "#A29E96",
+          "#C6C4BE",
+          "#F0EEEB"
         ]
       },
       "filet-sombre": {
         "role": "neutral",
-        "displayName": "Filet (sombre)",
-        "canonical": "#2B3746",
+        "displayName": "Filet de nuit",
+        "canonical": "#2E2C28",
         "cssVariable": "--border",
         "mode": "sombre",
-        "oklch": "oklch(33.3% 0.031 254.2)",
+        "oklch": "oklch(29.4% 0.008 84.6)",
         "tonalRamp": [
-          "#080B10",
-          "#1F262F",
-          "#384350",
-          "#556273",
-          "#768495",
-          "#9AA6B6",
-          "#C1CAD6",
-          "#E9EFF7"
+          "#0C0B0A",
+          "#252421",
+          "#413F3C",
+          "#605D59",
+          "#7F7D78",
+          "#A09E99",
+          "#C5C4C0",
+          "#EFEEEC"
         ]
       },
       "trait-sombre": {
         "role": "neutral",
-        "displayName": "Trait (sombre)",
-        "canonical": "#66778C",
+        "displayName": "Trait de nuit",
+        "canonical": "#6E6A63",
         "cssVariable": "--input",
         "mode": "sombre",
-        "oklch": "oklch(56.3% 0.038 253.9)",
+        "oklch": "oklch(52.6% 0.012 81.8)",
         "tonalRamp": [
-          "#070C12",
-          "#1D2631",
-          "#364353",
-          "#526377",
-          "#738499",
-          "#97A7BA",
-          "#BFCAD9",
-          "#E8EFF9"
+          "#0C0B09",
+          "#262420",
+          "#423F3A",
+          "#615D56",
+          "#817D75",
+          "#A29E97",
+          "#C7C4BE",
+          "#F0EEEB"
         ]
       },
-      "alerte-sombre": {
-        "role": "tertiary",
-        "displayName": "Alerte (sombre)",
-        "canonical": "#F2766B",
+      "erreur-sombre": {
+        "role": "error",
+        "displayName": "Corail d'erreur",
+        "canonical": "#FF8A70",
         "cssVariable": "--destructive",
         "mode": "sombre",
-        "oklch": "oklch(70.8% 0.155 26.9)",
+        "oklch": "oklch(75.6% 0.148 33.6)",
         "tonalRamp": [
-          "#1F0001",
-          "#4A0707",
-          "#791716",
-          "#A7322D",
-          "#CF564D",
-          "#EC8277",
-          "#FFB1A7",
-          "#FFE0D8"
+          "#1C0200",
+          "#460B02",
+          "#751904",
+          "#A0341D",
+          "#C5563E",
+          "#E87B63",
+          "#FDAD9B",
+          "#FFE3D8"
         ]
       },
-      "alerte-foreground-sombre": {
-        "role": "tertiary",
-        "displayName": "Blanc sur alerte (sombre)",
-        "canonical": "#2A0A07",
+      "erreur-foreground-sombre": {
+        "role": "error",
+        "displayName": "Brun sur erreur",
+        "canonical": "#2A0A05",
         "cssVariable": "--destructive-foreground",
         "mode": "sombre",
-        "oklch": "oklch(20.0% 0.054 28.7)",
+        "oklch": "oklch(19.9% 0.055 32.7)",
         "tonalRamp": [
-          "#130806",
-          "#341F1B",
-          "#583834",
-          "#7D5650",
-          "#A07670",
-          "#C19B95",
-          "#DFC1BD",
-          "#FDE9E6"
-        ]
-      },
-      "bandeau-sombre": {
-        "role": "primary",
-        "displayName": "Bandeau (sombre)",
-        "canonical": "#1A2D5A",
-        "cssVariable": "--shell",
-        "mode": "sombre",
-        "oklch": "oklch(30.8% 0.084 264.7)",
-        "tonalRamp": [
-          "#050A19",
-          "#18243F",
-          "#2F4169",
-          "#496091",
-          "#6982B5",
-          "#8FA5D3",
-          "#B8C9ED",
-          "#E3EFFF"
-        ]
-      },
-      "bandeau-foreground-sombre": {
-        "role": "primary",
-        "displayName": "Texte du bandeau (sombre)",
-        "canonical": "#E5EAF0",
-        "cssVariable": "--shell-foreground",
-        "mode": "sombre",
-        "oklch": "oklch(93.5% 0.010 252.8)",
-        "tonalRamp": [
-          "#0A0B0D",
-          "#232528",
-          "#3F4246",
-          "#5D6267",
-          "#7E8388",
-          "#A1A5AA",
-          "#C6C9CD",
-          "#EDEFF1"
+          "#120806",
+          "#331E19",
+          "#56362F",
+          "#7A524A",
+          "#9B7268",
+          "#BD938A",
+          "#DBBCB5",
+          "#FBEAE6"
         ]
       }
     },
     "typographyMeta": {
       "display": {
-        "displayName": "Titre du bandeau",
-        "purpose": "« Mes TODO » dans le bandeau d'encre."
-      },
-      "headline": {
-        "displayName": "Titre d'encart",
-        "purpose": "Titres des encarts d'état vide et tout terminé."
-      },
-      "chiffre": {
-        "displayName": "Chiffre de cartouche",
-        "purpose": "Valeurs des cellules du bandeau, tabulaires."
+        "displayName": "Chiffre géant",
+        "purpose": "Le nombre de TODO en cours, seul, sur le champ vermillon. 6,5rem au téléphone, 8rem dès 640 px, clamp en large.",
+        "responsive": {
+          "base": "6.5rem",
+          "sm": "8rem",
+          "lg": "clamp(8rem, min(15vw, 30dvh), 15rem)"
+        }
       },
       "title": {
-        "displayName": "En-tête de jour",
-        "purpose": "Date d'un groupe de jour ; « Terminés » à 1 rem."
+        "displayName": "Libellé du chiffre",
+        "purpose": "« en cours », en minuscules, sous le chiffre géant.",
+        "responsive": {
+          "base": "1.5rem",
+          "sm": "2rem",
+          "lg": "2.75rem"
+        }
       },
-      "chiffre-cellule": {
-        "displayName": "Chiffre de cellule",
-        "purpose": "Âge et nombre dans l'en-tête de jour, tabulaires."
+      "headline": {
+        "displayName": "Titre de jour",
+        "purpose": "Titres de jour et de la section Terminés ; la date en clair reprend la taille en gris pierre.",
+        "responsive": {
+          "base": "1.625rem",
+          "sm": "2rem"
+        }
       },
-      "bouton": {
-        "displayName": "Bouton",
-        "purpose": "Libellés d'action ; 1 rem pour l'action principale du bandeau."
+      "chiffre-secondaire": {
+        "displayName": "Chiffre secondaire",
+        "purpose": "Terminés, le plus ancien, nombre de TODO par jour.",
+        "responsive": {
+          "base": "1.375rem",
+          "lg": "1.75rem"
+        }
       },
       "body": {
         "displayName": "Texte",
-        "purpose": "Titres des TODO, champ, texte des encarts."
+        "purpose": "Titres des TODO et texte courant ; 1,1875rem dans la saisie en large."
+      },
+      "bouton": {
+        "displayName": "Bouton",
+        "purpose": "Boutons ; « Ajouter » en 700 et 1rem à 1,1875rem."
       },
       "label": {
-        "displayName": "Libellé",
-        "purpose": "Date du bandeau, précision de date, alerte de saisie, compteurs discrets."
-      },
-      "label-sm": {
-        "displayName": "Libellé petit",
-        "purpose": "Libellés des cellules du cartouche, aide clavier, « à l'instant »."
-      },
-      "label-xs": {
-        "displayName": "Libellé très petit",
-        "purpose": "Libellés « Âge » et « TODO » des en-têtes de jour."
+        "displayName": "Label",
+        "purpose": "Aide sous la saisie, légende des arcs, « à l'instant », « Enregistrement… »."
       }
     },
     "shadows": [
       {
-        "name": "menu-flottant",
-        "value": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
-        "purpose": "Uniquement les menus déroulants (popover du Select). Aucune ombre sur les surfaces de contenu."
+        "name": "calque-flottant",
+        "value": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+        "purpose": "Popover du calendrier (shadow-lg). Le sélecteur de thème est à plat, sans ombre."
       },
       {
-        "name": "focus-cartouche",
-        "value": "outline: 2px solid var(--ring); outline-offset: 2px; box-shadow: 0 0 0 6px var(--signature)",
-        "purpose": "Focus de tous les contrôles : contour d'encre et halo de surligneur. Sur le bandeau, le contour passe en --shell-foreground."
-      },
-      {
-        "name": "focus-invalide",
-        "value": "0 0 0 3px color-mix(in oklab, var(--destructive) 25%, transparent)",
-        "purpose": "Champ invalide."
+        "name": "halo-depot",
+        "value": "0 0 0 12px var(--signature-doux)",
+        "purpose": "Anneau plein, sans flou, autour du jour survolé pendant un glisser-déposer."
       }
     ],
     "motion": [
       {
         "name": "ease-trait",
         "value": "cubic-bezier(0.22, 1, 0.36, 1)",
-        "purpose": "Courbe unique des mouvements Cartouche, sortie exponentielle."
+        "purpose": "Sortie exponentielle : courbe par défaut de tous les mouvements."
       },
       {
-        "name": "surligne",
-        "value": "6s ease-trait ; balayage 0 à 6 % (360 ms), tenue jusqu'à 82 %, effacement jusqu'à 100 %",
-        "purpose": "Trait de surligneur (58 % de la hauteur de ligne) sur le TODO qui vient d'être ajouté. En mouvement réduit : posé sans animation."
-      },
-      {
-        "name": "trait-encre",
-        "value": "background-size 220ms ease-trait",
-        "purpose": "Barre d'encre de 2 px sur le titre d'un TODO coché, ligne par ligne ; le texte passe en graphite doux."
-      },
-      {
-        "name": "sortie-ligne",
-        "value": "grid-template-rows et opacity 200ms ease-trait",
-        "purpose": "Repli de la ligne cochée avant qu'elle rejoigne « Terminés »."
+        "name": "ease-ressort",
+        "value": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "purpose": "Léger ressort pour ce qui revient au repos : coche, ligne relâchée après un geste, libellé du geste au seuil."
       },
       {
         "name": "chiffre",
-        "value": "180ms ease-trait, de translateY(35%) et opacité 0",
-        "purpose": "Compteur qui change de valeur (pas au premier affichage)."
+        "value": "420ms ease-trait",
+        "purpose": "Le nouveau chiffre monte depuis le bas de sa fenêtre (translateY 70 % et fondu), seulement quand la valeur change."
       },
       {
         "name": "apparait",
-        "value": "200ms ease-trait, de translateY(-4px) et opacité 0",
-        "purpose": "Entrée des messages, alertes et encarts."
+        "value": "240ms ease-trait",
+        "purpose": "Entrée d'un message ou d'un libellé : fondu et 6 px vers le bas."
       },
       {
-        "name": "repli",
-        "value": "height 200ms ease-trait",
-        "purpose": "Ouverture et fermeture de « Terminés », rotation du chevron."
+        "name": "coche",
+        "value": "320ms ease-ressort",
+        "purpose": "La coche se pose (échelle 0,7 à 1) ; 600 ms pour le disque de l'état tout terminé."
       },
       {
-        "name": "survol",
-        "value": "150ms",
-        "purpose": "Changements de fond au survol et transitions de la case à cocher."
+        "name": "trait-encre",
+        "value": "220ms ease-trait",
+        "purpose": "Trait vermillon de 2 px qui barre le titre coché, puis effacement de la ligne (chorégraphie de 380 ms + 220 ms)."
+      },
+      {
+        "name": "glissement-flip",
+        "value": "460ms ease-trait",
+        "purpose": "Les lignes glissent à leur nouvelle place ; une ligne qui arrive descend de 10 px en fondu (260 ms)."
+      },
+      {
+        "name": "retour-ligne",
+        "value": "420ms ease-ressort",
+        "purpose": "La ligne revient en place après un geste au doigt."
+      },
+      {
+        "name": "arcs",
+        "value": "700ms ease-trait",
+        "purpose": "Les arcs du jour se dessinent à l'arrivée et avancent quand on coche ; 500 ms quand leur rayon change."
+      },
+      {
+        "name": "surligne",
+        "value": "6s ease-trait",
+        "purpose": "Trace vermillon pâle du dernier ajout : un état qui dure, puis s'efface."
+      },
+      {
+        "name": "menu",
+        "value": "150ms ease-trait",
+        "purpose": "Ouverture des calques flottants : fondu et zoom de 95 %."
+      },
+      {
+        "name": "geste-seuil",
+        "value": "96px",
+        "purpose": "Distance au doigt pour que le geste compte ; au-delà, la ligne est amortie à 35 % et le téléphone vibre 8 ms."
       },
       {
         "name": "mouvement-reduit",
         "value": "prefers-reduced-motion: reduce",
-        "purpose": "Toutes les animations et transitions ci-dessus sont coupées ; le squelette ne pulse plus."
+        "purpose": "Tous les mouvements sont coupés : chiffre, coche, trait, trace (affichée fixe), FLIP, arcs, menus."
       }
     ],
     "breakpoints": [
       {
         "name": "sm",
-        "value": "640px",
-        "purpose": "Gouttière 16 → 24 px ; cellules du cartouche en ligne à droite du titre."
+        "value": "640px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
       }
     ],
-    "themes": {
-      "mode": "data-theme",
-      "note": "Les jetons suffixés -sombre sont les valeurs de :root[data-theme=\"sombre\"] dans src/app/globals.css. Le script du <head> pose data-theme avant le premier rendu : choix enregistré (Clair, Sombre) ou, en Système, réglage du système."
+    "theming": {
+      "attribute": "data-theme",
+      "values": [
+        "clair",
+        "sombre"
+      ],
+      "source": "src/app/globals.css",
+      "note": "Le script du <head> pose l'attribut avant le premier rendu ; « Système » suit le réglage du système."
     }
   },
   "components": [
     {
-      "name": "Bouton signature (Ajouter)",
+      "name": "Champ de l'affiche",
+      "kind": "custom",
+      "refersTo": "champ-affiche",
+      "description": "Aplat vermillon qui porte le chiffre géant des TODO en cours, la ligne des compteurs et les arcs concentriques du jour.",
+      "html": "<header class=\"ds-champ\"><div class=\"ds-champ-tete\"><span>Mes TODO</span><small>samedi 21 novembre</small></div><dl class=\"ds-compteurs\"><dd class=\"ds-chiffre\">7</dd><dt class=\"ds-en-cours\">en cours</dt><p class=\"ds-ligne-compteurs\"><b>9</b> terminés · le plus ancien <b>4 j</b></p></dl><svg class=\"ds-arcs\" viewBox=\"0 0 400 400\" aria-hidden=\"true\"><g fill=\"none\" transform=\"rotate(180 200 200)\"><circle cx=\"200\" cy=\"200\" r=\"181\" stroke-width=\"30\" class=\"ds-piste\"/><circle cx=\"200\" cy=\"200\" r=\"181\" stroke-width=\"30\" pathLength=\"100\" stroke-dasharray=\"30 100\" class=\"ds-arc ds-arc-traine\"/><circle cx=\"200\" cy=\"200\" r=\"141\" stroke-width=\"30\" class=\"ds-piste\"/><circle cx=\"200\" cy=\"200\" r=\"141\" stroke-width=\"30\" pathLength=\"100\" stroke-dasharray=\"60 100\" class=\"ds-arc\"/><circle cx=\"200\" cy=\"200\" r=\"101\" stroke-width=\"30\" class=\"ds-piste\"/><circle cx=\"200\" cy=\"200\" r=\"101\" stroke-width=\"30\" pathLength=\"100\" stroke-dasharray=\"85 100\" class=\"ds-arc\"/></g></svg></header>",
+      "css": ".ds-champ { position: relative; overflow: hidden; background: var(--shell); color: var(--shell-foreground); padding: 32px 40px 0; min-height: 420px; font-family: var(--font-archivo), ui-sans-serif, system-ui, sans-serif; } .ds-champ-tete span { display: block; font-weight: 800; font-size: 1.25rem; } .ds-champ-tete small { font-size: 0.9375rem; font-weight: 500; } .ds-compteurs { position: relative; z-index: 1; margin: 40px 0 0; display: flex; flex-direction: column; } .ds-chiffre { margin: 0 0 0 -0.04em; font-size: 9rem; font-weight: 900; line-height: 0.8; letter-spacing: -0.04em; font-stretch: 115%; font-variant-numeric: tabular-nums; animation: ds-chiffre 420ms cubic-bezier(0.22, 1, 0.36, 1) both; } .ds-en-cours { margin-top: 12px; font-size: 2.75rem; font-weight: 800; line-height: 1; letter-spacing: -0.025em; } .ds-ligne-compteurs { margin-top: 24px; font-size: 1rem; font-weight: 500; } .ds-ligne-compteurs b { font-size: 1.75rem; font-weight: 800; font-variant-numeric: tabular-nums; } .ds-arcs { position: absolute; right: -12%; bottom: -16%; width: 320px; } .ds-piste { stroke: color-mix(in oklab, var(--shell-foreground) 25%, transparent); } .ds-arc { stroke: var(--shell-foreground); transition: stroke-dasharray 700ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-arc-traine { stroke: var(--shell-accent); } @keyframes ds-chiffre { from { opacity: 0; transform: translateY(70%); } to { opacity: 1; transform: none; } } @media (prefers-reduced-motion: reduce) { .ds-chiffre { animation: none; } .ds-arc { transition: none; } }"
+    },
+    {
+      "name": "Bouton principal",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Action principale : fond noir, texte papier, rayon de 12 px.",
+      "html": "<button class=\"ds-btn-primary\">Enregistrer</button>",
+      "css": ".ds-btn-primary { font-family: var(--font-archivo), ui-sans-serif, system-ui, sans-serif; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border: 1px solid transparent; border-radius: 12px; background: var(--primary); color: var(--primary-foreground); font-size: 0.9375rem; font-weight: 600; cursor: pointer; transition: all 150ms; } .ds-btn-primary:hover { background: color-mix(in oklab, var(--primary) 82%, var(--background)); } .ds-btn-primary:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; } .ds-btn-primary:active { transform: translateY(1px); }"
+    },
+    {
+      "name": "Bouton signature",
       "kind": "button",
       "refersTo": "button-signature",
-      "description": "Action principale posée sur le bandeau d'encre : surligneur, Semi Condensed 600, 44 px.",
-      "html": "<div class=\"ds-bandeau-fond\"><button class=\"ds-btn-signature\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"M12 5v14\"/></svg>Ajouter</button></div>",
-      "css": ".ds-bandeau-fond{background:var(--shell);padding:16px;} .ds-btn-signature{display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 20px;border:1px solid transparent;border-radius:var(--radius);background:var(--signature);color:var(--signature-foreground);font-family:var(--font-barlow-semi-condensed),'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:1rem;cursor:pointer;transition:all 150ms cubic-bezier(0.22,1,0.36,1);} .ds-btn-signature:hover{background:color-mix(in oklab,var(--signature) 86%,var(--foreground));} .ds-btn-signature:focus-visible{outline:2px solid var(--shell-foreground);outline-offset:2px;box-shadow:0 0 0 6px var(--signature);} .ds-btn-signature:active{transform:translateY(1px);}"
+      "description": "Action vermillon posée sur fond clair, quand elle doit se signaler.",
+      "html": "<button class=\"ds-btn-signature\">Terminer</button>",
+      "css": ".ds-btn-signature { font-family: var(--font-archivo), ui-sans-serif, system-ui, sans-serif; display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border: 1px solid transparent; border-radius: 12px; background: var(--signature); color: var(--signature-foreground); font-size: 0.9375rem; font-weight: 600; cursor: pointer; transition: all 150ms; } .ds-btn-signature:hover { background: color-mix(in oklab, var(--signature) 86%, var(--foreground)); } .ds-btn-signature:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; } .ds-btn-signature:active { transform: translateY(1px); }"
     },
     {
-      "name": "Bouton encre",
+      "name": "Bouton fantôme rond",
       "kind": "button",
-      "refersTo": "button-default",
-      "description": "Variante par défaut : encre sur blanc, 36 px.",
-      "html": "<button class=\"ds-btn-encre\">Enregistrer</button>",
-      "css": ".ds-btn-encre{display:inline-flex;align-items:center;height:36px;padding:0 14px;border:1px solid transparent;border-radius:var(--radius);background:var(--primary);color:var(--primary-foreground);font-family:var(--font-barlow-semi-condensed),'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:0.9375rem;cursor:pointer;transition:all 150ms cubic-bezier(0.22,1,0.36,1);} .ds-btn-encre:hover{background:color-mix(in oklab,var(--primary) 86%,var(--foreground));} .ds-btn-encre:focus-visible{outline: 2px solid var(--ring); outline-offset: 2px; box-shadow: 0 0 0 6px var(--signature);} .ds-btn-encre:active{transform:translateY(1px);}"
+      "refersTo": "button-icone-ligne",
+      "description": "Bouton d'icône d'une ligne (date) : cercle fantôme gris pierre, noir plein quand son calendrier est ouvert.",
+      "html": "<button class=\"ds-btn-rond\" aria-label=\"Changer la date\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M8 2v4\"/><path d=\"M16 2v4\"/><rect width=\"18\" height=\"18\" x=\"3\" y=\"4\" rx=\"2\"/><path d=\"M3 10h18\"/><path d=\"M8 14h.01\"/><path d=\"M12 14h.01\"/><path d=\"M16 14h.01\"/><path d=\"M8 18h.01\"/><path d=\"M12 18h.01\"/><path d=\"M16 18h.01\"/></svg></button> <button class=\"ds-btn-rond\" aria-expanded=\"true\" aria-label=\"Changer la date\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M8 2v4\"/><path d=\"M16 2v4\"/><rect width=\"18\" height=\"18\" x=\"3\" y=\"4\" rx=\"2\"/><path d=\"M3 10h18\"/><path d=\"M8 14h.01\"/><path d=\"M12 14h.01\"/><path d=\"M16 14h.01\"/><path d=\"M8 18h.01\"/><path d=\"M12 18h.01\"/><path d=\"M16 18h.01\"/></svg></button>",
+      "css": ".ds-btn-rond { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 1px solid transparent; border-radius: 9999px; background: transparent; color: var(--muted-foreground); cursor: pointer; transition: all 150ms; } .ds-btn-rond:hover { background: var(--accent); color: var(--foreground); } .ds-btn-rond[aria-expanded=\"true\"] { background: var(--foreground); color: var(--background); } .ds-btn-rond:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }"
     },
     {
-      "name": "Bouton contour",
-      "kind": "button",
-      "refersTo": "button-outline",
-      "description": "Action secondaire, par exemple « Réessayer » dans une alerte.",
-      "html": "<button class=\"ds-btn-contour\">Réessayer</button>",
-      "css": ".ds-btn-contour{display:inline-flex;align-items:center;height:36px;padding:0 14px;border:1px solid var(--input);border-radius:var(--radius);background:transparent;color:var(--foreground);font-family:var(--font-barlow-semi-condensed),'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:0.9375rem;cursor:pointer;transition:all 150ms;} .ds-btn-contour:hover{background:var(--accent);color:var(--accent-foreground);} .ds-btn-contour:focus-visible{outline: 2px solid var(--ring); outline-offset: 2px; box-shadow: 0 0 0 6px var(--signature);}"
-    },
-    {
-      "name": "Champ",
+      "name": "Saisie en pilule",
       "kind": "input",
-      "refersTo": "input",
-      "description": "Feuille blanche, trait de 1 px, focus encre et halo surligneur ; erreur en alerte.",
-      "html": "<input class=\"ds-input\" placeholder=\"Écris un nouveau TODO\" />",
-      "css": ".ds-input{height:36px;width:100%;max-width:360px;padding:4px 12px;border:1px solid var(--input);border-radius:var(--radius);background:var(--card);color:var(--card-foreground);font-family:var(--font-barlow),Barlow,sans-serif;font-size:1rem;caret-color:var(--primary);outline:none;transition:color 150ms,box-shadow 150ms,border-color 150ms;} .ds-input::placeholder{color:var(--muted-foreground);} .ds-input:focus-visible{border-color:var(--ring);outline: 2px solid var(--ring); outline-offset: 2px; box-shadow: 0 0 0 6px var(--signature);} .ds-input[aria-invalid=true]{border-color:var(--destructive);outline-color:var(--destructive);box-shadow:0 0 0 3px color-mix(in oklab,var(--destructive) 25%,transparent);}"
+      "refersTo": "saisie-pilule",
+      "description": "Saisie d'un TODO et son bouton Ajouter, tous deux en pilule, bord noir de 2 px, curseur vermillon.",
+      "html": "<form class=\"ds-saisie\" onsubmit=\"return false\"><input class=\"ds-saisie-champ\" placeholder=\"Écris un nouveau TODO\" aria-label=\"Nouveau TODO\"><button class=\"ds-saisie-btn\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"M12 5v14\"/></svg>Ajouter</button></form>",
+      "css": ".ds-saisie { display: flex; gap: 12px; font-family: var(--font-archivo), ui-sans-serif, system-ui, sans-serif; } .ds-saisie-champ { flex: 1; min-width: 0; height: 64px; padding: 0 28px; border: 2px solid var(--foreground); border-radius: 9999px; background: var(--background); color: var(--foreground); font: inherit; font-size: 1.1875rem; caret-color: var(--signature); outline: none; } .ds-saisie-champ::placeholder { color: var(--muted-foreground); } .ds-saisie-champ:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; } .ds-saisie-btn { display: inline-flex; align-items: center; gap: 6px; height: 64px; padding: 0 32px; border: 0; border-radius: 9999px; background: var(--primary); color: var(--primary-foreground); font: inherit; font-size: 1.1875rem; font-weight: 700; cursor: pointer; } .ds-saisie-btn:hover { background: color-mix(in oklab, var(--primary) 86%, var(--foreground)); } .ds-saisie-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; } .ds-saisie-btn:active { transform: translateY(1px); }"
     },
     {
-      "name": "Alerte de saisie",
+      "name": "Case ronde",
+      "kind": "custom",
+      "refersTo": "case-ronde",
+      "description": "Case d'un TODO : cercle de 24 px, bord noir de 2 px, pleine de vermillon une fois cochée, avec un léger ressort.",
+      "html": "<span class=\"ds-case\" role=\"checkbox\" aria-checked=\"false\" tabindex=\"0\"></span> <span class=\"ds-case\" role=\"checkbox\" aria-checked=\"true\" tabindex=\"0\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"/></svg></span>",
+      "css": ".ds-case { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: 2px solid var(--foreground); border-radius: 9999px; background: var(--card); color: var(--signature-foreground); cursor: pointer; transition: background-color 150ms, border-color 150ms; vertical-align: middle; } .ds-case:hover { border-color: var(--ring); } .ds-case:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; } .ds-case[aria-checked=\"true\"] { border-color: var(--signature); background: var(--signature); } .ds-case[aria-checked=\"true\"] svg { animation: ds-coche 320ms cubic-bezier(0.34, 1.56, 0.64, 1) both; } @keyframes ds-coche { from { transform: scale(0.7); } to { transform: scale(1); } } @media (prefers-reduced-motion: reduce) { .ds-case svg { animation: none; } }"
+    },
+    {
+      "name": "Pastille d'âge",
       "kind": "chip",
-      "refersTo": "alerte-saisie",
-      "description": "Message d'erreur sous le champ du bandeau : pastille de surligneur, label 500.",
-      "html": "<p class=\"ds-alerte-saisie\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><line x1=\"12\" x2=\"12\" y1=\"8\" y2=\"12\"/><line x1=\"12\" x2=\"12.01\" y1=\"16\" y2=\"16\"/></svg>Le titre est obligatoire.</p>",
-      "css": ".ds-alerte-saisie{display:inline-flex;align-items:center;gap:6px;margin:0;padding:4px 8px;border-radius:calc(var(--radius)*0.6);background:var(--signature);color:var(--signature-foreground);font-family:var(--font-barlow),Barlow,sans-serif;font-size:0.8125rem;font-weight:500;}"
+      "refersTo": "pastille-age",
+      "description": "Âge d'un jour : cercle de 40 px, discret les premiers jours, noir à 2 jours, plein de vermillon à 3 jours et plus.",
+      "html": "<span class=\"ds-pastille\">0 j</span> <span class=\"ds-pastille ds-pastille-deux\">2 j</span> <span class=\"ds-pastille ds-pastille-traine\">4 j</span>",
+      "css": ".ds-pastille { font-family: var(--font-archivo), ui-sans-serif, system-ui, sans-serif; display: inline-flex; align-items: center; justify-content: center; min-width: 40px; height: 40px; padding: 0 8px; box-sizing: border-box; border: 2px solid var(--border); border-radius: 9999px; color: var(--muted-foreground); font-size: 0.875rem; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; transition: color 300ms, background-color 300ms, border-color 300ms; } .ds-pastille-deux { border-color: var(--foreground); color: var(--foreground); } .ds-pastille-traine { border-color: var(--signature); background: var(--signature); color: var(--signature-foreground); }"
     },
     {
-      "name": "Bandeau et cellules de cartouche",
+      "name": "Jour et ligne de TODO",
+      "kind": "card",
+      "refersTo": "ligne-todo",
+      "description": "Un jour : titre très gras et date en gris, trait noir de 2 px, puis des lignes séparées par des filets, sans carte ; le titre coché est barré d'un trait vermillon.",
+      "html": "<section class=\"ds-jour\"><div class=\"ds-jour-tete\"><h3>Mardi <span>17 novembre</span></h3><span class=\"ds-jour-nb\"><b>3</b> TODO</span></div><ul><li class=\"ds-ligne\"><span class=\"ds-case-mini\"></span><span>Rappeler le garage</span></li><li class=\"ds-ligne\"><span class=\"ds-case-mini ds-coche\"></span><span class=\"ds-barre\">Payer la cantine</span></li></ul></section>",
+      "css": ".ds-jour { font-family: var(--font-archivo), ui-sans-serif, system-ui, sans-serif; color: var(--foreground); } .ds-jour-tete { display: flex; align-items: baseline; gap: 12px; padding-bottom: 12px; border-bottom: 2px solid var(--foreground); } .ds-jour-tete h3 { flex: 1; margin: 0; font-size: 2rem; font-weight: 800; line-height: 1; letter-spacing: -0.025em; font-stretch: 105%; } .ds-jour-tete h3 span { color: var(--muted-foreground); } .ds-jour-nb { font-size: 0.8125rem; font-weight: 600; color: var(--muted-foreground); } .ds-jour-nb b { font-size: 1.375rem; font-weight: 800; color: var(--foreground); } .ds-jour ul { margin: 0; padding: 0; list-style: none; } .ds-ligne { display: flex; align-items: center; gap: 16px; min-height: 60px; padding: 14px 0; box-sizing: border-box; border-bottom: 1px solid var(--border); font-size: 1.0625rem; line-height: 1.375; transition: background-color 150ms; } .ds-ligne:hover { background: color-mix(in oklab, var(--accent) 70%, transparent); } .ds-case-mini { flex: none; width: 24px; height: 24px; box-sizing: border-box; border: 2px solid var(--foreground); border-radius: 9999px; } .ds-coche { border-color: var(--signature); background: var(--signature); } .ds-barre { color: var(--muted-foreground); background-image: linear-gradient(var(--signature), var(--signature)); background-repeat: no-repeat; background-position: 0 58%; background-size: 100% 2px; }"
+    },
+    {
+      "name": "Sélecteur segmenté",
       "kind": "nav",
-      "refersTo": "bandeau",
-      "description": "En-tête de l'application : encre, titre, date et compartiments chiffrés à filets ; le chiffre lu en premier en surligneur.",
-      "html": "<header class=\"ds-bandeau\"><div><h1 class=\"ds-bandeau-titre\">Mes TODO</h1><div class=\"ds-bandeau-date\">Vendredi 20 novembre</div></div><dl class=\"ds-cellules\"><div><dt>En cours</dt><dd class=\"ds-en-avant\">14</dd></div><div><dt>Terminés</dt><dd>9</dd></div><div><dt>Le plus ancien</dt><dd>4 j</dd></div></dl></header>",
-      "css": ".ds-bandeau{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;padding:24px;background:var(--shell);color:var(--shell-foreground);} .ds-bandeau-titre{margin:0;font-family:var(--font-barlow-semi-condensed),'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:1.875rem;line-height:1.1;} .ds-bandeau-date{margin-top:4px;font-family:var(--font-barlow),Barlow,sans-serif;font-size:0.8125rem;font-weight:500;color:color-mix(in oklab,var(--shell-foreground) 80%,transparent);} .ds-cellules{display:flex;margin:0;border:1px solid color-mix(in oklab,var(--shell-foreground) 35%,transparent);} .ds-cellules>div{min-width:112px;padding:8px 16px;} .ds-cellules>div+div{border-left:1px solid color-mix(in oklab,var(--shell-foreground) 35%,transparent);} .ds-cellules dt{font-family:var(--font-barlow),Barlow,sans-serif;font-size:0.75rem;font-weight:500;color:color-mix(in oklab,var(--shell-foreground) 80%,transparent);} .ds-cellules dd{margin:0;font-family:var(--font-barlow-semi-condensed),'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:1.5rem;line-height:1.25;font-variant-numeric:tabular-nums;} .ds-cellules dd.ds-en-avant{color:var(--signature);}"
+      "refersTo": "selecteur-theme",
+      "description": "Thème du champ vermillon : trois pastilles (Système, Clair, Sombre) dans une pilule cerclée de blanc à 45 %, toujours visibles, sans menu. Le choix actif est la pastille blanche pleine, icône vermillon. Groupe de boutons radio : Tab entre sur le choix actif, les flèches changent de choix.",
+      "html": "<div class=\"ds-segments\" role=\"radiogroup\" aria-label=\"Thème\"><span class=\"ds-segment\" role=\"radio\" aria-checked=\"true\" aria-label=\"Système\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect width=\"20\" height=\"14\" x=\"2\" y=\"3\" rx=\"2\"/><line x1=\"8\" x2=\"16\" y1=\"21\" y2=\"21\"/><line x1=\"12\" x2=\"12\" y1=\"17\" y2=\"21\"/></svg></span><span class=\"ds-segment\" role=\"radio\" aria-checked=\"false\" aria-label=\"Clair\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2\"/><path d=\"M12 20v2\"/><path d=\"m4.93 4.93 1.41 1.41\"/><path d=\"m17.66 17.66 1.41 1.41\"/><path d=\"M2 12h2\"/><path d=\"M20 12h2\"/><path d=\"m6.34 17.66-1.41 1.41\"/><path d=\"m19.07 4.93-1.41 1.41\"/></svg></span><span class=\"ds-segment\" role=\"radio\" aria-checked=\"false\" aria-label=\"Sombre\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z\"/></svg></span></div>",
+      "css": ".ds-segments { display: inline-flex; gap: 2px; padding: 2px; border: 2px solid color-mix(in oklab, var(--shell-foreground) 45%, transparent); border-radius: 9999px; background: var(--shell); } .ds-segment { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 9999px; color: var(--shell-foreground); transition: background-color 200ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-segment:hover { background: color-mix(in oklab, var(--shell-foreground) 15%, transparent); } .ds-segment[aria-checked=\"true\"] { background: var(--shell-foreground); color: var(--shell); }"
     },
     {
-      "name": "Groupe de jour",
-      "kind": "card",
-      "refersTo": "en-tete-jour",
-      "description": "En-tête en bande de cartouche (date, âge teinté, nombre) sur une feuille de lignes de 46 px ; case à cocher Cartouche.",
-      "html": "<section class=\"ds-jour\"><div class=\"ds-jour-tete\"><h2>Lundi 16 novembre</h2><dl><div class=\"ds-age-4\"><dt>Âge</dt><dd>4 j</dd></div><div><dt>TODO</dt><dd>2</dd></div></dl></div><ul class=\"ds-jour-liste\"><li><label><input type=\"checkbox\" class=\"ds-case\" /><span>Relancer le devis de reprise</span></label></li><li><label><input type=\"checkbox\" class=\"ds-case\" checked /><span class=\"ds-barre\">Renouveler le nom de domaine</span></label></li></ul></section>",
-      "css": ".ds-jour{max-width:560px;font-family:var(--font-barlow),Barlow,sans-serif;color:var(--foreground);} .ds-jour-tete{display:flex;align-items:stretch;overflow:hidden;border:1px solid var(--input);border-radius:calc(var(--radius)*1.4) calc(var(--radius)*1.4) 0 0;background:var(--muted);} .ds-jour-tete h2{flex:1;margin:0;padding:8px 14px;font-family:var(--font-barlow-semi-condensed),'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:1.0625rem;line-height:1.25;} .ds-jour-tete dl{display:flex;margin:0;} .ds-jour-tete dl>div{width:72px;padding:6px 12px;border-left:1px solid var(--input);} .ds-jour-tete dt{font-size:0.6875rem;font-weight:500;opacity:.85;} .ds-jour-tete dd{margin:0;font-family:var(--font-barlow-semi-condensed),'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:1.125rem;line-height:1.25;font-variant-numeric:tabular-nums;} .ds-age-4{background:var(--primary);color:var(--primary-foreground);} .ds-jour-liste{margin:0;padding:0;list-style:none;border:1px solid var(--border);border-top:0;border-radius:0 0 calc(var(--radius)*1.4) calc(var(--radius)*1.4);background:var(--card);} .ds-jour-liste li+li{border-top:1px solid var(--border);} .ds-jour-liste label{display:flex;align-items:center;gap:14px;min-height:46px;padding:10px 14px;box-sizing:border-box;cursor:pointer;transition:background-color 150ms;} .ds-jour-liste label:hover{background:color-mix(in oklab,var(--accent) 60%,transparent);} .ds-case{appearance:none;flex-shrink:0;width:20px;height:20px;margin:0;border:1.5px solid var(--input);border-radius:var(--radius);background:var(--card);cursor:pointer;transition:background-color 150ms,border-color 150ms;} .ds-case:hover{border-color:var(--ring);} .ds-case:checked{border-color:var(--primary);background:var(--primary) url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E\") center/14px no-repeat;} .ds-case:focus-visible{outline: 2px solid var(--ring); outline-offset: 2px; box-shadow: 0 0 0 6px var(--signature);} .ds-barre{background-image:linear-gradient(var(--primary),var(--primary));background-repeat:no-repeat;background-position:0 58%;background-size:100% 2px;color:var(--muted-foreground);}"
-    },
-    {
-      "name": "Encart d'état",
-      "kind": "card",
-      "refersTo": "encart-etat",
-      "description": "États vide et tout terminé : feuille à filet, icône à l'encre, titre headline.",
-      "html": "<div class=\"ds-encart\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m5 12 7-7 7 7\"/><path d=\"M12 19V5\"/></svg><h2>Aucun TODO pour l'instant</h2><p>Écris ton premier TODO dans le champ du bandeau.</p></div>",
-      "css": ".ds-encart{max-width:560px;padding:40px 32px;border:1px solid var(--border);border-radius:calc(var(--radius)*1.4);background:var(--card);color:var(--foreground);font-family:var(--font-barlow),Barlow,sans-serif;} .ds-encart svg{color:var(--primary);margin-bottom:12px;} .ds-encart h2{margin:0;font-family:var(--font-barlow-semi-condensed),'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:1.25rem;line-height:1.25;} .ds-encart p{margin:6px 0 0;color:var(--muted-foreground);}"
+      "name": "Calque flottant",
+      "kind": "nav",
+      "refersTo": "calque-flottant",
+      "description": "Calque flottant (calendrier d'un TODO) : fond papier, filet, grand rayon, seule ombre du système.",
+      "html": "<div class=\"ds-calque\" role=\"dialog\" aria-label=\"Changer la date\"><div class=\"ds-calque-titre\">Changer la date</div><div class=\"ds-calque-texte\">Relancer Atelier Vercors sur le devis de reprise</div></div>",
+      "css": ".ds-calque { font-family: var(--font-archivo), ui-sans-serif, system-ui, sans-serif; display: inline-flex; flex-direction: column; gap: 2px; min-width: 220px; padding: 12px; border: 1px solid var(--border); border-radius: 21.6px; background: var(--popover); color: var(--popover-foreground); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); font-size: 0.9375rem; } .ds-calque-titre { font-weight: 600; } .ds-calque-texte { font-size: 0.8125rem; color: var(--muted-foreground); }"
     }
   ],
   "narrative": {
-    "northStar": "Le Cartouche",
-    "overview": "Le système reprend le cartouche d'un plan d'ingénierie : un bandeau d'encre qui porte le titre, la date et des compartiments chiffrés à filets, puis des feuilles blanches tracées au filet de 1 px. L'encre bleue structure, le surligneur jaune signale. Les formes sont nettes (rayons de 1 à 3 px), la typographie est une Barlow technique avec ses titres en Semi Condensed et des chiffres tabulaires. La densité est celle d'un registre : lignes de 46 px, en-têtes en bande, pas d'air décoratif.\n\nLa profondeur ne vient pas des ombres mais des aplats : papier gris-bleu, feuille blanche, calque pour les en-têtes, encre pour le bandeau. Le mouvement est bref et dessiné à la main : un trait de surligneur balaie le dernier ajout, un trait d'encre barre ce qu'on coche, un chiffre glisse en place quand il change. Tout mouvement est coupé quand le système demande un mouvement réduit.\n\nDeux modes, clair et sombre. Par défaut, ils suivent le réglage du système ; le bouton de thème du bandeau force l'un ou l'autre (Système, Clair, Sombre), choix retenu dans le navigateur. Le sombre garde la même grammaire : encre éclaircie, surligneur légèrement assourdi, bandeau d'encre profonde.",
+    "northStar": "L'affiche de la journée",
+    "overview": "L'écran se lit comme une affiche du style typographique international : un grand aplat vermillon, du noir et du blanc, une seule famille de caractères poussée jusqu'au 900 étendu, et une géométrie de cercles. Le champ vermillon porte ce qui compte d'un coup d'œil, le nombre de TODO en cours en chiffre géant et les arcs concentriques du jour ; la page blanche à côté porte la saisie et les jours, séparés par des filets et jamais par des cadres.\n\nLe système est vivant sans être bavard. Les chiffres roulent sur place, la case se remplit de vermillon avec un léger ressort, le titre coché se barre d'un trait vermillon, la ligne se replie et les autres glissent à leur place. Au doigt, on glisse une ligne à droite pour la terminer, à gauche pour changer son jour. Tous les mouvements tiennent entre 180 et 460 ms en sortie exponentielle, les arcs se dessinent en 700 ms, et tout est coupé en mouvement réduit.\n\nLe monde refuse la liste grise à cases carrées du gabarit TODO et le cartouche à filets de l'ancien monde : pas de carte, pas de case carrée, pas de bandeau bleu.",
     "keyCharacteristics": [
-      "Bandeau d'encre pleine largeur, contenu centré à 56 rem.",
-      "Cellules de cartouche à filets, chiffres tabulaires en Barlow Semi Condensed 600.",
-      "Feuilles blanches à filets de 1 px, rayons de 2 px (contrôles) et environ 3 px (cartes).",
-      "Surligneur jaune réservé au focus, à l'action principale sur le bandeau, au dernier ajout, au chiffre mis en avant et aux alertes de saisie.",
-      "Système plat : aucune ombre sur les surfaces de contenu.",
-      "Mouvements de 150 à 300 ms sur une sortie exponentielle, coupés en mouvement réduit."
+      "Un aplat vermillon (#D93A1A) en champ, du noir 111 et du blanc papier ailleurs.",
+      "Archivo seule, de 400 pour le texte à 900 étendue (wdth 115) pour le chiffre géant.",
+      "Cercles et pilules : cases rondes, pastilles d'âge rondes, saisie et bouton d'ajout en pilule.",
+      "Filets entre les lignes, trait noir de 2 px sous chaque titre de jour, aucune carte.",
+      "Mouvement continu et court ; la signature, ce sont les arcs du jour."
     ],
     "rules": [
       {
-        "name": "The Deux Voix Rule",
-        "body": "L'encre structure, le surligneur signale. Aucune troisième couleur d'accent ; l'alerte ne sert qu'aux erreurs.",
+        "name": "The Un Seul Rouge Rule",
+        "body": "Le vermillon est la seule couleur. Il marque le champ et ce qui est fait ou ce qui traîne ; aucune autre teinte n'entre dans l'écran, sauf le rouge d'erreur.",
         "section": "colors"
       },
       {
-        "name": "The Surligneur Rare Rule",
-        "body": "Le jaune ne s'emploie que pour le focus, l'action principale posée sur le bandeau, le dernier ajout, le chiffre lu en premier et l'alerte de saisie. S'il apparaît ailleurs, il ne signale plus rien.",
+        "name": "The Jetons Seulement Rule",
+        "body": "Aucune couleur en dur dans les composants : uniquement les jetons de `globals.css`, chacun défini en clair et en sombre. Les survols se dérivent d'un jeton par `color-mix`, jamais d'une valeur littérale.",
         "section": "colors"
       },
       {
-        "name": "The Jeton Unique Rule",
-        "body": "Toute couleur vient d'un jeton de `src/app/globals.css`, défini en clair et en sombre. Ni hex, ni `rgb()`, ni palette Tailwind, ni valeur arbitraire dans les composants. Une couleur manquante devient un nouveau jeton, pas une valeur locale.",
-        "section": "colors"
-      },
-      {
-        "name": "The Encre Qui Monte Rule",
-        "body": "L'âge d'un jour se lit à la densité d'encre de sa cellule : rien à 0 et 1 jour, survol à 2 jours, encre à 15 % à 3 jours, encre pleine à 4 jours et plus.",
-        "section": "colors"
-      },
-      {
-        "name": "The Chiffre Tabulaire Rule",
-        "body": "Tout nombre qu'on compare d'une ligne à l'autre (compteurs, âges) est en Semi Condensed 600 avec `tabular-nums`.",
+        "name": "The Chiffre Géant Rule",
+        "body": "Un seul chiffre en Display par écran : celui des TODO en cours. Les autres nombres restent en chiffre secondaire.",
         "section": "typography"
       },
       {
-        "name": "The Deux Poids Rule",
-        "body": "Le texte courant reste en 400, les libellés en 500, tout ce qui est en Semi Condensed en 600. Pas d'autres graisses.",
+        "name": "The Minuscules Rule",
+        "body": "Les libellés de compteurs s'écrivent en minuscules, en phrase, à côté de leur valeur ; jamais de petites capitales espacées au-dessus d'un titre.",
         "section": "typography"
       },
       {
-        "name": "The Plan à Plat Rule",
-        "body": "Une feuille posée sur le papier se distingue par son filet et son aplat, pas par une ombre. Une ombre n'apparaît que sur un élément qui flotte réellement au-dessus de la page.",
+        "name": "The Plat Par Défaut Rule",
+        "body": "Rien ne porte d'ombre au repos dans la page. Une ombre signale un calque qui flotte, rien d'autre.",
         "section": "elevation"
       }
     ],
     "dos": [
-      "**Do** prendre toutes les couleurs dans les jetons de `globals.css` (`bg-primary`, `bg-signature`, `bg-shell`, `border-input`…), et ajouter un jeton clair et sombre quand il en manque un.",
-      "**Do** composer uniquement avec les composants de `@/presentation/ui` ; un composant shadcn ajouté s'aligne sur `button.tsx` (rayon de 2 px, focus encre et surligneur, Semi Condensed 600 pour les libellés d'action).",
-      "**Do** donner à tout contrôle focalisable le focus Cartouche : contour d'encre de 2 px décalé de 2 px et halo de surligneur de 6 px.",
-      "**Do** écrire les nombres comparés en Semi Condensed 600 tabulaire.",
-      "**Do** séparer les feuilles par des filets de 1 px et des aplats, avec 2 px de rayon pour les contrôles et environ 3 px pour les cartes.",
-      "**Do** garder les mouvements entre 150 et 300 ms sur `ease-trait`, et les couper sous `prefers-reduced-motion`."
+      "Do garder le vermillon (#D93A1A) en aplat pour le champ et le réserver, dans la page, à ce qui est fait ou ce qui traîne.",
+      "Do donner à tout ce qui se touche dans la liste une forme ronde ou en pilule : cases, pastilles, saisie, boutons d'icône.",
+      "Do séparer les lignes par des filets de 1 px et les jours par un trait noir de 2 px.",
+      "Do composer les chiffres en Archivo 800 ou 900 tabulaires, le chiffre en cours en 900 étendue (wdth 115).",
+      "Do tenir les mouvements entre 180 et 460 ms sur `ease-trait`, réserver `ease-ressort` à ce qui revient au repos (case cochée, ligne relâchée), et tout couper en mouvement réduit.",
+      "Do ajouter un jeton clair et sombre dans `globals.css` quand une couleur manque."
     ],
     "donts": [
-      "**Don't** mettre une couleur en dur dans un composant : ni hex, ni `rgb()`/`hsl()`/`oklch()`, ni palette Tailwind (`bg-white`, `text-zinc-500`), ni valeur arbitraire (`bg-[#…]`).",
-      "**Don't** styler un `<button>` ou un `<input>` à la main quand le composant existe dans `@/presentation/ui`.",
-      "**Don't** poser une ombre sur une feuille, une liste ou un encart ; l'ombre est réservée aux menus qui flottent.",
-      "**Don't** employer le surligneur comme décor ou comme fond de section ; il ne sert qu'au focus, à l'action principale du bandeau, au dernier ajout, au chiffre mis en avant et à l'alerte de saisie.",
-      "**Don't** arrondir au-delà de 3 px."
+      "Don't utiliser de case carrée ni de pastille carrée.",
+      "Don't enfermer un jour ou une ligne dans une carte à bord ou à ombre.",
+      "Don't ajouter une seconde teinte d'accent, ni utiliser le vermillon pour une erreur.",
+      "Don't mettre une ombre sur un élément de la page au repos.",
+      "Don't écrire une couleur en dur, une couleur de la palette Tailwind ou une valeur `[#…]` dans un composant.",
+      "Don't reprendre l'encre bleue, le surligneur jaune ou les angles de 2 px de l'ancien monde Cartouche."
     ]
   }
 }

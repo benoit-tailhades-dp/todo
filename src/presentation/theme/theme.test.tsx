@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it } from "vitest";
-import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { MenuTheme } from "./menu-theme";
+import { SelecteurTheme } from "./selecteur-theme";
 import { CLE_THEME, ScriptTheme, scriptTheme } from "./script-theme";
 
 const SYSTEME_SOMBRE = "(prefers-color-scheme: dark)";
@@ -34,12 +34,12 @@ function executerScriptDuHead() {
   new Function(scriptTheme())();
 }
 
-/** Ouverture de l'application : le script du <head>, puis l'écran et son bouton de thème. */
+/** Ouverture de l'application : le script du <head>, puis l'écran et son sélecteur de thème. */
 function ouvrirApplication({ systemeSombre, enregistre }: { systemeSombre: boolean; enregistre?: string }) {
   if (enregistre !== undefined) window.localStorage.setItem(CLE_THEME, enregistre);
   const systeme = fauxSysteme(systemeSombre);
   executerScriptDuHead();
-  render(<MenuTheme />);
+  render(<SelecteurTheme />);
   return systeme;
 }
 
@@ -47,17 +47,24 @@ function themeDeLaPage(): string | null {
   return document.documentElement.getAttribute("data-theme");
 }
 
-function bouton(): HTMLElement {
-  return screen.getByRole("button", { name: /^Thème/ });
+function selecteur(): HTMLElement {
+  return screen.getByRole("radiogroup", { name: "Thème" });
 }
 
-function ouvrirMenu(): HTMLElement {
-  fireEvent.click(bouton());
-  return screen.getByRole("menu");
+function pastille(libelle: "Système" | "Clair" | "Sombre"): HTMLElement {
+  return within(selecteur()).getByRole("radio", { name: libelle });
+}
+
+/** Le choix que le lecteur d'écran annonce comme coché. */
+function choixCoche(): string | null {
+  return within(selecteur())
+    .getAllByRole("radio")
+    .find((radio) => radio.getAttribute("aria-checked") === "true")
+    ?.getAttribute("aria-label") ?? null;
 }
 
 function choisir(libelle: "Système" | "Clair" | "Sombre") {
-  fireEvent.click(within(ouvrirMenu()).getByRole("menuitemradio", { name: libelle }));
+  fireEvent.click(pastille(libelle));
 }
 
 afterEach(() => {
@@ -133,23 +140,22 @@ describe("script du <head> : le thème est posé avant le premier rendu", () => 
   });
 });
 
-describe("MenuTheme : choisir Système, Clair ou Sombre", () => {
-  it("le bouton annonce le thème actif : « Thème : Système » par défaut", () => {
+describe("SelecteurTheme : choisir Système, Clair ou Sombre", () => {
+  it("les trois choix sont visibles d'emblée, sans menu à ouvrir, et « Système » est coché par défaut", () => {
     ouvrirApplication({ systemeSombre: false });
-    expect(bouton()).toHaveProperty("ariaLabel", "Thème : Système");
+
+    expect(within(selecteur()).getAllByRole("radio").map((radio) => radio.getAttribute("aria-label"))).toEqual([
+      "Système",
+      "Clair",
+      "Sombre",
+    ]);
+    expect(choixCoche()).toBe("Système");
+    expect(screen.queryByRole("menu")).toBeNull();
   });
 
-  it("Sombre enregistré : le bouton annonce « Thème : Sombre »", () => {
+  it("Sombre enregistré : « Sombre » est coché", () => {
     ouvrirApplication({ systemeSombre: false, enregistre: "sombre" });
-    expect(bouton()).toHaveProperty("ariaLabel", "Thème : Sombre");
-  });
-
-  it("le menu propose Système, Clair et Sombre, le choix actif coché", () => {
-    ouvrirApplication({ systemeSombre: false, enregistre: "clair" });
-    const menu = ouvrirMenu();
-    const choix = within(menu).getAllByRole("menuitemradio");
-    expect(choix.map((c) => c.textContent)).toEqual(["Système", "Clair", "Sombre"]);
-    expect(choix.map((c) => c.getAttribute("aria-checked"))).toEqual(["false", "true", "false"]);
+    expect(choixCoche()).toBe("Sombre");
   });
 
   it("en clair, choisir Sombre : toute la page passe en sombre tout de suite, et le choix est enregistré", () => {
@@ -160,8 +166,7 @@ describe("MenuTheme : choisir Système, Clair ou Sombre", () => {
 
     expect(themeDeLaPage()).toBe("sombre");
     expect(window.localStorage.getItem(CLE_THEME)).toBe("sombre");
-    expect(bouton()).toHaveProperty("ariaLabel", "Thème : Sombre");
-    expect(screen.queryByRole("menu")).toBeNull();
+    expect(choixCoche()).toBe("Sombre");
   });
 
   it("Sombre choisi : à la réouverture, la page est sombre avant même l'affichage de l'écran", () => {
@@ -189,42 +194,34 @@ describe("MenuTheme : choisir Système, Clair ou Sombre", () => {
 
     expect(window.localStorage.getItem(CLE_THEME)).toBeNull();
     expect(themeDeLaPage()).toBe("clair");
-    expect(bouton()).toHaveProperty("ariaLabel", "Thème : Système");
+    expect(choixCoche()).toBe("Système");
 
     systeme.basculer(true);
     expect(themeDeLaPage()).toBe("sombre");
   });
 
-  it("au clavier : Entrée ouvre le menu sur le choix actif, flèche bas puis Entrée choisit, le focus revient au bouton", async () => {
+  it("au clavier : seul le choix actif est dans l'ordre de tabulation, la flèche passe au suivant et l'applique", async () => {
     ouvrirApplication({ systemeSombre: true });
-    bouton().focus();
+    expect(pastille("Système").tabIndex).toBe(0);
+    expect(pastille("Clair").tabIndex).toBe(-1);
+    pastille("Système").focus();
 
-    fireEvent.keyDown(bouton(), { key: "Enter" });
-    fireEvent.click(bouton());
-    const menu = screen.getByRole("menu");
-    // Le menu donne le focus au choix actif à l'image suivante.
-    await waitFor(() =>
-      expect(document.activeElement).toBe(within(menu).getByRole("menuitemradio", { name: "Système" })),
-    );
+    fireEvent.keyDown(pastille("Système"), { key: "ArrowRight" });
+    // Base UI déplace le focus dans une micro-tâche, après sa propre gestion du focus.
+    await act(async () => {});
 
-    fireEvent.keyDown(document.activeElement as Element, { key: "ArrowDown" });
-    expect(document.activeElement).toBe(within(menu).getByRole("menuitemradio", { name: "Clair" }));
-
-    fireEvent.keyDown(document.activeElement as Element, { key: "Enter" });
-
+    expect(document.activeElement).toBe(pastille("Clair"));
+    expect(choixCoche()).toBe("Clair");
     expect(themeDeLaPage()).toBe("clair");
-    await waitFor(() => expect(screen.queryByRole("menu")).toBeNull());
-    expect(document.activeElement).toBe(bouton());
-    expect(bouton()).toHaveProperty("ariaLabel", "Thème : Clair");
   });
 
-  it("l'attribut effacé par React (remontage du mode Strict en dev) : le menu le repose", () => {
+  it("l'attribut effacé par React (remontage du mode Strict en dev) : le sélecteur le repose", () => {
     window.localStorage.setItem(CLE_THEME, "sombre");
     fauxSysteme(false);
     executerScriptDuHead();
     document.documentElement.removeAttribute("data-theme");
 
-    render(<MenuTheme />);
+    render(<SelecteurTheme />);
 
     expect(themeDeLaPage()).toBe("sombre");
   });

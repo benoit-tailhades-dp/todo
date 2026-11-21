@@ -227,8 +227,10 @@ function LigneTodo({
         onGlisserDebut();
       }}
       onDragEnd={onGlisserFin}
+      // contain-layout : la case de Base UI cache son <input> en position fixed, en haut de la page.
+      // Sans ce bloc de référence, Chrome glisse une image qui va du haut de la page jusqu'à la ligne.
       className={cn(
-        "group/ligne grid border-t border-border transition-[grid-template-rows,opacity,background-color] duration-200 ease-trait first:border-t-0 motion-reduce:transition-none",
+        "group/ligne grid contain-layout border-t border-border transition-[grid-template-rows,opacity,background-color] duration-200 ease-trait first:border-t-0 motion-reduce:transition-none",
         phase === "sortie" ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr]",
         glisse && "bg-muted",
       )}

@@ -83,3 +83,21 @@ export function AlerteIntrouvable({ onFermer }: { onFermer: () => void }) {
     </Alert>
   );
 }
+
+/** Le jour demandé n'est pas une date (appel direct, valeur altérée) : le TODO n'a pas bougé. */
+export function AlerteDateInvalide({ onFermer }: { onFermer: () => void }) {
+  return (
+    <Alert variant="destructive" className="mb-6 animate-apparait">
+      <CircleAlert aria-hidden />
+      <AlertTitle>Cette date n&apos;est pas valide</AlertTitle>
+      <AlertDescription>
+        Le TODO est resté sous son jour. Choisis un autre jour dans son calendrier.
+      </AlertDescription>
+      <AlertAction>
+        <Button variant="ghost" size="icon-sm" aria-label="Fermer le message" onClick={onFermer}>
+          <X aria-hidden />
+        </Button>
+      </AlertAction>
+    </Alert>
+  );
+}

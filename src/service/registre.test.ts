@@ -12,6 +12,20 @@ function termine(id: string, titre: string, creeLe: number): Todo {
   return { id, titre, creeLe, termine: true };
 }
 
+/** Un TODO en cours auquel on a choisi un autre jour que son jour d'ajout. */
+function deplace(id: string, titre: string, creeLe: number, jour: string): Todo {
+  return { id, titre, creeLe, termine: false, jour };
+}
+
+/** Titres des jours, avec le nombre et les identifiants de leurs TODO. */
+function resume(todos: Todo[], maintenant = VENDREDI_20_MIDI) {
+  return composerRegistre(todos, maintenant).jours.map(({ titre, nombre, todos: liste }) => ({
+    titre,
+    nombre,
+    ids: liste.map((t) => t.id),
+  }));
+}
+
 describe("composerRegistre", () => {
   it("base sans TODO : aucun jour à afficher", () => {
     expect(composerRegistre([], VENDREDI_20_MIDI).jours).toEqual([]);
@@ -189,5 +203,102 @@ describe("composerRegistre", () => {
     );
 
     expect(compteurs.plusAncien).toBe(2);
+  });
+});
+
+describe("composerRegistre · jour choisi", () => {
+  const LUNDI_16_9H = Date.UTC(2026, 10, 16, 8, 0);
+  const LUNDI_16_15H = Date.UTC(2026, 10, 16, 14, 0);
+  const JEUDI_19_10H = Date.UTC(2026, 10, 19, 9, 0);
+  const VENDREDI_20_8H = Date.UTC(2026, 10, 20, 7, 0);
+  const VENDREDI_20_9H = Date.UTC(2026, 10, 20, 8, 0);
+
+  it("TODO d'aujourd'hui passé au lundi 16 : rangé sous « Lundi 16 novembre », les deux compteurs changent", () => {
+    const avant = [
+      todo("a", "Relancer le devis", LUNDI_16_9H),
+      todo("b", "Relire le contrat de maintenance", LUNDI_16_15H),
+      todo("c", "Sauvegarder la base de recette", VENDREDI_20_8H),
+      todo("d", "Préparer l'ordre du jour", VENDREDI_20_9H),
+    ];
+    expect(resume(avant)).toEqual([
+      { titre: "Lundi 16 novembre", nombre: 2, ids: ["a", "b"] },
+      { titre: "Aujourd'hui", nombre: 2, ids: ["c", "d"] },
+    ]);
+
+    const apres = avant.map((t) => (t.id === "c" ? { ...t, jour: "2026-11-16" } : t));
+
+    expect(resume(apres)).toEqual([
+      { titre: "Lundi 16 novembre", nombre: 3, ids: ["a", "b", "c"] },
+      { titre: "Aujourd'hui", nombre: 1, ids: ["d"] },
+    ]);
+  });
+
+  it("samedi 21 pour l'un, mardi 24 pour l'autre : rangés après « Aujourd'hui », sous « Demain » puis « Mardi 24 novembre »", () => {
+    const jours = resume([
+      deplace("a", "Relancer le devis", LUNDI_16_9H, "2026-11-24"),
+      deplace("b", "Relire le contrat de maintenance", LUNDI_16_15H, "2026-11-21"),
+      todo("c", "Sauvegarder la base de recette", VENDREDI_20_8H),
+    ]);
+
+    expect(jours).toEqual([
+      { titre: "Aujourd'hui", nombre: 1, ids: ["c"] },
+      { titre: "Demain", nombre: 1, ids: ["b"] },
+      { titre: "Mardi 24 novembre", nombre: 1, ids: ["a"] },
+    ]);
+  });
+
+  it("jour à venir : sa clé, la date en clair à côté de « Demain », un âge négatif", () => {
+    const { jours } = composerRegistre(
+      [
+        deplace("a", "Relancer le devis", LUNDI_16_9H, "2026-11-21"),
+        deplace("b", "Relire le contrat de maintenance", LUNDI_16_15H, "2026-11-24"),
+      ],
+      VENDREDI_20_MIDI,
+    );
+
+    expect(jours.map(({ cle, precision, age }) => ({ cle, precision, age }))).toEqual([
+      { cle: "2026-11-21", precision: "samedi 21 novembre", age: -1 },
+      { cle: "2026-11-24", precision: null, age: -4 },
+    ]);
+  });
+
+  it("dans un jour, l'ordre reste celui de l'ajout : un TODO venu d'« Hier » passe avant ceux ajoutés aujourd'hui", () => {
+    const jours = resume([
+      todo("c", "Sauvegarder la base de recette", VENDREDI_20_8H),
+      deplace("h", "Relancer le devis", JEUDI_19_10H, "2026-11-20"),
+      todo("d", "Préparer l'ordre du jour", VENDREDI_20_9H),
+    ]);
+
+    expect(jours).toEqual([{ titre: "Aujourd'hui", nombre: 3, ids: ["h", "c", "d"] }]);
+  });
+
+  it("le seul TODO en cours d'un jour déplacé : l'en-tête de ce jour disparaît", () => {
+    const jours = resume([
+      deplace("h", "Relancer le devis", JEUDI_19_10H, "2026-11-20"),
+      todo("c", "Sauvegarder la base de recette", VENDREDI_20_8H),
+    ]);
+
+    expect(jours.map((j) => j.titre)).toEqual(["Aujourd'hui"]);
+  });
+
+  it("le plus ancien suit le jour affiché, pas le jour d'ajout", () => {
+    const { compteurs } = composerRegistre(
+      [
+        deplace("a", "Relancer le devis", LUNDI_16_9H, "2026-11-21"),
+        todo("h", "Relire le contrat de maintenance", JEUDI_19_10H),
+      ],
+      VENDREDI_20_MIDI,
+    );
+
+    expect(compteurs.plusAncien).toBe(1);
+  });
+
+  it("que des jours à venir : le plus ancien est inconnu", () => {
+    const { compteurs } = composerRegistre(
+      [deplace("a", "Relancer le devis", LUNDI_16_9H, "2026-11-21")],
+      VENDREDI_20_MIDI,
+    );
+
+    expect(compteurs).toEqual({ enCours: 1, termines: 0, plusAncien: null });
   });
 });

@@ -116,6 +116,45 @@ describe("TodoRepository libSQL (fichier SQLite)", () => {
     expect(relus.toSorted(parId)).toEqual([{ ...a, termine: true }, b]);
   });
 
+  it("changerJour : ne change que le TODO visé, relu par listerTous et trouver, et survit à la réouverture", async () => {
+    const premiere = connecter();
+    const repository = createLibsqlTodoRepository(premiere);
+    const a = { id: "a", titre: "Relancer le devis", creeLe: Date.UTC(2026, 10, 20, 9, 0), termine: false };
+    const b = { id: "b", titre: "Relire le contrat", creeLe: Date.UTC(2026, 10, 20, 10, 0), termine: false };
+    await repository.ajouter(a);
+    await repository.ajouter(b);
+
+    await repository.changerJour("a", "2026-11-16");
+
+    expect(await repository.trouver("a")).toEqual({ ...a, jour: "2026-11-16" });
+    premiere.close();
+
+    const relus = await createLibsqlTodoRepository(connecter()).listerTous();
+    const parId = (x: TodoEnregistre, y: TodoEnregistre) => x.id.localeCompare(y.id);
+    expect(relus.toSorted(parId)).toEqual([{ ...a, jour: "2026-11-16" }, b]);
+    expect(relus.find((t) => t.id === "b")?.jour).toBeUndefined();
+  });
+
+  it("base du lot 5, sans colonne jour : la colonne est ajoutée, les TODO restent, la date peut changer", async () => {
+    const ancienne = connecter();
+    await ancienne.execute(
+      "CREATE TABLE todos (id TEXT PRIMARY KEY, titre TEXT NOT NULL, cree_le INTEGER NOT NULL, termine INTEGER NOT NULL DEFAULT 0)",
+    );
+    await ancienne.execute({
+      sql: "INSERT INTO todos (id, titre, cree_le, termine) VALUES (?, ?, ?, ?)",
+      args: ["a", "Relancer le devis", Date.UTC(2026, 10, 19, 9, 0), 0],
+    });
+    ancienne.close();
+
+    const repository = createLibsqlTodoRepository(connecter());
+    const a = { id: "a", titre: "Relancer le devis", creeLe: Date.UTC(2026, 10, 19, 9, 0), termine: false };
+
+    expect(await repository.listerTous()).toEqual([a]);
+    await repository.changerJour("a", "2026-11-20");
+
+    expect(await createLibsqlTodoRepository(connecter()).listerTous()).toEqual([{ ...a, jour: "2026-11-20" }]);
+  });
+
   it("création de la table en échec (réseau coupé) : l'appel suivant réessaie", async () => {
     const vrai = connecter();
     let coupures = 1;

@@ -5,11 +5,11 @@ import { BarreDemo } from "./barre-demo";
 import { Bandeau } from "./bandeau";
 import { CellulesCartouche, type Cellule } from "./cellules-cartouche";
 import { ChargementRegistre } from "./chargement-registre";
-import { dateLongue, ecartJours } from "./dates";
-import { todosDuScenario, type Scenario, type TodoMaquette } from "./donnees-fictives";
-import { AlerteIntrouvable, EtatErreurChargement, EtatToutTermine, EtatVide } from "./etats";
+import { ageDuJour, cleJour, dateLongue, titreDuJour } from "./dates";
+import { ID_GLISSE, ID_SELECTEUR, todosDuScenario, type Scenario, type TodoMaquette } from "./donnees-fictives";
+import { AlerteDateInvalide, AlerteIntrouvable, EtatErreurChargement, EtatToutTermine, EtatVide } from "./etats";
 import { FormulaireAjout } from "./formulaire-ajout";
-import { Registre, type Phase } from "./registre";
+import { jourDuTodo, Registre, type Glisser, type Phase } from "./registre";
 import { SectionTerminees } from "./section-terminees";
 
 const MESSAGE_TITRE_VIDE = "Écris un titre avant d'ajouter.";
@@ -19,6 +19,17 @@ const DUREE_REPLI = 220;
 /** Durée pendant laquelle le dernier ajout reste surligné (ms). */
 const DUREE_SURLIGNE = 6000;
 
+function glisserDuScenario(scenario: Scenario, maintenant: number): Glisser {
+  return scenario === "glisser" ? { id: ID_GLISSE, survole: cleJour(maintenant) } : { id: null, survole: null };
+}
+
+/** Revue : la ligne de l'état affiché, amenée au centre de l'écran. */
+const LIGNE_DU_SCENARIO: Partial<Record<Scenario, string>> = {
+  enregistrement: "en-attente",
+  "selecteur-date": ID_SELECTEUR,
+  glisser: ID_GLISSE,
+};
+
 function sans<T>(table: Record<string, T>, cle: string): Record<string, T> {
   const copie = { ...table };
   delete copie[cle];
@@ -27,7 +38,7 @@ function sans<T>(table: Record<string, T>, cle: string): Record<string, T> {
 
 /**
  * Maquette dynamique de l'écran TODO : état local et données fictives, sans base.
- * Les règles simulées ici (titre obligatoire, espaces retirés) appartiendront au service.
+ * Les règles simulées ici (titre obligatoire, espaces retirés, rangement par jour choisi) appartiendront au service.
  */
 export function MaquetteTodo({
   maintenant,
@@ -49,6 +60,11 @@ export function MaquetteTodo({
   const [alerteIntrouvable, setAlerteIntrouvable] = useState(scenarioInitial === "introuvable");
   const [terminesOuvert, setTerminesOuvert] = useState(scenarioInitial === "tout-termine");
   const [annonce, setAnnonce] = useState("");
+  const [dateOuverte, setDateOuverte] = useState<string | null>(
+    scenarioInitial === "selecteur-date" ? ID_SELECTEUR : null,
+  );
+  const [glisser, setGlisser] = useState<Glisser>(() => glisserDuScenario(scenarioInitial, maintenant));
+  const [alerteDateInvalide, setAlerteDateInvalide] = useState(scenarioInitial === "date-invalide");
   const champRef = useRef<HTMLInputElement>(null);
   const listeRef = useRef<HTMLDivElement>(null);
   const minuteurs = useRef<number[]>([]);
@@ -64,12 +80,11 @@ export function MaquetteTodo({
     return () => window.clearTimeout(minuteur);
   }, [dernierAjoutId]);
 
-  // Revue : l'état « enregistrement en cours » se joue sur la dernière ligne, on l'amène à l'écran.
+  // Revue : les états qui se jouent sur une ligne précise l'amènent à l'écran.
   useEffect(() => {
-    if (scenario !== "enregistrement") return;
-    listeRef.current
-      ?.querySelector('[data-todo-id="en-attente"]')
-      ?.scrollIntoView({ block: "center", behavior: "instant" });
+    const id = LIGNE_DU_SCENARIO[scenario];
+    if (!id) return;
+    listeRef.current?.querySelector(`[data-todo-id="${id}"]`)?.scrollIntoView({ block: "center", behavior: "instant" });
   }, [scenario]);
 
   function planifier(action: () => void, delai: number) {
@@ -90,6 +105,26 @@ export function MaquetteTodo({
     setAlerteIntrouvable(suivant === "introuvable");
     setTerminesOuvert(suivant === "tout-termine");
     setAnnonce("");
+    setDateOuverte(suivant === "selecteur-date" ? ID_SELECTEUR : null);
+    setGlisser(glisserDuScenario(suivant, maintenant));
+    setAlerteDateInvalide(suivant === "date-invalide");
+  }
+
+  /**
+   * Range le TODO sous le jour choisi ; sur son propre jour, rien ne change.
+   * Choisi au clavier, le focus revient au bouton calendrier du TODO, sous son nouveau jour.
+   */
+  function changerJour(id: string, jour: string, rendreFocus: boolean) {
+    const todo = todos.find((t) => t.id === id);
+    if (!todo || todo.termine || jourDuTodo(todo) === jour) return;
+    setTodos((liste) => liste.map((t) => (t.id === id ? { ...t, jour } : t)));
+    setAlerteDateInvalide(false);
+    setAnnonce(`« ${todo.titre} » déplacé sous ${titreDuJour(jour, maintenant)}.`);
+    if (rendreFocus) {
+      window.requestAnimationFrame(() =>
+        listeRef.current?.querySelector<HTMLElement>(`[data-todo-id="${id}"] [data-bouton-date]`)?.focus(),
+      );
+    }
   }
 
   function ajouter() {
@@ -145,7 +180,9 @@ export function MaquetteTodo({
 
   const enCours = todos.filter((t) => !t.termine).sort((a, b) => a.creeLe - b.creeLe);
   const termines = todos.filter((t) => t.termine).sort((a, b) => a.creeLe - b.creeLe);
-  const plusAncien = enCours[0];
+  // « Le plus ancien » suit le jour affiché : un TODO repoussé à demain n'est plus en retard.
+  const ages = enCours.map((t) => ageDuJour(jourDuTodo(t), maintenant));
+  const plusAncien = ages.length > 0 ? Math.max(...ages) : null;
   const injoignable = scenario === "erreur-chargement";
 
   const cellules: Cellule[] = injoignable
@@ -159,7 +196,7 @@ export function MaquetteTodo({
         { libelle: "Terminés", valeur: String(termines.length) },
         {
           libelle: "Le plus ancien",
-          valeur: plusAncien ? `${ecartJours(plusAncien.creeLe, maintenant)} j` : "—",
+          valeur: plusAncien !== null && plusAncien >= 0 ? `${plusAncien} j` : "—",
         },
       ];
 
@@ -185,6 +222,7 @@ export function MaquetteTodo({
           {annonce}
         </p>
         {alerteIntrouvable ? <AlerteIntrouvable onFermer={() => setAlerteIntrouvable(false)} /> : null}
+        {alerteDateInvalide ? <AlerteDateInvalide onFermer={() => setAlerteDateInvalide(false)} /> : null}
 
         {injoignable ? (
           <EtatErreurChargement onReessayer={() => changerScenario("liste")} />
@@ -201,7 +239,12 @@ export function MaquetteTodo({
               maintenant={maintenant}
               phases={phases}
               dernierAjoutId={dernierAjoutId}
+              dateOuverte={dateOuverte}
+              glisser={glisser}
               onTerminer={terminer}
+              onDateOuverteChange={setDateOuverte}
+              onChangerJour={(id, jour) => changerJour(id, jour, glisser.id === null)}
+              onGlisserChange={setGlisser}
             />
           </div>
         )}

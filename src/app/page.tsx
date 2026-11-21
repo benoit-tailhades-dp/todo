@@ -4,11 +4,11 @@ import { Suspense } from "react";
 import { ChargementListe } from "@/presentation/todo/chargement-liste";
 import { EcranTodo } from "@/presentation/todo/ecran-todo";
 import { todoService } from "@/service/instances";
-import { ajouterTodo, terminerTodo } from "./actions";
+import { ajouterTodo, changerDateTodo, terminerTodo } from "./actions";
 
 export const metadata: Metadata = {
   title: "Mes TODO",
-  description: "Ma liste de TODO, rangée par jour d'ajout.",
+  description: "Ma liste de TODO, rangée par jour.",
 };
 
 export default function Page() {
@@ -29,6 +29,12 @@ async function ListeDuJour() {
   const maintenant = await heureDeLaRequete();
   const todos = await todoService().lister();
   return (
-    <EcranTodo todos={todos} maintenant={maintenant} ajouterAction={ajouterTodo} terminerAction={terminerTodo} />
+    <EcranTodo
+      todos={todos}
+      maintenant={maintenant}
+      ajouterAction={ajouterTodo}
+      terminerAction={terminerTodo}
+      changerDateAction={changerDateTodo}
+    />
   );
 }

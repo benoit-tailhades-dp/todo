@@ -1,14 +1,15 @@
 "use client";
 
 import { startTransition, useEffect, useOptimistic, useRef, useState } from "react";
+import { titreDuJour } from "@/service/jours";
 import { composerRegistre, type Todo } from "@/service/registre";
-import type { ResultatAjout, ResultatTerminer } from "@/service/todo-service";
+import type { ResultatAjout, ResultatChangerDate, ResultatTerminer } from "@/service/todo-service";
 import { validerTitre } from "@/service/titre";
 import { Bandeau } from "./bandeau";
 import { CellulesCartouche, type Cellule } from "./cellules-cartouche";
-import { AlerteIntrouvable, EtatToutTermine, EtatVide } from "./etats";
+import { AlerteDateInvalide, AlerteIntrouvable, EtatToutTermine, EtatVide } from "./etats";
 import { FormulaireAjout } from "./formulaire-ajout";
-import { Registre, type Phase } from "./registre";
+import { Registre, type Glisser, type Phase } from "./registre";
 import { SectionTerminees } from "./section-terminees";
 
 const MESSAGES = { "titre-vide": "Écris un titre avant d'ajouter." } as const;
@@ -18,12 +19,23 @@ const DUREE_SURLIGNE = 6000;
 const DUREE_TRAIT = 380;
 const DUREE_REPLI = 220;
 
+const AUCUN_GLISSER: Glisser = { id: null, survole: null };
+
 /** Changement affiché avant la réponse du serveur. */
-type Changement = { type: "ajout"; todo: Todo } | { type: "termine"; id: string };
+type Changement =
+  | { type: "ajout"; todo: Todo }
+  | { type: "termine"; id: string }
+  | { type: "date"; id: string; jour: string };
 
 function appliquer(liste: Todo[], changement: Changement): Todo[] {
-  if (changement.type === "ajout") return [...liste, changement.todo];
-  return liste.map((todo) => (todo.id === changement.id ? { ...todo, termine: true } : todo));
+  switch (changement.type) {
+    case "ajout":
+      return [...liste, changement.todo];
+    case "termine":
+      return liste.map((todo) => (todo.id === changement.id ? { ...todo, termine: true } : todo));
+    case "date":
+      return liste.map((todo) => (todo.id === changement.id ? { ...todo, jour: changement.jour } : todo));
+  }
 }
 
 function sans<T>(table: Record<string, T>, cle: string): Record<string, T> {
@@ -38,26 +50,31 @@ function mouvementReduit(): boolean {
 
 /**
  * L'écran de l'application : le bandeau, son cartouche et sa saisie, puis les TODO en cours rangés par jour
- * et les TODO terminés à part. Un ajout ou un TODO coché s'affiche tout de suite, puis la page se recharge
- * avec la base.
+ * et les TODO terminés à part. Un ajout, un TODO coché ou déplacé s'affiche tout de suite, puis la page
+ * se recharge avec la base.
  */
 export function EcranTodo({
   todos,
   maintenant,
   ajouterAction,
   terminerAction,
+  changerDateAction,
 }: {
   todos: Todo[];
   /** Instant de la requête : les jours sont calculés par rapport à lui. */
   maintenant: number;
   ajouterAction: (saisie: string) => Promise<ResultatAjout>;
   terminerAction: (id: string) => Promise<ResultatTerminer>;
+  changerDateAction: (id: string, jour: string) => Promise<ResultatChangerDate>;
 }) {
   const [saisie, setSaisie] = useState("");
   const [erreur, setErreur] = useState<string | null>(null);
   const [dernierAjoutId, setDernierAjoutId] = useState<string | null>(null);
   const [annonce, setAnnonce] = useState("");
   const [alerteIntrouvable, setAlerteIntrouvable] = useState(false);
+  const [alerteDateInvalide, setAlerteDateInvalide] = useState(false);
+  const [dateOuverte, setDateOuverte] = useState<string | null>(null);
+  const [glisser, setGlisser] = useState<Glisser>(AUCUN_GLISSER);
   const [phases, setPhases] = useState<Record<string, Phase>>({});
   const [affiches, afficherChangement] = useOptimistic(todos, appliquer);
   const registre = composerRegistre(affiches, maintenant);
@@ -93,6 +110,7 @@ export function EcranTodo({
     setSaisie("");
     setErreur(null);
     setAlerteIntrouvable(false);
+    setAlerteDateInvalide(false);
     compteurAttente.current += 1;
     const enAttente: Todo = {
       id: `en-attente-${compteurAttente.current}`,
@@ -149,6 +167,32 @@ export function EcranTodo({
     );
   }
 
+  /**
+   * Range le TODO sous le jour choisi, tout de suite, puis l'enregistre. Choisi au clavier, le focus revient
+   * au bouton de date du TODO, sous son nouveau jour.
+   */
+  function changerJour(id: string, jour: string, rendreFocus: boolean) {
+    const todo = affiches.find((t) => t.id === id);
+    if (!todo || todo.termine) return;
+
+    setAlerteIntrouvable(false);
+    setAlerteDateInvalide(false);
+    if (rendreFocus) {
+      window.requestAnimationFrame(() =>
+        listeRef.current?.querySelector<HTMLElement>(`[data-todo-id="${id}"] [data-bouton-date]`)?.focus(),
+      );
+    }
+    startTransition(async () => {
+      afficherChangement({ type: "date", id, jour });
+      const resultat = await changerDateAction(id, jour);
+      startTransition(() => {
+        if (resultat.ok) setAnnonce(`« ${todo.titre} » déplacé sous ${titreDuJour(jour, maintenant)}.`);
+        else if (resultat.erreur === "date-invalide") setAlerteDateInvalide(true);
+        else if (resultat.erreur === "introuvable") setAlerteIntrouvable(true);
+      });
+    });
+  }
+
   const { compteurs } = registre;
   const cellules: Cellule[] = [
     { libelle: "En cours", valeur: String(compteurs.enCours), enAvant: true },
@@ -178,6 +222,7 @@ export function EcranTodo({
           {annonce}
         </p>
         {alerteIntrouvable ? <AlerteIntrouvable onFermer={() => setAlerteIntrouvable(false)} /> : null}
+        {alerteDateInvalide ? <AlerteDateInvalide onFermer={() => setAlerteDateInvalide(false)} /> : null}
 
         {registre.etat === "vide" ? (
           <EtatVide />
@@ -187,10 +232,16 @@ export function EcranTodo({
           <div ref={listeRef}>
             <Registre
               jours={registre.jours}
+              maintenant={maintenant}
               phases={phases}
               enAttente={enAttente}
               dernierAjoutId={dernierAjoutId}
+              dateOuverte={dateOuverte}
+              glisser={glisser}
               onTerminer={terminer}
+              onDateOuverteChange={setDateOuverte}
+              onChangerJour={(id, jour) => changerJour(id, jour, glisser.id === null)}
+              onGlisserChange={setGlisser}
             />
           </div>
         )}

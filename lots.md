@@ -5,6 +5,8 @@ Les lots se traitent dans l'ordre, avec `/lot N`.
 
 ## Décisions
 
+Décisions produit ci-dessous. Les décisions d'architecture, avec leurs options écartées, sont dans `docs/decisions/`.
+
 - Pilote de base : `@libsql/client` dès le lot 1 (fichier local `file:` en dev, Turso en ligne, même API).
 - Ordre d'affichage : du plus ancien au plus récent.
 - Groupement : les TODO en cours sont rangés par jour d'ajout, sous un en-tête par jour (« Aujourd'hui », « Hier », sinon la date) avec le nombre de TODO de ce jour.

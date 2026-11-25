@@ -1,7 +1,8 @@
 // Calendrier de l'application. Les jours se calculent à l'heure de Paris : le serveur (UTC sur Vercel)
 // et le navigateur rangent ainsi chaque TODO sous le même jour.
 
-const FUSEAU = "Europe/Paris";
+/** Fuseau de l'application (ADR 003) : le calendrier de la présentation le reprend pour compter les mêmes jours. */
+export const FUSEAU = "Europe/Paris";
 const JOUR = 86_400_000;
 
 const formatCle = new Intl.DateTimeFormat("fr-FR", {

@@ -6,7 +6,7 @@ import nextTs from "eslint-config-next/typescript";
 // En config « flat », la dernière déclaration d'une règle qui s'applique à un fichier remplace les précédentes :
 // chaque couche reprend donc la liste complète de ses interdits.
 
-/** Clients de base de données : réservés à src/data. À compléter quand le pilote sera choisi. */
+/** Clients de base de données : réservés à src/data. Tout nouveau client de base s'ajoute ici. */
 const DB_CLIENTS = {
   group: ["@libsql/*", "better-sqlite3", "drizzle-orm", "drizzle-orm/*"],
   message: "Seule la couche données (src/data) parle à la base.",

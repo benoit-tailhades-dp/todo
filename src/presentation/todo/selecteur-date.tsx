@@ -6,7 +6,7 @@ import { fr } from "react-day-picker/locale";
 import { Button } from "@/presentation/ui/button";
 import { Calendar } from "@/presentation/ui/calendar";
 import { Popover, PopoverContent, PopoverDescription, PopoverTitle, PopoverTrigger } from "@/presentation/ui/popover";
-import { cleJour, instantDuJour } from "@/service/jours";
+import { cleJour, FUSEAU, instantDuJour } from "@/service/jours";
 
 /**
  * Bouton calendrier d'un TODO en cours : choisir un autre jour, passé ou futur, le range sous ce jour.
@@ -63,7 +63,7 @@ export function SelecteurDate({
             selected={selection}
             defaultMonth={selection}
             today={new Date(maintenant)}
-            timeZone="Europe/Paris"
+            timeZone={FUSEAU}
             locale={fr}
             onSelect={(date) => onChoisir(cleJour(date.getTime()))}
           />

@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "type": "stdio",
+      "command": "pnpm",
+      "args": ["--reporter=silent", "dlx", "@playwright/mcp@0.0.86", "--headless", "--isolated"]
+    }
+  }
+}

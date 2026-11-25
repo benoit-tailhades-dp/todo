@@ -23,11 +23,13 @@ Cette version a des changements cassants (voir `AGENTS.md`). Lire le guide conce
 
 ## Architecture : trois couches
 
-`INTENT.md` fixe le produit (un TODO pour une seule personne, sans authentification) et l'architecture. Chaque couche a ses règles dans `.claude/rules/`, chargées selon le chemin du fichier modifié. `eslint.config.mjs` les fait respecter par `no-restricted-imports`.
+`INTENT.md` fixe le produit (un TODO pour une seule personne, sans authentification) et l'architecture. Chaque couche a ses règles dans `.claude/rules/`, chargées selon le chemin du fichier modifié. `eslint.config.mjs` les fait respecter par `no-restricted-imports`, et le hook `.claude/hooks/lint-apres-modif.sh` lance ESLint après chaque modification d'un fichier `.ts`, `.tsx`, `.js`, `.jsx`, `.mjs` ou `.mts` : une erreur revient aussitôt à l'agent.
+
+Les décisions d'architecture sont dans `docs/decisions/` (ADR, skill `decision-context`). Les lire avant de proposer un choix d'architecture, de librairie ou de structure.
 
 - **Présentation** (`src/app/`, `src/presentation/`) : n'appelle que `@/service/...`, jamais `@/data`, jamais `process.env`. Aucune règle métier.
 - **Service** (`src/service/`) : porte les règles métier. Il reçoit le repository en paramètre (`createXService(repository)`) et n'importe ni React, ni Next, ni la présentation. Tests écrits avant le code, avec un faux repository écrit dans le test (pas de librairie de mock).
-- **Données** (`src/data/`) : seule couche qui parle à la base et lit les variables d'environnement (valeurs dans `.env.local`). Chaque module commence par `import "server-only"`, que `vitest.config.mts` neutralise en test. Pilote prévu : `@libsql/client`, avec un fichier SQLite en local et Turso en ligne. Passer à Turso ne doit modifier que `src/data/` et `package.json`. Ajouter le pilote à `DB_CLIENTS` dans `eslint.config.mjs`.
+- **Données** (`src/data/`) : seule couche qui parle à la base et lit les variables d'environnement (valeurs dans `.env.local`). Chaque module commence par `import "server-only"`, que `vitest.config.mts` neutralise en test. Pilote : `@libsql/client` (ADR 002), fichier SQLite en local (`file:local.db`) et Turso en ligne, configuré dans `src/data/connexion.ts`. Un changement de base ne modifie que `src/data/` et `package.json`. Tout nouveau client de base va dans `DB_CLIENTS` (`eslint.config.mjs`).
 
 Tests : environnement `node` par défaut. Un test de composant commence par `// @vitest-environment jsdom` (voir `src/presentation/todo/ecran-todo.test.tsx`).
 
@@ -43,10 +45,13 @@ Affiche suisse (style typographique international) : champ vermillon en aplat (`
 
 ## Maquette de référence
 
-La route `/maquette` (`src/presentation/maquette/`) a servi de référence visuelle aux lots 1 à 7. Elle n'a pas été refaite dans le monde Affiche (elle en hérite seulement les jetons) : pour le visuel, l'écran réel `/` fait foi. Données fictives, état local, pas de base. `?etat=` ouvre un état directement (`vide`, `tout-termine`, `chargement`, `erreur-chargement`, `titre-vide`, `introuvable`, `enregistrement`). Les règles qu'elle simule (titre obligatoire, espaces retirés, tri, groupement par jour) doivent vivre dans le service quand un lot les livre. Les jours se calculent à l'heure de Paris (`Europe/Paris`), voir `src/presentation/maquette/dates.ts`.
+La route `/maquette` (`src/presentation/maquette/`) a servi de référence visuelle aux lots 1 à 7. Elle n'a pas été refaite dans le monde Affiche (elle en hérite seulement les jetons) : pour le visuel, l'écran réel `/` fait foi. Données fictives, état local, pas de base. `?etat=` ouvre un état directement (`vide`, `tout-termine`, `chargement`, `erreur-chargement`, `titre-vide`, `introuvable`, `enregistrement`). Les règles qu'elle simule (titre obligatoire, espaces retirés, tri, groupement par jour) doivent vivre dans le service quand un lot les livre. Les jours se calculent à l'heure de Paris (ADR 003) : règle et constante `FUSEAU` dans `src/service/jours.ts`, copie propre à la maquette dans `src/presentation/maquette/dates.ts`.
 
 ## Façon de travailler
 
 - Le backlog est découpé en lots dans `lots.md`, avec une issue GitHub par lot. Un lot se traite avec le skill `/lot N` : plan validé, TDD, conformité à la maquette, PR de `dev` vers `main`.
 - Commits : `feat(lot-N): …`, `fix(lot-N): …`, `chore: …`, `docs: …`.
+- Captures de conformité (étape « Vérifier » du skill `lot`) : MCP Playwright (`.mcp.json`, sans fenêtre). Mobile : `browser_resize` à 390 px de large. Sombre : `browser_emulate_media` avec `colorScheme: "dark"`. Mouvement réduit : `reducedMotion: "reduce"`. Enregistrer avec `browser_take_screenshot` dans `docs/plan/captures/lot-N/`.
+- Avant `gh pr create`, le hook `.claude/hooks/verifier-avant-pr.sh` lance `pnpm lint`, `pnpm exec tsc --noEmit` et `pnpm test`, et bloque la PR si l'un échoue.
+- Skills du projet (`.claude/skills/`) : `lot` (traiter un lot), `backlog` (issues GitHub), `decision-context` (ADR).
 - Agents du projet (`.claude/agents/`) : `revue` (relecture d'une PR), `securite` (contrôle avant mise en production), `backlog` (demande en vrac vers issues GitHub).

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ageDuJour, cleJour, dateLongue, instantDuJour, precisionDuJour, titreDuJour, validerJour } from "./jours";
+import { ageDuJour, cleJour, dateLongue, FUSEAU, instantDuJour, precisionDuJour, titreDuJour, validerJour } from "./jours";
 
 // Instants absolus. En novembre, Paris est à UTC + 1.
 const JEUDI_19_23H30 = Date.UTC(2026, 10, 19, 22, 30);
@@ -10,6 +10,10 @@ const VENDREDI_20_23H30 = Date.UTC(2026, 10, 20, 22, 30);
 describe("jours (heure de Paris)", () => {
   it("les tests tournent en UTC, comme le serveur Vercel", () => {
     expect(new Date(VENDREDI_20_MIDI).getTimezoneOffset()).toBe(0);
+  });
+
+  it("expose le fuseau de l'application, pour que le calendrier compte les mêmes jours (ADR 003)", () => {
+    expect(FUSEAU).toBe("Europe/Paris");
   });
 
   it("range un instant sous son jour à Paris, pas sous son jour UTC", () => {

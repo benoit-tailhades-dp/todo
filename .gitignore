@@ -43,3 +43,7 @@ next-env.d.ts
 
 # sqlite local
 local.db*
+
+# claude code : réglages et instructions propres à chaque poste
+CLAUDE.local.md
+.claude/settings.local.json

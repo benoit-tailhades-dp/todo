@@ -18,7 +18,7 @@ Périmètre : `src/data/`.
 
 ## Comment vérifier
 
-1. `pnpm lint` : la règle `no-restricted-imports` bloque les clients de base (`DB_CLIENTS` dans `eslint.config.mjs`) partout hors de `src/data`. Compléter la liste quand le pilote sera choisi.
+1. `pnpm lint` : la règle `no-restricted-imports` bloque les clients de base (`DB_CLIENTS` dans `eslint.config.mjs`) partout hors de `src/data`. Tout nouveau client de base s'ajoute à cette liste.
 2. La base et sa configuration ne sont utilisées que dans `src/data` (la commande ne doit rien renvoyer) :
    ```bash
    grep -rnE "@libsql/|better-sqlite3|drizzle-orm|process\.env\.(DATABASE|TURSO)" src --include='*.ts' --include='*.tsx' | grep -v "^src/data/"
